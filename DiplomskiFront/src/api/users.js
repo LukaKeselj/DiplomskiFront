@@ -9,3 +9,8 @@ export async function setUserBlockedStatusRequest(id, isBlocked) {
   const { data } = await apiClient.patch(`/users/${id}/block`, { isBlocked })
   return data
 }
+
+export async function updateUserRequest(id, payload) {
+  const { data } = await apiClient.put(`/users/${id}`, payload)
+  return data
+}

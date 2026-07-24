@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react"
+import { Link, useLocation } from "react-router"
 
 import {
   Collapsible,
@@ -16,7 +17,10 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 
-export function NavMain({ items }) {
+export function NavMain({ items, onOpenAccount }) {
+  const location = useLocation()
+  const currentUrl = `${location.pathname}${location.search}`
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platforma</SidebarGroupLabel>
@@ -38,15 +42,23 @@ export function NavMain({ items }) {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
+                  {item.items?.map((subItem) =>
+                    subItem.action === "account" ? (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton onClick={onOpenAccount}>
                           <span>{subItem.title}</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ) : (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton asChild isActive={subItem.url === currentUrl}>
+                          <Link to={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    )
+                  )}
                 </SidebarMenuSub>
               </CollapsibleContent>
             </SidebarMenuItem>

@@ -4,3 +4,7 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
+
+export function getInitials(name, surname) {
+  return `${name?.[0] ?? ""}${surname?.[0] ?? ""}`.toUpperCase() || "?"
+}

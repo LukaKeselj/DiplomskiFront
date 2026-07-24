@@ -17,7 +17,28 @@ createRoot(document.getElementById('root')).render(
           <AuthProvider>
             <TooltipProvider>
               <App />
-              <Toaster position="top-center" />
+              <Toaster
+                position="top-center"
+                toastOptions={{
+                  style: {
+                    background: "var(--popover)",
+                    color: "var(--popover-foreground)",
+                    border: "1px solid var(--border)",
+                  },
+                  success: {
+                    iconTheme: {
+                      primary: "var(--primary)",
+                      secondary: "var(--popover)",
+                    },
+                  },
+                  error: {
+                    iconTheme: {
+                      primary: "var(--destructive)",
+                      secondary: "var(--popover)",
+                    },
+                  },
+                }}
+              />
             </TooltipProvider>
           </AuthProvider>
         </BrowserRouter>

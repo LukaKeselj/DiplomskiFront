@@ -1,3 +1,4 @@
+import { useState } from "react"
 import {
   Activity,
   Apple,
@@ -10,6 +11,7 @@ import {
   Users,
 } from "lucide-react"
 
+import { AccountSheet } from "@/components/account-sheet"
 import { NavMain } from "@/components/nav-main"
 import { NavRoutines } from "@/components/nav-routines"
 import { NavUser } from "@/components/nav-user"
@@ -81,7 +83,7 @@ const data = {
       icon: Settings2,
       items: [
         { title: "Profil", url: "#" },
-        { title: "Nalog", url: "#" },
+        { title: "Nalog", url: "#", action: "account" },
       ],
     },
   ],
@@ -108,15 +110,15 @@ const adminNavMain = [
     url: "#",
     icon: Users,
     items: [
-      { title: "Svi korisnici", url: "#" },
-      { title: "Blokirani korisnici", url: "#" },
+      { title: "Svi korisnici", url: "/" },
+      { title: "Blokirani korisnici", url: "/?usersView=blocked" },
     ],
   },
   {
     title: "Podešavanja",
     url: "#",
     icon: Settings2,
-    items: [{ title: "Nalog", url: "#" }],
+    items: [{ title: "Nalog", url: "#", action: "account" }],
   },
 ]
 
@@ -141,6 +143,7 @@ function AdminHeader() {
 export function AppSidebar({ ...props }) {
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
+  const [isAccountOpen, setIsAccountOpen] = useState(false)
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -148,13 +151,17 @@ export function AppSidebar({ ...props }) {
         {isAdmin ? <AdminHeader /> : <ProgramSwitcher programs={data.programs} />}
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={isAdmin ? adminNavMain : data.navMain} />
+        <NavMain
+          items={isAdmin ? adminNavMain : data.navMain}
+          onOpenAccount={() => setIsAccountOpen(true)}
+        />
         {!isAdmin && <NavRoutines routines={data.routines} />}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <NavUser onOpenAccount={() => setIsAccountOpen(true)} />
       </SidebarFooter>
       <SidebarRail />
+      <AccountSheet open={isAccountOpen} onOpenChange={setIsAccountOpen} />
     </Sidebar>
   )
 }

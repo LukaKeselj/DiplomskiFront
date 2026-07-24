@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useSearchParams } from "react-router"
 
 import { getAllUsersRequest, setUserBlockedStatusRequest } from "@/api/users"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -47,8 +48,12 @@ export default function Home() {
       .finally(() => setIsLoadingUsers(false))
   }, [isAdmin])
 
+  const [searchParams] = useSearchParams()
+  const usersView = searchParams.get("usersView") === "blocked" ? "blocked" : "all"
+
   const totalUsers = users.length
   const blockedUsers = users.filter((u) => u.isBlocked).length
+  const visibleUsers = usersView === "blocked" ? users.filter((u) => u.isBlocked) : users
 
   async function handleToggleBlock() {
     if (!selectedUser) return
@@ -83,7 +88,13 @@ export default function Home() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{isAdmin ? "Administracija" : "Pregled"}</BreadcrumbPage>
+                  <BreadcrumbPage>
+                    {isAdmin
+                      ? usersView === "blocked"
+                        ? "Blokirani korisnici"
+                        : "Svi korisnici"
+                      : "Pregled"}
+                  </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -126,13 +137,16 @@ export default function Home() {
           </div>
           {isAdmin ? (
             <div className="flex-1 rounded-xl bg-muted/50 p-4">
+              <h2 className="mb-3 text-sm font-medium text-muted-foreground">
+                {usersView === "blocked" ? "Blokirani korisnici" : "Svi korisnici"}
+              </h2>
               {isLoadingUsers ? (
                 <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
                   Učitavanje korisnika...
                 </div>
-              ) : users.length === 0 ? (
+              ) : visibleUsers.length === 0 ? (
                 <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
-                  Nema korisnika za prikaz
+                  {usersView === "blocked" ? "Nema blokiranih korisnika" : "Nema korisnika za prikaz"}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -147,7 +161,7 @@ export default function Home() {
                       </tr>
                     </thead>
                     <tbody>
-                      {users.map((u) => (
+                      {visibleUsers.map((u) => (
                         <tr
                           key={u._id}
                           onClick={() => setSelectedUser(u)}

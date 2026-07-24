@@ -25,9 +25,19 @@ export function AuthProvider({ children }) {
     setAuth(null)
   }
 
+  function updateUser(updatedUser) {
+    setAuth((prev) => (prev ? { ...prev, user: { ...prev.user, ...updatedUser } } : prev))
+  }
+
   return (
     <AuthContext.Provider
-      value={{ token: auth?.token ?? null, user: auth?.user ?? null, login, logout }}
+      value={{
+        token: auth?.token ?? null,
+        user: auth?.user ?? null,
+        login,
+        logout,
+        updateUser,
+      }}
     >
       {children}
     </AuthContext.Provider>
