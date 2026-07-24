@@ -1,39 +1,44 @@
 import { createContext, useContext, useEffect, useState } from "react"
+import { logoutRequest } from "@/api/auth"
 
 const AuthContext = createContext(null)
-const STORAGE_KEY = "auth"
+const STORAGE_KEY = "auth_user"
 
 export function AuthProvider({ children }) {
-  const [auth, setAuth] = useState(() => {
+  const [user, setUser] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
     return stored ? JSON.parse(stored) : null
   })
 
   useEffect(() => {
-    if (auth) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(auth))
+    if (user) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
     } else {
       localStorage.removeItem(STORAGE_KEY)
     }
-  }, [auth])
+  }, [user])
 
-  function login({ token, user }) {
-    setAuth({ token, user })
+  function login({ user: loggedInUser }) {
+    setUser(loggedInUser)
   }
 
-  function logout() {
-    setAuth(null)
+  async function logout() {
+    try {
+      await logoutRequest()
+    } catch {
+      // ignore network errors, clear local state regardless
+    }
+    setUser(null)
   }
 
   function updateUser(updatedUser) {
-    setAuth((prev) => (prev ? { ...prev, user: { ...prev.user, ...updatedUser } } : prev))
+    setUser((prev) => (prev ? { ...prev, ...updatedUser } : prev))
   }
 
   return (
     <AuthContext.Provider
       value={{
-        token: auth?.token ?? null,
-        user: auth?.user ?? null,
+        user,
         login,
         logout,
         updateUser,

@@ -11,7 +11,13 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { MUSCLE_GROUPS } from "@/lib/muscle-groups"
 
@@ -81,19 +87,19 @@ export function ExerciseForm({ exercise }) {
         <Field>
           <FieldLabel htmlFor="exercise-muscle-group">Mišićna grupa</FieldLabel>
           <Select
-            id="exercise-muscle-group"
             value={form.muscleGroup}
-            onChange={handleChange("muscleGroup")}
-            required
+            onValueChange={(value) => setForm((prev) => ({ ...prev, muscleGroup: value }))}
           >
-            <option value="" disabled>
-              Izaberi mišićnu grupu
-            </option>
-            {MUSCLE_GROUPS.map((group) => (
-              <option key={group.value} value={group.value}>
-                {group.label}
-              </option>
-            ))}
+            <SelectTrigger id="exercise-muscle-group">
+              <SelectValue placeholder="Izaberi mišićnu grupu" />
+            </SelectTrigger>
+            <SelectContent>
+              {MUSCLE_GROUPS.map((group) => (
+                <SelectItem key={group.value} value={group.value}>
+                  {group.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </Field>
         <Field>

@@ -13,7 +13,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Select } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useAuth } from "@/context/AuthContext"
 import { MUSCLE_GROUPS } from "@/lib/muscle-groups"
 import { getYoutubeEmbedUrl, getYoutubeThumbnailUrl } from "@/lib/youtube"
@@ -108,17 +114,18 @@ export default function Exercises() {
   return (
     <AppLayout breadcrumb="Vežbe">
       <div className="flex items-center justify-between gap-4">
-        <Select
-          className="w-56"
-          value={muscleGroupFilter}
-          onChange={(event) => setMuscleGroupFilter(event.target.value)}
-        >
-          <option value="all">Sve mišićne grupe</option>
-          {MUSCLE_GROUPS.map((group) => (
-            <option key={group.value} value={group.value}>
-              {group.label}
-            </option>
-          ))}
+        <Select value={muscleGroupFilter} onValueChange={setMuscleGroupFilter}>
+          <SelectTrigger className="w-56">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Sve mišićne grupe</SelectItem>
+            {MUSCLE_GROUPS.map((group) => (
+              <SelectItem key={group.value} value={group.value}>
+                {group.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
         {isAdmin && (
           <Button asChild>

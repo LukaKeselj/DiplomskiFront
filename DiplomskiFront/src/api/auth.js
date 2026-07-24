@@ -33,3 +33,13 @@ export async function resetPasswordRequest(token, password) {
   const { data } = await apiClient.post("/auth/reset-password", { token, password })
   return data
 }
+
+export async function logoutRequest() {
+  const { data } = await apiClient.post("/auth/logout")
+  return data
+}
+
+export async function meRequest() {
+  const { data } = await apiClient.get("/auth/me")
+  return data
+}
