@@ -5,6 +5,9 @@ import ForgotPassword from "@/pages/ForgotPassword"
 import ResetPassword from "@/pages/ResetPassword"
 import CompleteProfile from "@/pages/CompleteProfile"
 import Home from "@/pages/Home"
+import Exercises from "@/pages/Exercises"
+import ExerciseDetail from "@/pages/ExerciseDetail"
+import ExerciseFormPage from "@/pages/ExerciseFormPage"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
 
 export function AppRoutes() {
@@ -20,6 +23,38 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercises"
+        element={
+          <ProtectedRoute>
+            <Exercises />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercises/new"
+        element={
+          <ProtectedRoute adminOnly>
+            <ExerciseFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercises/:id"
+        element={
+          <ProtectedRoute>
+            <ExerciseDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercises/:id/edit"
+        element={
+          <ProtectedRoute adminOnly>
+            <ExerciseFormPage />
           </ProtectedRoute>
         }
       />

@@ -3,15 +3,8 @@ import toast from "react-hot-toast"
 import { useSearchParams } from "react-router"
 
 import { getAllUsersRequest, setUserBlockedStatusRequest } from "@/api/users"
-import { AppSidebar } from "@/components/app-sidebar"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb"
+import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
   SheetContent,
@@ -20,12 +13,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { useAuth } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
 
@@ -74,129 +61,107 @@ export default function Home() {
     }
   }
 
+  const breadcrumb = isAdmin
+    ? usersView === "blocked"
+      ? "Blokirani korisnici"
+      : "Svi korisnici"
+    : "Pregled"
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbPage>
-                    {isAdmin
-                      ? usersView === "blocked"
-                        ? "Blokirani korisnici"
-                        : "Svi korisnici"
-                      : "Pregled"}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-          <ThemeToggle className="mr-4" />
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            {isAdmin ? (
-              <>
-                <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-                  <span className="text-sm text-muted-foreground">Ukupno korisnika</span>
-                  <span className="text-2xl font-semibold">{isLoadingUsers ? "—" : totalUsers}</span>
-                </div>
-                <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-                  <span className="text-sm text-muted-foreground">Blokirani korisnici</span>
-                  <span className="text-2xl font-semibold">{isLoadingUsers ? "—" : blockedUsers}</span>
-                </div>
-                <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-                  <span className="text-sm text-muted-foreground">Vežbe u bazi</span>
-                  <span className="text-2xl font-semibold">—</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-                  <span className="text-sm text-muted-foreground">Treninzi ovog meseca</span>
-                  <span className="text-2xl font-semibold">—</span>
-                </div>
-                <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-                  <span className="text-sm text-muted-foreground">Aktivan program</span>
-                  <span className="text-2xl font-semibold">Push Pull Legs</span>
-                </div>
-                <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-                  <span className="text-sm text-muted-foreground">Trenutna serija</span>
-                  <span className="text-2xl font-semibold">—</span>
-                </div>
-              </>
-            )}
-          </div>
-          {isAdmin ? (
-            <div className="flex-1 rounded-xl bg-muted/50 p-4">
-              <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-                {usersView === "blocked" ? "Blokirani korisnici" : "Svi korisnici"}
-              </h2>
-              {isLoadingUsers ? (
-                <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
-                  Učitavanje korisnika...
-                </div>
-              ) : visibleUsers.length === 0 ? (
-                <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
-                  {usersView === "blocked" ? "Nema blokiranih korisnika" : "Nema korisnika za prikaz"}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b text-left text-muted-foreground">
-                        <th className="pb-2 pr-4 font-medium">Ime i prezime</th>
-                        <th className="pb-2 pr-4 font-medium">Korisničko ime</th>
-                        <th className="pb-2 pr-4 font-medium">Email</th>
-                        <th className="pb-2 pr-4 font-medium">Uloga</th>
-                        <th className="pb-2 font-medium">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {visibleUsers.map((u) => (
-                        <tr
-                          key={u._id}
-                          onClick={() => setSelectedUser(u)}
-                          className="cursor-pointer border-b transition-colors last:border-0 hover:bg-muted"
-                        >
-                          <td className="py-2 pr-4">{`${u.name} ${u.surname}`}</td>
-                          <td className="py-2 pr-4">{u.username}</td>
-                          <td className="py-2 pr-4">{u.email}</td>
-                          <td className="py-2 pr-4 capitalize">{u.role}</td>
-                          <td className="py-2">
-                            <span
-                              className={cn(
-                                "rounded-full px-2 py-0.5 text-xs font-medium",
-                                u.isBlocked
-                                  ? "bg-destructive/10 text-destructive"
-                                  : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                              )}
-                            >
-                              {u.isBlocked ? "Blokiran" : "Aktivan"}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+    <AppLayout breadcrumb={breadcrumb}>
+      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+        {isAdmin ? (
+          <>
+            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
+              <span className="text-sm text-muted-foreground">Ukupno korisnika</span>
+              <span className="text-2xl font-semibold">{isLoadingUsers ? "—" : totalUsers}</span>
+            </div>
+            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
+              <span className="text-sm text-muted-foreground">Blokirani korisnici</span>
+              <span className="text-2xl font-semibold">{isLoadingUsers ? "—" : blockedUsers}</span>
+            </div>
+            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
+              <span className="text-sm text-muted-foreground">Vežbe u bazi</span>
+              <span className="text-2xl font-semibold">—</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
+              <span className="text-sm text-muted-foreground">Treninzi ovog meseca</span>
+              <span className="text-2xl font-semibold">—</span>
+            </div>
+            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
+              <span className="text-sm text-muted-foreground">Aktivan program</span>
+              <span className="text-2xl font-semibold">Push Pull Legs</span>
+            </div>
+            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
+              <span className="text-sm text-muted-foreground">Trenutna serija</span>
+              <span className="text-2xl font-semibold">—</span>
+            </div>
+          </>
+        )}
+      </div>
+      {isAdmin ? (
+        <div className="flex-1 rounded-xl bg-muted/50 p-4">
+          <h2 className="mb-3 text-sm font-medium text-muted-foreground">
+            {usersView === "blocked" ? "Blokirani korisnici" : "Svi korisnici"}
+          </h2>
+          {isLoadingUsers ? (
+            <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
+              Učitavanje korisnika...
+            </div>
+          ) : visibleUsers.length === 0 ? (
+            <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
+              {usersView === "blocked" ? "Nema blokiranih korisnika" : "Nema korisnika za prikaz"}
             </div>
           ) : (
-            <div className="flex min-h-[100vh] flex-1 items-center justify-center rounded-xl bg-muted/50 text-sm text-muted-foreground md:min-h-min">
-              Istorija treninga će se prikazivati ovde
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-muted-foreground">
+                    <th className="pb-2 pr-4 font-medium">Ime i prezime</th>
+                    <th className="pb-2 pr-4 font-medium">Korisničko ime</th>
+                    <th className="pb-2 pr-4 font-medium">Email</th>
+                    <th className="pb-2 pr-4 font-medium">Uloga</th>
+                    <th className="pb-2 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleUsers.map((u) => (
+                    <tr
+                      key={u._id}
+                      onClick={() => setSelectedUser(u)}
+                      className="cursor-pointer border-b transition-colors last:border-0 hover:bg-muted"
+                    >
+                      <td className="py-2 pr-4">{`${u.name} ${u.surname}`}</td>
+                      <td className="py-2 pr-4">{u.username}</td>
+                      <td className="py-2 pr-4">{u.email}</td>
+                      <td className="py-2 pr-4 capitalize">{u.role}</td>
+                      <td className="py-2">
+                        <span
+                          className={cn(
+                            "rounded-full px-2 py-0.5 text-xs font-medium",
+                            u.isBlocked
+                              ? "bg-destructive/10 text-destructive"
+                              : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          )}
+                        >
+                          {u.isBlocked ? "Blokiran" : "Aktivan"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
-      </SidebarInset>
+      ) : (
+        <div className="flex min-h-[100vh] flex-1 items-center justify-center rounded-xl bg-muted/50 text-sm text-muted-foreground md:min-h-min">
+          Istorija treninga će se prikazivati ovde
+        </div>
+      )}
       {isAdmin && (
         <Sheet open={!!selectedUser} onOpenChange={(open) => !open && setSelectedUser(null)}>
           <SheetContent>
@@ -251,6 +216,6 @@ export default function Home() {
           </SheetContent>
         </Sheet>
       )}
-    </SidebarProvider>
+    </AppLayout>
   )
 }

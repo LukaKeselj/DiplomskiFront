@@ -59,6 +59,12 @@ const data = {
       ],
     },
     {
+      title: "Vežbe",
+      url: "#",
+      icon: Dumbbell,
+      items: [{ title: "Sve vežbe", url: "/exercises" }],
+    },
+    {
       title: "Napredak",
       url: "#",
       icon: TrendingUp,
@@ -101,8 +107,8 @@ const adminNavMain = [
     icon: Dumbbell,
     isActive: true,
     items: [
-      { title: "Sve vežbe", url: "#" },
-      { title: "Dodaj vežbu", url: "#" },
+      { title: "Sve vežbe", url: "/exercises" },
+      { title: "Dodaj vežbu", url: "/exercises/new" },
     ],
   },
   {
