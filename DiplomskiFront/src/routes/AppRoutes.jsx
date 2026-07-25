@@ -10,7 +10,13 @@ import ExerciseDetail from "@/pages/ExerciseDetail"
 import ExerciseFormPage from "@/pages/ExerciseFormPage"
 import WorkoutPlans from "@/pages/WorkoutPlans"
 import WorkoutPlanDetail from "@/pages/WorkoutPlanDetail"
+import WorkoutPlanDayDetail from "@/pages/WorkoutPlanDayDetail"
 import WorkoutPlanFormPage from "@/pages/WorkoutPlanFormPage"
+import Supplements from "@/pages/Supplements"
+import SupplementFormPage from "@/pages/SupplementFormPage"
+import MySupplements from "@/pages/MySupplements"
+import UserSupplementFormPage from "@/pages/UserSupplementFormPage"
+import NearbyGyms from "@/pages/NearbyGyms"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
 
 export function AppRoutes() {
@@ -90,6 +96,70 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <WorkoutPlanFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workout-plans/:id/days/:dayId"
+        element={
+          <ProtectedRoute>
+            <WorkoutPlanDayDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/supplements"
+        element={
+          <ProtectedRoute>
+            <Supplements />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/supplements/new"
+        element={
+          <ProtectedRoute adminOnly>
+            <SupplementFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/supplements/:id/edit"
+        element={
+          <ProtectedRoute adminOnly>
+            <SupplementFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-supplements"
+        element={
+          <ProtectedRoute>
+            <MySupplements />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-supplements/new"
+        element={
+          <ProtectedRoute>
+            <UserSupplementFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-supplements/:id/edit"
+        element={
+          <ProtectedRoute>
+            <UserSupplementFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/nearby-gyms"
+        element={
+          <ProtectedRoute>
+            <NearbyGyms />
           </ProtectedRoute>
         }
       />

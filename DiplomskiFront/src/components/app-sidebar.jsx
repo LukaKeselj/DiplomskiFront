@@ -5,6 +5,8 @@ import {
   Dumbbell,
   Flame,
   Footprints,
+  MapPin,
+  Pill,
   Settings2,
   ShieldCheck,
   TrendingUp,
@@ -85,6 +87,21 @@ const data = {
       ],
     },
     {
+      title: "Suplementi",
+      url: "#",
+      icon: Pill,
+      items: [
+        { title: "Katalog", url: "/supplements" },
+        { title: "Moj režim", url: "/my-supplements" },
+      ],
+    },
+    {
+      title: "Teretane",
+      url: "#",
+      icon: MapPin,
+      items: [{ title: "U okolini", url: "/nearby-gyms" }],
+    },
+    {
       title: "Podešavanja",
       url: "#",
       icon: Settings2,
@@ -118,6 +135,22 @@ const adminNavMain = [
       { title: "Sve vežbe", url: "/exercises" },
       { title: "Dodaj vežbu", url: "/exercises/new" },
     ],
+  },
+  {
+    title: "Suplementi",
+    url: "#",
+    icon: Pill,
+    items: [
+      { title: "Katalog", url: "/supplements" },
+      { title: "Dodaj suplement", url: "/supplements/new" },
+      { title: "Moj režim", url: "/my-supplements" },
+    ],
+  },
+  {
+    title: "Teretane",
+    url: "#",
+    icon: MapPin,
+    items: [{ title: "U okolini", url: "/nearby-gyms" }],
   },
   {
     title: "Korisnici",

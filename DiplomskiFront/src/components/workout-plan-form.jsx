@@ -24,7 +24,7 @@ function nextUid() {
 }
 
 function emptyExercise() {
-  return { uid: nextUid(), exercise: "", targetSets: "", targetReps: "" }
+  return { uid: nextUid(), exercise: "", targetSets: "", targetReps: "", restMinutes: "" }
 }
 
 function emptyDay() {
@@ -43,6 +43,7 @@ function daysFromPlan(plan) {
           exercise: exercise.exercise ?? "",
           targetSets: exercise.targetSets ?? "",
           targetReps: exercise.targetReps ?? "",
+          restMinutes: exercise.restMinutes ?? "",
         }))
       : [emptyExercise()],
   }))
@@ -129,11 +130,17 @@ export function WorkoutPlanForm({ plan }) {
       name: name.trim(),
       days: days.map((day) => ({
         dayName: day.dayName.trim(),
-        exercises: day.exercises.map((exercise) => ({
-          exercise: exercise.exercise,
-          targetSets: Number(exercise.targetSets) || 0,
-          targetReps: Number(exercise.targetReps) || 0,
-        })),
+        exercises: day.exercises.map((exercise) => {
+          const exercisePayload = {
+            exercise: exercise.exercise,
+            targetSets: Number(exercise.targetSets) || 0,
+            targetReps: Number(exercise.targetReps) || 0,
+          }
+          if (exercise.restMinutes !== "") {
+            exercisePayload.restMinutes = Number(exercise.restMinutes) || 0
+          }
+          return exercisePayload
+        }),
       })),
     }
 
@@ -245,6 +252,23 @@ export function WorkoutPlanForm({ plan }) {
                           dayIndex,
                           exerciseIndex,
                           "targetReps",
+                          event.target.value
+                        )
+                      }
+                    />
+                  </Field>
+                  <Field className="w-full sm:w-24">
+                    <FieldLabel htmlFor={`rest-${exercise.uid}`}>Odmor (min)</FieldLabel>
+                    <Input
+                      id={`rest-${exercise.uid}`}
+                      type="number"
+                      min={0}
+                      value={exercise.restMinutes}
+                      onChange={(event) =>
+                        handleExerciseFieldChange(
+                          dayIndex,
+                          exerciseIndex,
+                          "restMinutes",
                           event.target.value
                         )
                       }

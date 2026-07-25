@@ -1,15 +1,24 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
-import { Pencil, Trash2 } from "lucide-react"
+import { ChevronRight, Pencil, Trash2 } from "lucide-react"
 
 import { deleteWorkoutPlanRequest, getWorkoutPlanRequest } from "@/api/workoutPlans"
-import { getExercisesRequest } from "@/api/exercises"
 import { AppLayout } from "@/components/app-layout"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Card,
-  CardContent,
+  CardAction,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -19,16 +28,13 @@ export default function WorkoutPlanDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [plan, setPlan] = useState(null)
-  const [exercises, setExercises] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   useEffect(() => {
-    Promise.all([getWorkoutPlanRequest(id), getExercisesRequest()])
-      .then(([planData, exercisesData]) => {
-        setPlan(planData)
-        setExercises(exercisesData)
-      })
+    getWorkoutPlanRequest(id)
+      .then(setPlan)
       .catch((error) => {
         if (error.response?.status === 403) {
           toast.error("Nemaš pristup ovom planu")
@@ -40,15 +46,7 @@ export default function WorkoutPlanDetail() {
       .finally(() => setIsLoading(false))
   }, [id, navigate])
 
-  const exerciseById = useMemo(() => {
-    const map = new Map()
-    exercises.forEach((exercise) => map.set(exercise._id, exercise))
-    return map
-  }, [exercises])
-
   async function handleDelete() {
-    if (!window.confirm(`Obrisati plan "${plan.name}"?`)) return
-
     setIsDeleting(true)
     try {
       await deleteWorkoutPlanRequest(id)
@@ -79,7 +77,11 @@ export default function WorkoutPlanDetail() {
                   Izmeni
                 </Link>
               </Button>
-              <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              <Button
+                variant="destructive"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                disabled={isDeleting}
+              >
                 <Trash2 />
                 {isDeleting ? "Brisanje..." : "Obriši"}
               </Button>
@@ -87,39 +89,19 @@ export default function WorkoutPlanDetail() {
           </div>
 
           {plan.days.map((day) => (
-            <Card key={day._id}>
-              <CardHeader>
-                <CardTitle>{day.dayName}</CardTitle>
-                <CardDescription>
-                  {day.exercises.length} {day.exercises.length === 1 ? "vežba" : "vežbi"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2">
-                {day.exercises.map((item) => {
-                  const exercise = exerciseById.get(item.exercise)
-                  return (
-                    <div
-                      key={item._id}
-                      className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2"
-                    >
-                      <div>
-                        <p className="text-sm font-medium">
-                          {exercise?.name ?? "Nepoznata vežba"}
-                        </p>
-                        {exercise?.muscleGroup && (
-                          <p className="text-xs text-muted-foreground capitalize">
-                            {exercise.muscleGroup}
-                          </p>
-                        )}
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        {item.targetSets} x {item.targetReps}
-                      </span>
-                    </div>
-                  )
-                })}
-              </CardContent>
-            </Card>
+            <Link key={day._id} to={`/workout-plans/${plan._id}/days/${day._id}`}>
+              <Card className="transition-colors hover:bg-muted/50">
+                <CardHeader>
+                  <CardTitle>{day.dayName}</CardTitle>
+                  <CardDescription>
+                    {day.exercises.length} {day.exercises.length === 1 ? "vežba" : "vežbi"}
+                  </CardDescription>
+                  <CardAction>
+                    <ChevronRight className="size-4 text-muted-foreground" />
+                  </CardAction>
+                </CardHeader>
+              </Card>
+            </Link>
           ))}
 
           <Button variant="outline" onClick={() => navigate("/workout-plans")}>
@@ -127,6 +109,23 @@ export default function WorkoutPlanDetail() {
           </Button>
         </div>
       ) : null}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Obrisati plan?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Da li si siguran da želiš da obrišeš plan &quot;{plan?.name}&quot;? Ova akcija se ne
+              može poništiti.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>
+              Obriši
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   )
 }

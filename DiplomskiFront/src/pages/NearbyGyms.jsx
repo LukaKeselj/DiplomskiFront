@@ -1,0 +1,211 @@
+import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
+import {
+  APIProvider,
+  AdvancedMarker,
+  InfoWindow,
+  Map,
+  Pin,
+  useMap,
+  useMapsLibrary,
+} from "@vis.gl/react-google-maps"
+
+import { AppLayout } from "@/components/app-layout"
+import { Button } from "@/components/ui/button"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
+
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+const SEARCH_RADIUS_METERS = 5000
+
+function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId, setSelectedGymId }) {
+  const map = useMap()
+  const placesLib = useMapsLibrary("places")
+
+  useEffect(() => {
+    if (!placesLib || !userLocation) return
+
+    let cancelled = false
+    setIsSearching(true)
+
+    placesLib.Place.searchNearby({
+      fields: ["id", "displayName", "location", "formattedAddress", "rating"],
+      locationRestriction: {
+        center: userLocation,
+        radius: SEARCH_RADIUS_METERS,
+      },
+      includedPrimaryTypes: ["gym"],
+      maxResultCount: 20,
+      rankPreference: placesLib.SearchNearbyRankPreference.DISTANCE,
+      language: "sr",
+    })
+      .then(({ places }) => {
+        if (!cancelled) setGyms(places ?? [])
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error(error)
+          toast.error("Neuspešno učitavanje teretana u okolini")
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsSearching(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [placesLib, userLocation, setGyms, setIsSearching])
+
+  const selectedGym = gyms.find((gym) => gym.id === selectedGymId) ?? null
+
+  useEffect(() => {
+    if (selectedGym && map) {
+      map.panTo({ lat: selectedGym.location.lat(), lng: selectedGym.location.lng() })
+    }
+  }, [selectedGym, map])
+
+  return (
+    <>
+      <AdvancedMarker position={userLocation}>
+        <Pin background="#2563eb" borderColor="#1d4ed8" glyphColor="#ffffff" />
+      </AdvancedMarker>
+      {gyms.map((gym) => (
+        <AdvancedMarker
+          key={gym.id}
+          position={{ lat: gym.location.lat(), lng: gym.location.lng() }}
+          onClick={() => setSelectedGymId(gym.id)}
+        />
+      ))}
+      {selectedGym && (
+        <InfoWindow
+          position={{ lat: selectedGym.location.lat(), lng: selectedGym.location.lng() }}
+          onCloseClick={() => setSelectedGymId(null)}
+        >
+          <div className="text-sm text-gray-900">
+            <p className="font-medium">{selectedGym.displayName}</p>
+            {selectedGym.formattedAddress && (
+              <p className="text-gray-600">{selectedGym.formattedAddress}</p>
+            )}
+          </div>
+        </InfoWindow>
+      )}
+    </>
+  )
+}
+
+function NearbyGymsView({ userLocation }) {
+  const [gyms, setGyms] = useState([])
+  const [isSearching, setIsSearching] = useState(true)
+  const [selectedGymId, setSelectedGymId] = useState(null)
+
+  return (
+    <div className="grid flex-1 gap-4 lg:grid-cols-[2fr_1fr]">
+      <div className="h-[70vh] overflow-hidden rounded-xl border">
+        <Map
+          defaultCenter={userLocation}
+          defaultZoom={14}
+          mapId="DEMO_MAP_ID"
+          gestureHandling="greedy"
+          disableDefaultUI={false}
+        >
+          <GymMarkers
+            userLocation={userLocation}
+            gyms={gyms}
+            setGyms={setGyms}
+            setIsSearching={setIsSearching}
+            selectedGymId={selectedGymId}
+            setSelectedGymId={setSelectedGymId}
+          />
+        </Map>
+      </div>
+      <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto">
+        {isSearching ? (
+          <p className="text-sm text-muted-foreground">Tražimo teretane...</p>
+        ) : gyms.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Nema teretana u okolini ({SEARCH_RADIUS_METERS / 1000} km)
+          </p>
+        ) : (
+          gyms.map((gym) => (
+            <Card
+              key={gym.id}
+              className={cn(
+                "cursor-pointer transition-colors hover:bg-muted/50",
+                selectedGymId === gym.id && "bg-muted/50"
+              )}
+              onClick={() => setSelectedGymId(gym.id)}
+            >
+              <CardHeader>
+                <CardTitle className="text-sm">{gym.displayName}</CardTitle>
+                {gym.formattedAddress && (
+                  <CardDescription>{gym.formattedAddress}</CardDescription>
+                )}
+              </CardHeader>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
+function isGeolocationSupported() {
+  return typeof navigator !== "undefined" && "geolocation" in navigator
+}
+
+export default function NearbyGyms() {
+  const [status, setStatus] = useState(() => (isGeolocationSupported() ? "loading" : "unsupported"))
+  const [userLocation, setUserLocation] = useState(null)
+  const [requestId, setRequestId] = useState(0)
+
+  useEffect(() => {
+    if (!isGeolocationSupported()) return
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+        setStatus("granted")
+      },
+      () => {
+        setStatus("denied")
+        toast.error("Nismo mogli da pristupimo tvojoj lokaciji")
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }, [requestId])
+
+  function handleRetry() {
+    setStatus("loading")
+    setRequestId((id) => id + 1)
+  }
+
+  return (
+    <AppLayout breadcrumb="Teretane u okolini">
+      {!GOOGLE_MAPS_API_KEY ? (
+        <p className="text-sm text-muted-foreground">
+          Google Maps API ključ nije podešen (VITE_GOOGLE_MAPS_API_KEY).
+        </p>
+      ) : status === "unsupported" ? (
+        <p className="text-sm text-muted-foreground">Tvoj pregledač ne podržava geolokaciju.</p>
+      ) : status === "loading" ? (
+        <p className="text-sm text-muted-foreground">Tražimo tvoju lokaciju...</p>
+      ) : status === "denied" ? (
+        <div className="flex flex-col items-start gap-3">
+          <p className="text-sm text-muted-foreground">
+            Nismo mogli da pristupimo tvojoj lokaciji. Proveri dozvole u pregledaču i pokušaj
+            ponovo.
+          </p>
+          <Button onClick={handleRetry}>Pokušaj ponovo</Button>
+        </div>
+      ) : (
+        <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={["places", "marker"]}>
+          <NearbyGymsView userLocation={userLocation} />
+        </APIProvider>
+      )}
+    </AppLayout>
+  )
+}

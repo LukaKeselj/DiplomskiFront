@@ -5,6 +5,16 @@ import { Pencil, Trash2 } from "lucide-react"
 
 import { deleteExerciseRequest, getExerciseRequest } from "@/api/exercises"
 import { AppLayout } from "@/components/app-layout"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -24,6 +34,7 @@ export default function ExerciseDetail() {
   const [exercise, setExercise] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   useEffect(() => {
     getExerciseRequest(id)
@@ -36,8 +47,6 @@ export default function ExerciseDetail() {
   }, [id, navigate])
 
   async function handleDelete() {
-    if (!window.confirm(`Obrisati vežbu "${exercise.name}"?`)) return
-
     setIsDeleting(true)
     try {
       await deleteExerciseRequest(id)
@@ -94,7 +103,11 @@ export default function ExerciseDetail() {
                     Izmeni
                   </Link>
                 </Button>
-                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+                <Button
+                  variant="destructive"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  disabled={isDeleting}
+                >
                   <Trash2 />
                   {isDeleting ? "Brisanje..." : "Obriši"}
                 </Button>
@@ -103,6 +116,23 @@ export default function ExerciseDetail() {
           </div>
         </div>
       ) : null}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Obrisati vežbu?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Da li si siguran da želiš da obrišeš vežbu &quot;{exercise?.name}&quot;? Ova akcija
+              se ne može poništiti.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>
+              Obriši
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   )
 }
