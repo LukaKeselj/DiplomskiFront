@@ -3,6 +3,7 @@ import toast from "react-hot-toast"
 import { useSearchParams } from "react-router"
 
 import { getAllUsersRequest, setUserBlockedStatusRequest } from "@/api/users"
+import { getExercisesRequest } from "@/api/exercises"
 import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,6 +22,8 @@ export default function Home() {
   const isAdmin = user?.role === "admin"
   const [users, setUsers] = useState([])
   const [isLoadingUsers, setIsLoadingUsers] = useState(true)
+  const [exerciseCount, setExerciseCount] = useState(0)
+  const [isLoadingExercises, setIsLoadingExercises] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
   const [isTogglingBlock, setIsTogglingBlock] = useState(false)
 
@@ -33,6 +36,13 @@ export default function Home() {
         toast.error(error.response?.data?.message || "Neuspešno učitavanje korisnika")
       })
       .finally(() => setIsLoadingUsers(false))
+
+    getExercisesRequest()
+      .then((exercises) => setExerciseCount(exercises.length))
+      .catch((error) => {
+        toast.error(error.response?.data?.message || "Neuspešno učitavanje vežbi")
+      })
+      .finally(() => setIsLoadingExercises(false))
   }, [isAdmin])
 
   const [searchParams] = useSearchParams()
@@ -82,7 +92,9 @@ export default function Home() {
             </div>
             <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
               <span className="text-sm text-muted-foreground">Vežbe u bazi</span>
-              <span className="text-2xl font-semibold">—</span>
+              <span className="text-2xl font-semibold">
+                {isLoadingExercises ? "—" : exerciseCount}
+              </span>
             </div>
           </>
         ) : (

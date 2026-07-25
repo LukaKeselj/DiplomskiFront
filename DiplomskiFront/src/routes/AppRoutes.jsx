@@ -8,6 +8,9 @@ import Home from "@/pages/Home"
 import Exercises from "@/pages/Exercises"
 import ExerciseDetail from "@/pages/ExerciseDetail"
 import ExerciseFormPage from "@/pages/ExerciseFormPage"
+import WorkoutPlans from "@/pages/WorkoutPlans"
+import WorkoutPlanDetail from "@/pages/WorkoutPlanDetail"
+import WorkoutPlanFormPage from "@/pages/WorkoutPlanFormPage"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
 
 export function AppRoutes() {
@@ -55,6 +58,38 @@ export function AppRoutes() {
         element={
           <ProtectedRoute adminOnly>
             <ExerciseFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workout-plans"
+        element={
+          <ProtectedRoute>
+            <WorkoutPlans />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workout-plans/new"
+        element={
+          <ProtectedRoute>
+            <WorkoutPlanFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workout-plans/:id"
+        element={
+          <ProtectedRoute>
+            <WorkoutPlanDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workout-plans/:id/edit"
+        element={
+          <ProtectedRoute>
+            <WorkoutPlanFormPage />
           </ProtectedRoute>
         }
       />

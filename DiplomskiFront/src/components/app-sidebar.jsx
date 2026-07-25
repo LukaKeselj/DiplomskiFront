@@ -53,6 +53,7 @@ const data = {
       icon: Dumbbell,
       isActive: true,
       items: [
+        { title: "Planovi treninga", url: "/workout-plans" },
         { title: "Istorija", url: "#" },
         { title: "Šabloni", url: "#" },
         { title: "Novi trening", url: "#" },
@@ -101,6 +102,13 @@ const data = {
 }
 
 const adminNavMain = [
+  {
+    title: "Treninzi",
+    url: "#",
+    icon: Dumbbell,
+    isActive: true,
+    items: [{ title: "Planovi treninga", url: "/workout-plans" }],
+  },
   {
     title: "Vežbe",
     url: "#",
