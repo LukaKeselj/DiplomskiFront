@@ -43,3 +43,8 @@ export async function meRequest() {
   const { data } = await apiClient.get("/auth/me")
   return data
 }
+
+export async function refreshRequest() {
+  const { data } = await apiClient.post("/auth/refresh")
+  return data
+}
