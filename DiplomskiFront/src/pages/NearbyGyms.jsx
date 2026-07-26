@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { Accessibility, SquareArrowOutUpRight } from "lucide-react"
 import {
   APIProvider,
   AdvancedMarker,
@@ -18,6 +19,11 @@ import { cn } from "@/lib/utils"
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const SEARCH_RADIUS_METERS = 5000
 
+function googleMapsPlaceUrl(gym) {
+  const query = encodeURIComponent(gym.displayName ?? gym.formattedAddress ?? "")
+  return `https://www.google.com/maps/search/?api=1&query=${query}&query_place_id=${gym.id}`
+}
+
 function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId, setSelectedGymId }) {
   const map = useMap()
   const placesLib = useMapsLibrary("places")
@@ -29,7 +35,14 @@ function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId
     setIsSearching(true)
 
     placesLib.Place.searchNearby({
-      fields: ["id", "displayName", "location", "formattedAddress", "rating"],
+      fields: [
+        "id",
+        "displayName",
+        "location",
+        "formattedAddress",
+        "rating",
+        "accessibilityOptions",
+      ],
       locationRestriction: {
         center: userLocation,
         radius: SEARCH_RADIUS_METERS,
@@ -82,10 +95,31 @@ function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId
           position={{ lat: selectedGym.location.lat(), lng: selectedGym.location.lng() }}
           onCloseClick={() => setSelectedGymId(null)}
         >
-          <div className="text-sm text-gray-900">
-            <p className="font-medium">{selectedGym.displayName}</p>
+          <div className="w-60 pr-0.5">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm leading-snug font-medium text-gray-900">
+                {selectedGym.displayName}
+              </p>
+              <a
+                href={googleMapsPlaceUrl(selectedGym)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Otvori u Google Maps"
+                className="flex size-6 shrink-0 items-center justify-center rounded-md bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
+              >
+                <SquareArrowOutUpRight className="size-3.5" />
+              </a>
+            </div>
             {selectedGym.formattedAddress && (
-              <p className="text-gray-600">{selectedGym.formattedAddress}</p>
+              <p className="mt-1 text-xs leading-snug text-gray-600">
+                {selectedGym.formattedAddress}
+              </p>
+            )}
+            {selectedGym.accessibilityOptions?.wheelchairAccessibleEntrance && (
+              <p className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-600">
+                <Accessibility className="size-3.5" />
+                Pristupačan ulaz
+              </p>
             )}
           </div>
         </InfoWindow>
@@ -108,6 +142,7 @@ function NearbyGymsView({ userLocation }) {
           mapId="DEMO_MAP_ID"
           gestureHandling="greedy"
           disableDefaultUI={false}
+          onClick={() => setSelectedGymId(null)}
         >
           <GymMarkers
             userLocation={userLocation}

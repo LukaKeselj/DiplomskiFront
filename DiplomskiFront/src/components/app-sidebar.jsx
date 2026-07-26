@@ -82,7 +82,7 @@ const data = {
       url: "#",
       icon: Apple,
       items: [
-        { title: "Dnevnik ishrane", url: "#" },
+        { title: "Dnevnik ishrane", url: "/nutrition-log" },
         { title: "Kalorije", url: "#" },
       ],
     },
@@ -145,6 +145,12 @@ const adminNavMain = [
       { title: "Dodaj suplement", url: "/supplements/new" },
       { title: "Moj režim", url: "/my-supplements" },
     ],
+  },
+  {
+    title: "Ishrana",
+    url: "#",
+    icon: Apple,
+    items: [{ title: "Dnevnik ishrane", url: "/nutrition-log" }],
   },
   {
     title: "Teretane",
