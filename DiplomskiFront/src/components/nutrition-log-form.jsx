@@ -234,7 +234,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
               {trimmedQuery && isSearching ? (
                 <p className="text-sm text-muted-foreground">Pretraga...</p>
               ) : visibleResults.length > 0 ? (
-                <div className="flex max-h-64 flex-col gap-1 overflow-y-auto">
+                <div className="grid max-h-72 grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2">
                   {visibleResults.map((food) => (
                     <button
                       key={food.foodId}
@@ -263,74 +263,76 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
               {isLoadingServings ? (
                 <p className="text-sm text-muted-foreground">Učitavanje porcija...</p>
               ) : (
-                <Field>
-                  <FieldLabel>Porcija</FieldLabel>
-                  <div className="flex flex-col gap-1">
-                    {servings.map((serving) => (
-                      <button
-                        key={serving.servingId}
-                        type="button"
-                        onClick={() => handleSelectServing(serving)}
-                        className={cn(
-                          "rounded-lg border p-2.5 text-left text-sm transition-colors hover:bg-muted",
-                          serving.servingId === selectedServingId
-                            ? "border-primary bg-primary/5"
-                            : "border-border"
-                        )}
-                      >
-                        {serving.description} — {serving.calories} kcal
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-              )}
-
-              {selectedServing && (
-                <>
+                <div className="grid gap-4 sm:grid-cols-2">
                   <Field>
-                    <FieldLabel htmlFor="nutrition-amount">
-                      {servingGrams ? "Gramaža (g)" : "Količina (broj porcija)"}
-                    </FieldLabel>
-                    <Input
-                      id="nutrition-amount"
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      value={amount}
-                      onChange={(event) => setAmount(event.target.value)}
-                    />
-                    {!servingGrams && (
-                      <p className="text-xs text-muted-foreground">
-                        Ova porcija nema definisanu gramažu — unesi broj porcija (npr. 1.5).
-                      </p>
-                    )}
+                    <FieldLabel>Porcija</FieldLabel>
+                    <div className="flex max-h-72 flex-col gap-1 overflow-y-auto">
+                      {servings.map((serving) => (
+                        <button
+                          key={serving.servingId}
+                          type="button"
+                          onClick={() => handleSelectServing(serving)}
+                          className={cn(
+                            "rounded-lg border p-2.5 text-left text-sm transition-colors hover:bg-muted",
+                            serving.servingId === selectedServingId
+                              ? "border-primary bg-primary/5"
+                              : "border-border"
+                          )}
+                        >
+                          {serving.description} — {serving.calories} kcal
+                        </button>
+                      ))}
+                    </div>
                   </Field>
 
-                  {computed && (
-                    <div className="grid grid-cols-5 gap-2 rounded-lg bg-muted/50 p-2.5 text-center text-xs">
-                      <div>
-                        <div className="font-medium">{computed.calories}</div>
-                        <div className="text-muted-foreground">kcal</div>
-                      </div>
-                      <div>
-                        <div className="font-medium">{computed.protein}g</div>
-                        <div className="text-muted-foreground">protein</div>
-                      </div>
-                      <div>
-                        <div className="font-medium">{computed.fat}g</div>
-                        <div className="text-muted-foreground">masti</div>
-                      </div>
-                      <div>
-                        <div className="font-medium">{computed.carbs}g</div>
-                        <div className="text-muted-foreground">UH</div>
-                      </div>
-                      <div>
-                        <div className="font-medium">{computed.fiber}g</div>
-                        <div className="text-muted-foreground">vlakna</div>
-                      </div>
-                    </div>
+                  {selectedServing && (
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor="nutrition-amount">
+                          {servingGrams ? "Gramaža (g)" : "Količina (broj porcija)"}
+                        </FieldLabel>
+                        <Input
+                          id="nutrition-amount"
+                          type="number"
+                          min="0"
+                          step="0.1"
+                          value={amount}
+                          onChange={(event) => setAmount(event.target.value)}
+                        />
+                        {!servingGrams && (
+                          <p className="text-xs text-muted-foreground">
+                            Ova porcija nema definisanu gramažu — unesi broj porcija (npr. 1.5).
+                          </p>
+                        )}
+                      </Field>
+
+                      {computed && (
+                        <div className="grid grid-cols-5 gap-2 rounded-lg bg-muted/50 p-2.5 text-center text-xs">
+                          <div>
+                            <div className="font-medium">{computed.calories}</div>
+                            <div className="text-muted-foreground">kcal</div>
+                          </div>
+                          <div>
+                            <div className="font-medium">{computed.protein}g</div>
+                            <div className="text-muted-foreground">protein</div>
+                          </div>
+                          <div>
+                            <div className="font-medium">{computed.fat}g</div>
+                            <div className="text-muted-foreground">masti</div>
+                          </div>
+                          <div>
+                            <div className="font-medium">{computed.carbs}g</div>
+                            <div className="text-muted-foreground">UH</div>
+                          </div>
+                          <div>
+                            <div className="font-medium">{computed.fiber}g</div>
+                            <div className="text-muted-foreground">vlakna</div>
+                          </div>
+                        </div>
+                      )}
+                    </FieldGroup>
                   )}
-                </>
+                </div>
               )}
             </FieldGroup>
           )}
@@ -355,7 +357,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                 onChange={handleManualChange("name")}
               />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Field>
                 <FieldLabel htmlFor="nutrition-manual-calories">Kalorije (kcal)</FieldLabel>
                 <Input

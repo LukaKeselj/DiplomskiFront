@@ -20,6 +20,13 @@ export async function getDailySummaryRequest(date) {
   return data
 }
 
+export async function getSummaryRangeRequest(startDate, endDate) {
+  const { data } = await apiClient.get("/nutrition-logs/summary/range", {
+    params: { startDate, endDate },
+  })
+  return data
+}
+
 export async function createNutritionLogRequest(payload) {
   const { data } = await apiClient.post("/nutrition-logs", payload)
   return data

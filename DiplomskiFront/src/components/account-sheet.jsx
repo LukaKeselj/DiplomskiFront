@@ -49,6 +49,7 @@ export function AccountSheet({ open, onOpenChange }) {
         username: user.username ?? "",
         email: user.email ?? "",
         height: user.height ?? "",
+        weight: user.weight ?? "",
       })
       setProfileImage(user.profileImage ?? "")
       setPasswordFields(emptyPasswordFields)
@@ -108,6 +109,7 @@ export function AccountSheet({ open, onOpenChange }) {
       email: form.email,
       height: Number(form.height),
       profileImage,
+      ...(form.weight !== "" ? { weight: Number(form.weight) } : {}),
     }
 
     if (isChangingPassword) {
@@ -198,16 +200,28 @@ export function AccountSheet({ open, onOpenChange }) {
                 required
               />
             </Field>
-            <Field>
-              <FieldLabel htmlFor="account-height">Visina (cm)</FieldLabel>
-              <Input
-                id="account-height"
-                type="number"
-                value={form.height}
-                onChange={handleChange("height")}
-                required
-              />
-            </Field>
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel htmlFor="account-height">Visina (cm)</FieldLabel>
+                <Input
+                  id="account-height"
+                  type="number"
+                  value={form.height}
+                  onChange={handleChange("height")}
+                  required
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="account-weight">Težina (kg)</FieldLabel>
+                <Input
+                  id="account-weight"
+                  type="number"
+                  step="0.1"
+                  value={form.weight}
+                  onChange={handleChange("weight")}
+                />
+              </Field>
+            </div>
 
             <FieldSeparator>Promena šifre</FieldSeparator>
 

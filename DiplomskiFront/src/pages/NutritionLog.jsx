@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { BarChart3, Pencil, Plus, Trash2 } from "lucide-react"
 
 import {
   deleteNutritionLogRequest,
@@ -20,26 +20,56 @@ import {
 import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { NutritionLogForm } from "@/components/nutrition-log-form"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+import { NutritionWeeklyChart } from "@/components/nutrition-weekly-chart"
+import { cn } from "@/lib/utils"
 
 function todayDateString() {
   return new Date().toISOString().slice(0, 10)
 }
 
 const SUMMARY_ITEMS = [
-  { key: "calories", label: "Kalorije", unit: "kcal" },
-  { key: "protein", label: "Proteini", unit: "g" },
-  { key: "fat", label: "Masti", unit: "g" },
-  { key: "carbs", label: "Ugljeni hidrati", unit: "g" },
-  { key: "fiber", label: "Vlakna", unit: "g" },
+  {
+    key: "calories",
+    label: "Kalorije",
+    unit: "kcal",
+    color: "text-orange-600 dark:text-orange-400",
+  },
+  {
+    key: "protein",
+    label: "Proteini",
+    unit: "g",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  { key: "fat", label: "Masti", unit: "g", color: "text-violet-600 dark:text-violet-400" },
+  {
+    key: "carbs",
+    label: "Ugljeni hidrati",
+    unit: "g",
+    color: "text-blue-600 dark:text-blue-400",
+  },
+  {
+    key: "fiber",
+    label: "Vlakna",
+    unit: "g",
+    color: "text-emerald-600 dark:text-emerald-400",
+  },
+]
+
+const ENTRY_STATS = [
+  { key: "calories", color: "text-orange-600 dark:text-orange-400", format: (v) => `${v} kcal` },
+  { key: "protein", color: "text-rose-600 dark:text-rose-400", format: (v) => `${v}g protein` },
+  { key: "fat", color: "text-violet-600 dark:text-violet-400", format: (v) => `${v}g masti` },
+  { key: "carbs", color: "text-blue-600 dark:text-blue-400", format: (v) => `${v}g UH` },
+  { key: "fiber", color: "text-emerald-600 dark:text-emerald-400", format: (v) => `${v}g vlakna` },
 ]
 
 export default function NutritionLog() {
@@ -53,6 +83,7 @@ export default function NutritionLog() {
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [reloadNonce, setReloadNonce] = useState(0)
+  const [isWeeklyChartOpen, setIsWeeklyChartOpen] = useState(false)
 
   useEffect(() => {
     Promise.all([getNutritionLogsRequest(date), getDailySummaryRequest(date)])
@@ -108,13 +139,20 @@ export default function NutritionLog() {
         <Input
           type="date"
           className="w-48"
+          max={today}
           value={date}
-          onChange={(event) => setDate(event.target.value)}
+          onChange={(event) => setDate(event.target.value > today ? today : event.target.value)}
         />
-        <Button onClick={openAddForm}>
-          <Plus />
-          Dodaj unos
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsWeeklyChartOpen(true)}>
+            <BarChart3 />
+            Nedeljni pregled
+          </Button>
+          <Button onClick={openAddForm}>
+            <Plus />
+            Dodaj unos
+          </Button>
+        </div>
       </div>
 
       {summary && (
@@ -125,7 +163,7 @@ export default function NutritionLog() {
           <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-5">
             {SUMMARY_ITEMS.map((item) => (
               <div key={item.key} className="flex flex-col gap-0.5">
-                <span className="text-lg font-medium">
+                <span className={cn("text-lg font-semibold", item.color)}>
                   {summary[item.key]}
                   <span className="ml-1 text-sm font-normal text-muted-foreground">
                     {item.unit}
@@ -148,9 +186,15 @@ export default function NutritionLog() {
             <Card key={entry._id}>
               <CardHeader>
                 <CardTitle>{entry.foodName}</CardTitle>
-                <CardDescription>
-                  {entry.calories} kcal • {entry.protein}g protein • {entry.fat}g masti •{" "}
-                  {entry.carbs}g UH • {entry.fiber}g vlakna
+                <CardDescription className="flex flex-wrap items-center gap-x-1.5">
+                  {ENTRY_STATS.map((stat, index) => (
+                    <span key={stat.key} className="flex items-center gap-1.5">
+                      {index > 0 && <span className="text-muted-foreground">•</span>}
+                      <span className={cn("font-medium", stat.color)}>
+                        {stat.format(entry[stat.key])}
+                      </span>
+                    </span>
+                  ))}
                 </CardDescription>
                 <CardAction className="flex items-center gap-2">
                   <Button variant="outline" size="icon" onClick={() => openEditForm(entry)}>
@@ -166,28 +210,38 @@ export default function NutritionLog() {
         </div>
       )}
 
-      <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <SheetContent className="overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>{editingEntry ? "Izmena unosa" : "Dodaj unos"}</SheetTitle>
-            <SheetDescription>
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingEntry ? "Izmena unosa" : "Dodaj unos"}</DialogTitle>
+            <DialogDescription>
               {editingEntry
                 ? "Izmeni podatke o unetoj namirnici."
                 : "Pretraži bazu hrane ili unesi podatke ručno."}
-            </SheetDescription>
-          </SheetHeader>
-          <div className="px-4 pb-4">
-            {isFormOpen && (
-              <NutritionLogForm
-                date={date}
-                entry={editingEntry}
-                onSaved={handleSaved}
-                onCancel={() => setIsFormOpen(false)}
-              />
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
+            </DialogDescription>
+          </DialogHeader>
+          {isFormOpen && (
+            <NutritionLogForm
+              date={date}
+              entry={editingEntry}
+              onSaved={handleSaved}
+              onCancel={() => setIsFormOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isWeeklyChartOpen} onOpenChange={setIsWeeklyChartOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Nedeljni pregled</DialogTitle>
+            <DialogDescription>
+              Raspodela kalorija po makroima za poslednjih 7 dana (zaključno sa {date}).
+            </DialogDescription>
+          </DialogHeader>
+          {isWeeklyChartOpen && <NutritionWeeklyChart endDate={date} />}
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
