@@ -24,6 +24,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useAuth } from "@/context/AuthContext"
+import { ExerciseProgress } from "@/components/exercise-progress"
 import { getYoutubeEmbedUrl } from "@/lib/youtube"
 
 export default function ExerciseDetail() {
@@ -91,6 +92,9 @@ export default function ExerciseDetail() {
               )}
             </CardContent>
           </Card>
+
+          <ExerciseProgress exerciseId={exercise._id} />
+
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigate("/exercises")}>
               Nazad na listu

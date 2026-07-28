@@ -1,6 +1,9 @@
-import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Link } from "react-router"
+import toast from "react-hot-toast"
+import { ChevronsUpDown, Dumbbell, Plus } from "lucide-react"
 
+import { activateWorkoutPlanRequest, getWorkoutPlansRequest } from "@/api/workoutPlans"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +19,33 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useAuth } from "@/context/AuthContext"
 
-export function ProgramSwitcher({ programs }) {
+export function ProgramSwitcher() {
   const { isMobile } = useSidebar()
-  const [activeProgram, setActiveProgram] = React.useState(programs[0])
+  const { user, updateUser } = useAuth()
+  const [plans, setPlans] = useState([])
+  const [isActivating, setIsActivating] = useState(false)
 
-  if (!activeProgram) {
-    return null
+  useEffect(() => {
+    getWorkoutPlansRequest()
+      .then(setPlans)
+      .catch(() => {})
+  }, [])
+
+  const activePlan = plans.find((plan) => plan._id === user?.activeWorkoutPlan)
+
+  async function handleActivate(planId) {
+    setIsActivating(true)
+    try {
+      const updatedUser = await activateWorkoutPlanRequest(planId)
+      updateUser(updatedUser)
+      toast.success("Plan je aktiviran")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Aktivacija nije uspela")
+    } finally {
+      setIsActivating(false)
+    }
   }
 
   return (
@@ -35,11 +58,13 @@ export function ProgramSwitcher({ programs }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeProgram.logo className="size-4" />
+                <Dumbbell className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeProgram.name}</span>
-                <span className="truncate text-xs">{activeProgram.status}</span>
+                <span className="truncate font-medium">
+                  {activePlan?.name ?? "Nema aktivnog plana"}
+                </span>
+                <span className="truncate text-xs">{activePlan ? "Aktivan" : "Izaberi plan"}</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -51,27 +76,38 @@ export function ProgramSwitcher({ programs }) {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Programi treninga
+              Moji planovi
             </DropdownMenuLabel>
-            {programs.map((program, index) => (
-              <DropdownMenuItem
-                key={program.name}
-                onClick={() => setActiveProgram(program)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <program.logo className="size-3.5 shrink-0" />
-                </div>
-                {program.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
+            {plans.length === 0 ? (
+              <div className="px-2 py-1.5 text-xs text-muted-foreground">Nemaš planova</div>
+            ) : (
+              plans.map((plan, index) => (
+                <DropdownMenuItem
+                  key={plan._id}
+                  disabled={isActivating || plan._id === user?.activeWorkoutPlan}
+                  onClick={() => handleActivate(plan._id)}
+                  className="gap-2 p-2"
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border">
+                    <Dumbbell className="size-3.5 shrink-0" />
+                  </div>
+                  {plan.name}
+                  {plan._id === user?.activeWorkoutPlan ? (
+                    <DropdownMenuShortcut>✓</DropdownMenuShortcut>
+                  ) : (
+                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                  )}
+                </DropdownMenuItem>
+              ))
+            )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <Plus className="size-4" />
-              </div>
-              <div className="font-medium text-muted-foreground">Dodaj program</div>
+            <DropdownMenuItem asChild className="gap-2 p-2">
+              <Link to="/workout-plans/new">
+                <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                  <Plus className="size-4" />
+                </div>
+                <div className="font-medium text-muted-foreground">Novi plan</div>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

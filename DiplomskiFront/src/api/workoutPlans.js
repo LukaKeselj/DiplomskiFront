@@ -24,3 +24,13 @@ export async function deleteWorkoutPlanRequest(id) {
   const { data } = await apiClient.delete(`/workout-plans/${id}`)
   return data
 }
+
+export async function getActiveWorkoutPlanRequest() {
+  const { data } = await apiClient.get("/workout-plans/active")
+  return data
+}
+
+export async function activateWorkoutPlanRequest(id) {
+  const { data } = await apiClient.post(`/workout-plans/${id}/activate`)
+  return data
+}

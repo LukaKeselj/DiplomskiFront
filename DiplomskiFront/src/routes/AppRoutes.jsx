@@ -18,6 +18,7 @@ import MySupplements from "@/pages/MySupplements"
 import UserSupplementFormPage from "@/pages/UserSupplementFormPage"
 import NearbyGyms from "@/pages/NearbyGyms"
 import NutritionLog from "@/pages/NutritionLog"
+import BodyWeight from "@/pages/BodyWeight"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
 
 export function AppRoutes() {
@@ -169,6 +170,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <NutritionLog />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/body-weight"
+        element={
+          <ProtectedRoute>
+            <BodyWeight />
           </ProtectedRoute>
         }
       />

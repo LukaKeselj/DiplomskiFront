@@ -31,23 +31,6 @@ import {
 import { useAuth } from "@/context/AuthContext"
 
 const data = {
-  programs: [
-    {
-      name: "Push Pull Legs",
-      logo: Dumbbell,
-      status: "Aktivan",
-    },
-    {
-      name: "Full Body",
-      logo: Activity,
-      status: "Pauziran",
-    },
-    {
-      name: "5x5 Snaga",
-      logo: Flame,
-      status: "Nacrt",
-    },
-  ],
   navMain: [
     {
       title: "Treninzi",
@@ -72,7 +55,7 @@ const data = {
       url: "#",
       icon: TrendingUp,
       items: [
-        { title: "Telesna težina", url: "#" },
+        { title: "Telesna težina", url: "/body-weight" },
         { title: "Statistika", url: "#" },
         { title: "Grafici", url: "#" },
       ],
@@ -201,7 +184,7 @@ export function AppSidebar({ ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        {isAdmin ? <AdminHeader /> : <ProgramSwitcher programs={data.programs} />}
+        {isAdmin ? <AdminHeader /> : <ProgramSwitcher />}
       </SidebarHeader>
       <SidebarContent>
         <NavMain

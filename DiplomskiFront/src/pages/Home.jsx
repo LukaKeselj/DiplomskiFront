@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet"
 import { useAuth } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
+import { WeeklyWeightBanner } from "@/components/weekly-weight-banner"
 
 export default function Home() {
   const { user } = useAuth()
@@ -79,6 +80,7 @@ export default function Home() {
 
   return (
     <AppLayout breadcrumb={breadcrumb}>
+      {!isAdmin && <WeeklyWeightBanner />}
       <div className="grid auto-rows-min gap-4 md:grid-cols-3">
         {isAdmin ? (
           <>

@@ -3,7 +3,12 @@ import { Link, useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
 import { ChevronRight, Pencil, Trash2 } from "lucide-react"
 
-import { deleteWorkoutPlanRequest, getWorkoutPlanRequest } from "@/api/workoutPlans"
+import {
+  activateWorkoutPlanRequest,
+  deleteWorkoutPlanRequest,
+  getWorkoutPlanRequest,
+} from "@/api/workoutPlans"
+import { getNextWorkoutDayRequest } from "@/api/workoutSessions"
 import { AppLayout } from "@/components/app-layout"
 import {
   AlertDialog,
@@ -23,14 +28,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { useAuth } from "@/context/AuthContext"
 
 export default function WorkoutPlanDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user, updateUser } = useAuth()
   const [plan, setPlan] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isActivating, setIsActivating] = useState(false)
+  const [nextDay, setNextDay] = useState(null)
+
+  const isActivePlan = user?.activeWorkoutPlan === id
 
   useEffect(() => {
     getWorkoutPlanRequest(id)
@@ -45,6 +56,25 @@ export default function WorkoutPlanDetail() {
       })
       .finally(() => setIsLoading(false))
   }, [id, navigate])
+
+  useEffect(() => {
+    getNextWorkoutDayRequest(id)
+      .then(setNextDay)
+      .catch(() => {})
+  }, [id])
+
+  async function handleActivate() {
+    setIsActivating(true)
+    try {
+      const updatedUser = await activateWorkoutPlanRequest(id)
+      updateUser(updatedUser)
+      toast.success("Plan je aktiviran")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Aktivacija nije uspela")
+    } finally {
+      setIsActivating(false)
+    }
+  }
 
   async function handleDelete() {
     setIsDeleting(true)
@@ -69,8 +99,20 @@ export default function WorkoutPlanDetail() {
       ) : plan ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
-            <h1 className="text-xl font-medium">{plan.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-medium">{plan.name}</h1>
+              {isActivePlan && (
+                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                  Aktivan
+                </span>
+              )}
+            </div>
             <div className="flex gap-2">
+              {!isActivePlan && (
+                <Button onClick={handleActivate} disabled={isActivating}>
+                  {isActivating ? "Aktiviranje..." : "Aktiviraj"}
+                </Button>
+              )}
               <Button variant="outline" asChild>
                 <Link to={`/workout-plans/${plan._id}/edit`}>
                   <Pencil />
@@ -92,7 +134,14 @@ export default function WorkoutPlanDetail() {
             <Link key={day._id} to={`/workout-plans/${plan._id}/days/${day._id}`}>
               <Card className="transition-colors hover:bg-muted/50">
                 <CardHeader>
-                  <CardTitle>{day.dayName}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle>{day.dayName}</CardTitle>
+                    {nextDay?.day?._id === day._id && (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        Sledeći
+                      </span>
+                    )}
+                  </div>
                   <CardDescription>
                     {day.exercises.length} {day.exercises.length === 1 ? "vežba" : "vežbi"}
                   </CardDescription>
