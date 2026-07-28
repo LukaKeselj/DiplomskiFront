@@ -57,14 +57,28 @@ export function ProgramSwitcher() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <div
+                className={
+                  activePlan
+                    ? "flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
+                    : "flex aspect-square size-8 items-center justify-center rounded-lg border border-dashed border-sidebar-foreground/30 text-sidebar-foreground/50"
+                }
+              >
                 <Dumbbell className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {activePlan?.name ?? "Nema aktivnog plana"}
                 </span>
-                <span className="truncate text-xs">{activePlan ? "Aktivan" : "Izaberi plan"}</span>
+                <span
+                  className={
+                    activePlan
+                      ? "truncate text-xs text-primary"
+                      : "truncate text-xs text-sidebar-foreground/50"
+                  }
+                >
+                  {activePlan ? "Aktivan" : "Izaberi plan"}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>

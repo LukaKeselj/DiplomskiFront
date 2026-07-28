@@ -16,25 +16,34 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { useSidebarNav } from "@/context/SidebarNavContext"
 
 export function NavMain({ items, onOpenAccount }) {
   const location = useLocation()
   const currentUrl = `${location.pathname}${location.search}`
+  const { openSections, setSectionOpen } = useSidebarNav()
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platforma</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
+        {items.map((item) => {
+          const hasActiveChild = item.items?.some(
+            (subItem) => subItem.url === currentUrl
+          )
+          const isOpen = openSections[item.title] ?? (hasActiveChild || item.isActive)
+
+          return (
           <Collapsible
             key={item.title}
             asChild
-            defaultOpen={item.isActive}
+            open={isOpen}
+            onOpenChange={(open) => setSectionOpen(item.title, open)}
             className="group/collapsible"
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
+                <SidebarMenuButton tooltip={item.title} isActive={hasActiveChild}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -63,7 +72,8 @@ export function NavMain({ items, onOpenAccount }) {
               </CollapsibleContent>
             </SidebarMenuItem>
           </Collapsible>
-        ))}
+          )
+        })}
       </SidebarMenu>
     </SidebarGroup>
   )

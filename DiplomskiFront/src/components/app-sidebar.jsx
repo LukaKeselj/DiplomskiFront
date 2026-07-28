@@ -1,10 +1,8 @@
 import { useState } from "react"
 import {
-  Activity,
   Apple,
   Dumbbell,
-  Flame,
-  Footprints,
+  ListChecks,
   MapPin,
   Pill,
   Settings2,
@@ -15,7 +13,6 @@ import {
 
 import { AccountSheet } from "@/components/account-sheet"
 import { NavMain } from "@/components/nav-main"
-import { NavRoutines } from "@/components/nav-routines"
 import { NavUser } from "@/components/nav-user"
 import { ProgramSwitcher } from "@/components/program-switcher"
 import {
@@ -37,37 +34,25 @@ const data = {
       url: "#",
       icon: Dumbbell,
       isActive: true,
-      items: [
-        { title: "Planovi treninga", url: "/workout-plans" },
-        { title: "Istorija", url: "#" },
-        { title: "Šabloni", url: "#" },
-        { title: "Novi trening", url: "#" },
-      ],
+      items: [{ title: "Planovi treninga", url: "/workout-plans" }],
     },
     {
       title: "Vežbe",
       url: "#",
-      icon: Dumbbell,
+      icon: ListChecks,
       items: [{ title: "Sve vežbe", url: "/exercises" }],
     },
     {
       title: "Napredak",
       url: "#",
       icon: TrendingUp,
-      items: [
-        { title: "Telesna težina", url: "/body-weight" },
-        { title: "Statistika", url: "#" },
-        { title: "Grafici", url: "#" },
-      ],
+      items: [{ title: "Telesna težina", url: "/body-weight" }],
     },
     {
       title: "Ishrana",
       url: "#",
       icon: Apple,
-      items: [
-        { title: "Dnevnik ishrane", url: "/nutrition-log" },
-        { title: "Kalorije", url: "#" },
-      ],
+      items: [{ title: "Dnevnik ishrane", url: "/nutrition-log" }],
     },
     {
       title: "Suplementi",
@@ -88,16 +73,8 @@ const data = {
       title: "Podešavanja",
       url: "#",
       icon: Settings2,
-      items: [
-        { title: "Profil", url: "#" },
-        { title: "Nalog", url: "#", action: "account" },
-      ],
+      items: [{ title: "Nalog", url: "#", action: "account" }],
     },
-  ],
-  routines: [
-    { name: "Push Day", url: "#", icon: Flame },
-    { name: "Pull Day", url: "#", icon: Activity },
-    { name: "Leg Day", url: "#", icon: Footprints },
   ],
 }
 
@@ -112,7 +89,7 @@ const adminNavMain = [
   {
     title: "Vežbe",
     url: "#",
-    icon: Dumbbell,
+    icon: ListChecks,
     isActive: true,
     items: [
       { title: "Sve vežbe", url: "/exercises" },
@@ -191,7 +168,6 @@ export function AppSidebar({ ...props }) {
           items={isAdmin ? adminNavMain : data.navMain}
           onOpenAccount={() => setIsAccountOpen(true)}
         />
-        {!isAdmin && <NavRoutines routines={data.routines} />}
       </SidebarContent>
       <SidebarFooter>
         <NavUser onOpenAccount={() => setIsAccountOpen(true)} />
