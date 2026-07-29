@@ -167,11 +167,11 @@ export default function Home() {
           </div>
           <WeeklyWeightBanner />
           <HomeCalendar />
-          <div className="grid items-start gap-4 md:grid-cols-3">
-            <HomeWorkoutWidget />
+          <div className="grid items-start gap-4 md:grid-cols-2">
             <HomeNutritionWidget />
             <HomeSupplementsWidget />
           </div>
+          <HomeWorkoutWidget />
         </>
       )}
       {isAdmin && (

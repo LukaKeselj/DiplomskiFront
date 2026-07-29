@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
-import { Check, Dumbbell } from "lucide-react"
+import { Check, ChevronLeft, ChevronRight, Dumbbell } from "lucide-react"
 
 import { getExercisesRequest } from "@/api/exercises"
 import { getActiveWorkoutPlanRequest } from "@/api/workoutPlans"
@@ -23,6 +23,11 @@ export function HomeWorkoutWidget() {
   const [isLoading, setIsLoading] = useState(Boolean(user?.activeWorkoutPlan))
   const [isCompleting, setIsCompleting] = useState(false)
   const [justCompleted, setJustCompleted] = useState(false)
+  const scrollRef = useRef(null)
+
+  function scrollByAmount(amount) {
+    scrollRef.current?.scrollBy({ left: amount, behavior: "smooth" })
+  }
 
   useEffect(() => {
     if (!user?.activeWorkoutPlan) return
@@ -103,24 +108,50 @@ export function HomeWorkoutWidget() {
           <>
             <div className="flex items-center justify-between gap-2">
               <p className="text-lg font-semibold">{nextDay.day.dayName}</p>
-              {!justCompleted && !isRestDay && (
-                <Button size="sm" onClick={handleCompleteDay} disabled={isCompleting}>
-                  <Check />
-                  {isCompleting ? "Čuvanje..." : "Završi dan"}
-                </Button>
-              )}
+              <div className="flex items-center gap-2">
+                {!justCompleted && !isRestDay && (
+                  <Button size="sm" onClick={handleCompleteDay} disabled={isCompleting}>
+                    <Check />
+                    {isCompleting ? "Čuvanje..." : "Završi dan"}
+                  </Button>
+                )}
+                {!isRestDay && nextDay.day.exercises.length > 1 && (
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => scrollByAmount(-336)}
+                    >
+                      <ChevronLeft />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => scrollByAmount(336)}
+                    >
+                      <ChevronRight />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
             {isRestDay ? (
               <p className="text-sm text-muted-foreground">Dan odmora</p>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div
+                ref={scrollRef}
+                className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
                 {nextDay.day.exercises.map((item, index) => (
-                  <DayExerciseCard
-                    key={item._id}
-                    order={index + 1}
-                    item={item}
-                    exercise={exerciseById.get(item.exercise)}
-                  />
+                  <div key={item._id} className="w-80 shrink-0 snap-start sm:w-96">
+                    <DayExerciseCard
+                      order={index + 1}
+                      item={item}
+                      exercise={exerciseById.get(item.exercise)}
+                    />
+                  </div>
                 ))}
               </div>
             )}
