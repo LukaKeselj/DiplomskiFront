@@ -47,7 +47,6 @@ export function DayExerciseCard({ order, item, exercise }) {
         weight: weightNumber,
       })
       toast.success(`Kilaža zabeležena za ${exercise?.name ?? "vežbu"}`)
-      setWeight("")
     } catch (error) {
       toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
     } finally {

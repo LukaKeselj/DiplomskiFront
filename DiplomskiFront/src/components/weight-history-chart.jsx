@@ -13,7 +13,7 @@ function formatDay(dateString) {
   })
 }
 
-export function WeightHistoryChart({ logs }) {
+export function WeightHistoryChart({ logs, className }) {
   const chartData = [...logs]
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .map((log) => ({
@@ -22,7 +22,7 @@ export function WeightHistoryChart({ logs }) {
     }))
 
   return (
-    <ChartContainer config={chartConfig}>
+    <ChartContainer config={chartConfig} className={className}>
       <LineChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical={false} />
         <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} />
