@@ -15,8 +15,12 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { useAuth } from "@/context/AuthContext"
-import { cn } from "@/lib/utils"
+import { cn, formatFullDateLabel } from "@/lib/utils"
 import { WeeklyWeightBanner } from "@/components/weekly-weight-banner"
+import { HomeWorkoutWidget } from "@/components/home-workout-widget"
+import { HomeNutritionWidget } from "@/components/home-nutrition-widget"
+import { HomeSupplementsWidget } from "@/components/home-supplements-widget"
+import { HomeCalendar } from "@/components/home-calendar"
 
 export default function Home() {
   const { user } = useAuth()
@@ -80,10 +84,9 @@ export default function Home() {
 
   return (
     <AppLayout breadcrumb={breadcrumb}>
-      {!isAdmin && <WeeklyWeightBanner />}
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        {isAdmin ? (
-          <>
+      {isAdmin ? (
+        <>
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
               <span className="text-sm text-muted-foreground">Ukupno korisnika</span>
               <span className="text-2xl font-semibold">{isLoadingUsers ? "—" : totalUsers}</span>
@@ -98,83 +101,78 @@ export default function Home() {
                 {isLoadingExercises ? "—" : exerciseCount}
               </span>
             </div>
-          </>
-        ) : (
-          <>
-            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-              <span className="text-sm text-muted-foreground">Treninzi ovog meseca</span>
-              <span className="text-2xl font-semibold">—</span>
-            </div>
-            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-              <span className="text-sm text-muted-foreground">Aktivan program</span>
-              <span className="text-2xl font-semibold">Push Pull Legs</span>
-            </div>
-            <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-              <span className="text-sm text-muted-foreground">Trenutna serija</span>
-              <span className="text-2xl font-semibold">—</span>
-            </div>
-          </>
-        )}
-      </div>
-      {isAdmin ? (
-        <div className="flex-1 rounded-xl bg-muted/50 p-4">
-          <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-            {usersView === "blocked" ? "Blokirani korisnici" : "Svi korisnici"}
-          </h2>
-          {isLoadingUsers ? (
-            <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
-              Učitavanje korisnika...
-            </div>
-          ) : visibleUsers.length === 0 ? (
-            <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
-              {usersView === "blocked" ? "Nema blokiranih korisnika" : "Nema korisnika za prikaz"}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left text-muted-foreground">
-                    <th className="pb-2 pr-4 font-medium">Ime i prezime</th>
-                    <th className="pb-2 pr-4 font-medium">Korisničko ime</th>
-                    <th className="pb-2 pr-4 font-medium">Email</th>
-                    <th className="pb-2 pr-4 font-medium">Uloga</th>
-                    <th className="pb-2 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleUsers.map((u) => (
-                    <tr
-                      key={u._id}
-                      onClick={() => setSelectedUser(u)}
-                      className="cursor-pointer border-b transition-colors last:border-0 hover:bg-muted"
-                    >
-                      <td className="py-2 pr-4">{`${u.name} ${u.surname}`}</td>
-                      <td className="py-2 pr-4">{u.username}</td>
-                      <td className="py-2 pr-4">{u.email}</td>
-                      <td className="py-2 pr-4 capitalize">{u.role}</td>
-                      <td className="py-2">
-                        <span
-                          className={cn(
-                            "rounded-full px-2 py-0.5 text-xs font-medium",
-                            u.isBlocked
-                              ? "bg-destructive/10 text-destructive"
-                              : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          )}
-                        >
-                          {u.isBlocked ? "Blokiran" : "Aktivan"}
-                        </span>
-                      </td>
+          </div>
+          <div className="flex-1 rounded-xl bg-muted/50 p-4">
+            <h2 className="mb-3 text-sm font-medium text-muted-foreground">
+              {usersView === "blocked" ? "Blokirani korisnici" : "Svi korisnici"}
+            </h2>
+            {isLoadingUsers ? (
+              <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
+                Učitavanje korisnika...
+              </div>
+            ) : visibleUsers.length === 0 ? (
+              <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
+                {usersView === "blocked" ? "Nema blokiranih korisnika" : "Nema korisnika za prikaz"}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-muted-foreground">
+                      <th className="pb-2 pr-4 font-medium">Ime i prezime</th>
+                      <th className="pb-2 pr-4 font-medium">Korisničko ime</th>
+                      <th className="pb-2 pr-4 font-medium">Email</th>
+                      <th className="pb-2 pr-4 font-medium">Uloga</th>
+                      <th className="pb-2 font-medium">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                  </thead>
+                  <tbody>
+                    {visibleUsers.map((u) => (
+                      <tr
+                        key={u._id}
+                        onClick={() => setSelectedUser(u)}
+                        className="cursor-pointer border-b transition-colors last:border-0 hover:bg-muted"
+                      >
+                        <td className="py-2 pr-4">{`${u.name} ${u.surname}`}</td>
+                        <td className="py-2 pr-4">{u.username}</td>
+                        <td className="py-2 pr-4">{u.email}</td>
+                        <td className="py-2 pr-4 capitalize">{u.role}</td>
+                        <td className="py-2">
+                          <span
+                            className={cn(
+                              "rounded-full px-2 py-0.5 text-xs font-medium",
+                              u.isBlocked
+                                ? "bg-destructive/10 text-destructive"
+                                : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            )}
+                          >
+                            {u.isBlocked ? "Blokiran" : "Aktivan"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
       ) : (
-        <div className="flex min-h-[100vh] flex-1 items-center justify-center rounded-xl bg-muted/50 text-sm text-muted-foreground md:min-h-min">
-          Istorija treninga će se prikazivati ovde
-        </div>
+        <>
+          <div>
+            <h1 className="font-heading text-2xl font-semibold">
+              Zdravo{user?.name ? `, ${user.name}` : ""}
+            </h1>
+            <p className="text-sm text-muted-foreground">{formatFullDateLabel(new Date())}</p>
+          </div>
+          <WeeklyWeightBanner />
+          <div className="grid gap-4 md:grid-cols-3">
+            <HomeWorkoutWidget />
+            <HomeNutritionWidget />
+            <HomeSupplementsWidget />
+          </div>
+          <HomeCalendar />
+        </>
       )}
       {isAdmin && (
         <Sheet open={!!selectedUser} onOpenChange={(open) => !open && setSelectedUser(null)}>

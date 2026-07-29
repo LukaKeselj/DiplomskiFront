@@ -1,7 +1,9 @@
 import { useState } from "react"
+import { Link, useLocation } from "react-router"
 import {
   Apple,
   Dumbbell,
+  House,
   ListChecks,
   MapPin,
   Pill,
@@ -19,6 +21,7 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -52,7 +55,10 @@ const data = {
       title: "Ishrana",
       url: "#",
       icon: Apple,
-      items: [{ title: "Dnevnik ishrane", url: "/nutrition-log" }],
+      items: [
+        { title: "Dnevnik ishrane", url: "/nutrition-log" },
+        { title: "Planovi ishrane", url: "/nutrition-plans" },
+      ],
     },
     {
       title: "Suplementi",
@@ -110,7 +116,10 @@ const adminNavMain = [
     title: "Ishrana",
     url: "#",
     icon: Apple,
-    items: [{ title: "Dnevnik ishrane", url: "/nutrition-log" }],
+    items: [
+      { title: "Dnevnik ishrane", url: "/nutrition-log" },
+      { title: "Planovi ishrane", url: "/nutrition-plans" },
+    ],
   },
   {
     title: "Teretane",
@@ -157,6 +166,7 @@ export function AppSidebar({ ...props }) {
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
   const [isAccountOpen, setIsAccountOpen] = useState(false)
+  const location = useLocation()
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -164,6 +174,20 @@ export function AppSidebar({ ...props }) {
         {isAdmin ? <AdminHeader /> : <ProgramSwitcher />}
       </SidebarHeader>
       <SidebarContent>
+        {!isAdmin && (
+          <SidebarGroup>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location.pathname === "/"} tooltip="Pregled">
+                  <Link to="/">
+                    <House />
+                    <span>Pregled</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
         <NavMain
           items={isAdmin ? adminNavMain : data.navMain}
           onOpenAccount={() => setIsAccountOpen(true)}

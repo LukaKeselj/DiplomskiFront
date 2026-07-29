@@ -1,9 +1,13 @@
+import { Link, useLocation } from "react-router"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -14,6 +18,9 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export function AppLayout({ breadcrumb, children }) {
+  const location = useLocation()
+  const isHome = location.pathname === "/"
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -27,6 +34,16 @@ export function AppLayout({ breadcrumb, children }) {
             />
             <Breadcrumb>
               <BreadcrumbList>
+                {!isHome && (
+                  <>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link to="/">Početna</Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                  </>
+                )}
                 <BreadcrumbItem>
                   <BreadcrumbPage>{breadcrumb}</BreadcrumbPage>
                 </BreadcrumbItem>

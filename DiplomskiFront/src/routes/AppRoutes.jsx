@@ -19,6 +19,9 @@ import UserSupplementFormPage from "@/pages/UserSupplementFormPage"
 import NearbyGyms from "@/pages/NearbyGyms"
 import NutritionLog from "@/pages/NutritionLog"
 import BodyWeight from "@/pages/BodyWeight"
+import NutritionPlans from "@/pages/NutritionPlans"
+import NutritionPlanDetail from "@/pages/NutritionPlanDetail"
+import NutritionPlanFormPage from "@/pages/NutritionPlanFormPage"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
 
 export function AppRoutes() {
@@ -178,6 +181,38 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <BodyWeight />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/nutrition-plans"
+        element={
+          <ProtectedRoute>
+            <NutritionPlans />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/nutrition-plans/new"
+        element={
+          <ProtectedRoute>
+            <NutritionPlanFormPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/nutrition-plans/:id"
+        element={
+          <ProtectedRoute>
+            <NutritionPlanDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/nutrition-plans/:id/edit"
+        element={
+          <ProtectedRoute>
+            <NutritionPlanFormPage />
           </ProtectedRoute>
         }
       />
