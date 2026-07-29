@@ -166,12 +166,12 @@ export default function Home() {
             <p className="text-sm text-muted-foreground">{formatFullDateLabel(new Date())}</p>
           </div>
           <WeeklyWeightBanner />
-          <div className="grid gap-4 md:grid-cols-3">
+          <HomeCalendar />
+          <div className="grid items-start gap-4 md:grid-cols-3">
             <HomeWorkoutWidget />
             <HomeNutritionWidget />
             <HomeSupplementsWidget />
           </div>
-          <HomeCalendar />
         </>
       )}
       {isAdmin && (

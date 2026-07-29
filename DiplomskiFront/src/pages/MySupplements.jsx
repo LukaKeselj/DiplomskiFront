@@ -130,7 +130,11 @@ export default function MySupplements() {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <Avatar size="lg" className="size-10">
-                      <AvatarImage src={supplement?.imageUrl} alt={supplement?.name} />
+                      <AvatarImage
+                        src={supplement?.imageUrl}
+                        alt={supplement?.name}
+                        className="object-contain"
+                      />
                       <AvatarFallback>
                         {(supplement?.name ?? "?").trim().slice(0, 2).toUpperCase()}
                       </AvatarFallback>

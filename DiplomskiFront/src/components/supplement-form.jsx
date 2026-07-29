@@ -51,7 +51,7 @@ export function SupplementForm({ supplement }) {
       <FieldGroup>
         <div className="flex items-center gap-4">
           <Avatar size="lg" className="size-16">
-            <AvatarImage src={imageUrl} alt={name} />
+            <AvatarImage src={imageUrl} alt={name} className="object-contain" />
             <AvatarFallback className="text-base">
               {name.trim().slice(0, 2).toUpperCase()}
             </AvatarFallback>

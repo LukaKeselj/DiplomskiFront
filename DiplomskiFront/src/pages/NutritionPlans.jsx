@@ -57,7 +57,8 @@ export default function NutritionPlans() {
                     )}
                   </div>
                   <CardDescription>
-                    {itemCount(plan)} {itemCount(plan) === 1 ? "namirnica" : "namirnica"} u nedelji
+                    {plan.days.length} {plan.days.length === 1 ? "dan" : "dana"} u ciklusu • {itemCount(plan)}{" "}
+                    namirnica ukupno
                   </CardDescription>
                 </CardHeader>
               </Card>

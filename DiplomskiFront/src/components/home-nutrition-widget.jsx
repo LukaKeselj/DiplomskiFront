@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
 import { useAuth } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
+import { getNutritionPlanDayForDate } from "@/lib/nutrition-cycle"
 
 function todayDateString() {
   return new Date().toISOString().slice(0, 10)
@@ -42,9 +43,8 @@ export function HomeNutritionWidget() {
 
   const todayItems = useMemo(() => {
     if (!plan) return []
-    const todayDayOfWeek = new Date().getDay()
-    return plan.days.find((day) => day.dayOfWeek === todayDayOfWeek)?.items ?? []
-  }, [plan])
+    return getNutritionPlanDayForDate(plan, user?.activeNutritionPlanStartDate, today)?.items ?? []
+  }, [plan, user?.activeNutritionPlanStartDate, today])
 
   const confirmedCount = todayItems.filter((item) => confirmedByItem[item._id]).length
   const progress = todayItems.length > 0 ? (confirmedCount / todayItems.length) * 100 : 0

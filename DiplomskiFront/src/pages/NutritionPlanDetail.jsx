@@ -22,9 +22,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/AuthContext"
-import { DAYS_OF_WEEK_DISPLAY_ORDER, DAYS_OF_WEEK } from "@/lib/days-of-week"
-
-const dayLabelByValue = new Map(DAYS_OF_WEEK.map((d) => [d.value, d.label]))
 
 export default function NutritionPlanDetail() {
   const { id } = useParams()
@@ -119,13 +116,12 @@ export default function NutritionPlanDetail() {
             </div>
           </div>
 
-          {DAYS_OF_WEEK_DISPLAY_ORDER.map((dayOfWeek) => {
-            const day = plan.days.find((d) => d.dayOfWeek === dayOfWeek)
-            const items = day?.items ?? []
+          {plan.days.map((day, dayIndex) => {
+            const items = day.items ?? []
             return (
-              <Card key={dayOfWeek}>
+              <Card key={day._id ?? dayIndex}>
                 <CardHeader>
-                  <CardTitle>{dayLabelByValue.get(dayOfWeek)}</CardTitle>
+                  <CardTitle>{day.dayName}</CardTitle>
                   <CardDescription>
                     {items.length === 0
                       ? "Nema planiranih namirnica"
