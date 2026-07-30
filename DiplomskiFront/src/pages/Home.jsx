@@ -31,6 +31,8 @@ export default function Home() {
   const [isLoadingExercises, setIsLoadingExercises] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
   const [isTogglingBlock, setIsTogglingBlock] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(() => new Date())
+  const [nutritionRefreshKey, setNutritionRefreshKey] = useState(0)
 
   useEffect(() => {
     if (!isAdmin) return
@@ -166,12 +168,19 @@ export default function Home() {
             <p className="text-sm text-muted-foreground">{formatFullDateLabel(new Date())}</p>
           </div>
           <WeeklyWeightBanner />
-          <HomeCalendar />
+          <HomeCalendar
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+            refreshKey={nutritionRefreshKey}
+          />
+          <HomeWorkoutWidget date={selectedDate} />
           <div className="grid items-start gap-4 md:grid-cols-2">
-            <HomeNutritionWidget />
-            <HomeSupplementsWidget />
+            <HomeNutritionWidget
+              date={selectedDate}
+              onLogChange={() => setNutritionRefreshKey((key) => key + 1)}
+            />
+            <HomeSupplementsWidget date={selectedDate} />
           </div>
-          <HomeWorkoutWidget />
         </>
       )}
       {isAdmin && (

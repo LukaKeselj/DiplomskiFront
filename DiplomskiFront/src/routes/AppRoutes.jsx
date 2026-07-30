@@ -19,6 +19,7 @@ import UserSupplementFormPage from "@/pages/UserSupplementFormPage"
 import NearbyGyms from "@/pages/NearbyGyms"
 import NutritionLog from "@/pages/NutritionLog"
 import BodyWeight from "@/pages/BodyWeight"
+import ExerciseProgressOverview from "@/pages/ExerciseProgressOverview"
 import NutritionPlans from "@/pages/NutritionPlans"
 import NutritionPlanDetail from "@/pages/NutritionPlanDetail"
 import NutritionPlanFormPage from "@/pages/NutritionPlanFormPage"
@@ -181,6 +182,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <BodyWeight />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercise-progress"
+        element={
+          <ProtectedRoute>
+            <ExerciseProgressOverview />
           </ProtectedRoute>
         }
       />

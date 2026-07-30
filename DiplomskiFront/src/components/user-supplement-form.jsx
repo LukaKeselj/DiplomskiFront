@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export function UserSupplementForm({ userSupplement }) {
+export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
   const isEditing = Boolean(userSupplement)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -73,14 +73,19 @@ export function UserSupplementForm({ userSupplement }) {
 
     setIsSubmitting(true)
     try {
+      let saved
       if (isEditing) {
-        await updateUserSupplementRequest(userSupplement._id, payload)
+        saved = await updateUserSupplementRequest(userSupplement._id, payload)
         toast.success("Suplement u režimu je ažuriran")
       } else {
-        await createUserSupplementRequest(payload)
+        saved = await createUserSupplementRequest(payload)
         toast.success("Suplement je dodat u tvoj režim")
       }
-      navigate("/my-supplements")
+      if (onSaved) {
+        onSaved(saved)
+      } else {
+        navigate("/my-supplements")
+      }
     } catch (error) {
       if (error.response?.status === 403) {
         toast.error("Nemaš dozvolu da izmeniš ovaj zapis")
@@ -145,7 +150,7 @@ export function UserSupplementForm({ userSupplement }) {
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Čuvanje..." : isEditing ? "Sačuvaj izmene" : "Dodaj u režim"}
           </Button>
-          <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+          <Button type="button" variant="outline" onClick={onCancel ?? (() => navigate(-1))}>
             Otkaži
           </Button>
         </div>

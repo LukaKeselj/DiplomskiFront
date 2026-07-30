@@ -49,7 +49,10 @@ const data = {
       title: "Napredak",
       url: "#",
       icon: TrendingUp,
-      items: [{ title: "Telesna težina", url: "/body-weight" }],
+      items: [
+        { title: "Telesna težina", url: "/body-weight" },
+        { title: "Vežbe", url: "/exercise-progress" },
+      ],
     },
     {
       title: "Ishrana",

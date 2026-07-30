@@ -25,9 +25,8 @@ const SUMMARY_ITEMS = [
   { key: "carbs", label: "UH", unit: "g", color: "text-blue-600 dark:text-blue-400" },
 ]
 
-export function HomeCalendar() {
+export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedDate, setSelectedDate] = useState(() => new Date())
   const [weightLogs, setWeightLogs] = useState([])
   const [summary, setSummary] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -53,7 +52,7 @@ export function HomeCalendar() {
     return () => {
       cancelled = true
     }
-  }, [isOpen, dateKey])
+  }, [isOpen, dateKey, refreshKey])
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} asChild>
@@ -77,7 +76,7 @@ export function HomeCalendar() {
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium">{formatFullDateLabel(selectedDate)}</h3>
               {!isToday && (
-                <Button size="sm" variant="ghost" onClick={() => setSelectedDate(new Date())}>
+                <Button size="sm" variant="ghost" onClick={() => onSelectDate(new Date())}>
                   Danas
                 </Button>
               )}
@@ -87,7 +86,7 @@ export function HomeCalendar() {
               <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={(date) => date && setSelectedDate(date)}
+                onSelect={(date) => date && onSelectDate(date)}
                 locale={srLatn}
                 className="rounded-md border p-2"
               />
