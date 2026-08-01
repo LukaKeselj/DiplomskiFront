@@ -3,16 +3,6 @@ import { AnimatePresence, motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
-const containerVariants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.03,
-    },
-  },
-}
-
 const itemVariants = {
   hidden: { opacity: 0, y: 18, scale: 0.96, boxShadow: "0 0 0 rgba(0,0,0,0)" },
   show: {
@@ -33,16 +23,9 @@ const hoverAnimation = {
 
 const CardGrid = forwardRef(function CardGrid({ className, children, ...props }, ref) {
   return (
-    <motion.div
-      ref={ref}
-      className={cn(className)}
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      {...props}
-    >
+    <div ref={ref} className={cn(className)} {...props}>
       <AnimatePresence mode="popLayout">{children}</AnimatePresence>
-    </motion.div>
+    </div>
   )
 })
 
@@ -50,6 +33,9 @@ function CardGridItem({ className, children, hover = true, ...props }) {
   return (
     <motion.div
       layout
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.3 }}
       variants={itemVariants}
       exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
       whileHover={hover ? hoverAnimation : undefined}

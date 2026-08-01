@@ -268,7 +268,7 @@ export function HomeWorkoutWidget({ date, onSessionChange }) {
             ) : (
               <CardGrid
                 ref={scrollRef}
-                className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pt-2 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
                 {dayToShow.exercises.map((item, index) => (
                   <CardGridItem key={item._id} className="w-80 shrink-0 snap-start sm:w-96">

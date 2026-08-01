@@ -27,6 +27,7 @@ import { HomeNutritionWidget } from "@/components/home-nutrition-widget"
 import { HomeSupplementsWidget } from "@/components/home-supplements-widget"
 import { HomeStopwatchWidget } from "@/components/home-stopwatch-widget"
 import { HomeCalendar } from "@/components/home-calendar"
+import { MotionSection } from "@/components/ui/motion-section"
 
 export default function Home() {
   const { user } = useAuth()
@@ -188,25 +189,39 @@ export default function Home() {
             </h1>
             <p className="text-sm text-muted-foreground">{formatFullDateLabel(new Date())}</p>
           </div>
-          <HomeFitnessScoreWidget refreshKey={scoreRefreshKey} />
-          <HomeCalendar
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-            refreshKey={nutritionRefreshKey}
-          />
-          <WeeklyWeightBanner onWeightLogged={bumpScoreRefresh} />
-          <Separator />
-          <HomeStopwatchWidget />
-          <HomeWorkoutWidget date={selectedDate} onSessionChange={bumpScoreRefresh} />
-          <div className="grid items-start gap-4 md:grid-cols-2">
-            <HomeNutritionWidget
-              date={selectedDate}
-              onLogChange={() => {
-                setNutritionRefreshKey((key) => key + 1)
-                bumpScoreRefresh()
-              }}
+          <MotionSection>
+            <HomeFitnessScoreWidget refreshKey={scoreRefreshKey} />
+          </MotionSection>
+          <MotionSection>
+            <HomeCalendar
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+              refreshKey={nutritionRefreshKey}
             />
-            <HomeSupplementsWidget date={selectedDate} onSupplementChange={bumpScoreRefresh} />
+          </MotionSection>
+          <MotionSection>
+            <WeeklyWeightBanner onWeightLogged={bumpScoreRefresh} />
+          </MotionSection>
+          <Separator />
+          <MotionSection>
+            <HomeStopwatchWidget />
+          </MotionSection>
+          <MotionSection>
+            <HomeWorkoutWidget date={selectedDate} onSessionChange={bumpScoreRefresh} />
+          </MotionSection>
+          <div className="grid items-start gap-4 md:grid-cols-2">
+            <MotionSection>
+              <HomeNutritionWidget
+                date={selectedDate}
+                onLogChange={() => {
+                  setNutritionRefreshKey((key) => key + 1)
+                  bumpScoreRefresh()
+                }}
+              />
+            </MotionSection>
+            <MotionSection>
+              <HomeSupplementsWidget date={selectedDate} onSupplementChange={bumpScoreRefresh} />
+            </MotionSection>
           </div>
         </>
       )}
