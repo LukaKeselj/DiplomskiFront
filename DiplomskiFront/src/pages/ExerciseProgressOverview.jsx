@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
-import { Minus, TrendingDown, TrendingUp } from "lucide-react"
+import { LineChart, Minus, TrendingDown, TrendingUp } from "lucide-react"
 
 import { getExercisesRequest } from "@/api/exercises"
 import { getWorkoutLogsRequest } from "@/api/workoutLogs"
 import { AppLayout } from "@/components/app-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
+import { CardGridSkeleton } from "@/components/ui/card-grid-skeleton"
+import { EmptyState } from "@/components/ui/empty-state"
 
 function DeltaBadge({ delta }) {
   if (delta > 0) {
@@ -86,40 +89,43 @@ export default function ExerciseProgressOverview() {
   return (
     <AppLayout breadcrumb="Napredak po vežbama">
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje...</p>
+        <CardGridSkeleton />
       ) : progressByExercise.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Još nema zabeleženih kilaža. Unesi kilažu na nekoj vežbi (na Home stranici ili u
-          detaljima vežbe) da bi pratio/la napredak ovde.
-        </p>
+        <EmptyState
+          icon={LineChart}
+          title="Još nema zabeleženih kilaža"
+          description="Unesi kilažu na nekoj vežbi (na Home stranici ili u detaljima vežbe) da bi pratio/la napredak ovde."
+        />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <CardGrid className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {progressByExercise.map((item) => (
-            <Link key={item.exerciseId} to={`/exercises/${item.exerciseId}`}>
-              <Card className="h-full transition-colors hover:bg-muted/50">
-                <CardHeader>
-                  <CardTitle className="text-base">{item.exercise.name}</CardTitle>
-                  <CardDescription className="capitalize">
-                    {item.exercise.muscleGroup}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-2xl font-semibold">{item.last.weight} kg</span>
-                    <DeltaBadge delta={item.delta} />
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Prvi unos: {item.first.weight} kg</span>
-                    <span>Max: {item.max} kg</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {item.entryCount} {item.entryCount === 1 ? "unos" : "unosa"}
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
+            <CardGridItem key={item.exerciseId}>
+              <Link to={`/exercises/${item.exerciseId}`}>
+                <Card className="h-full transition-colors hover:bg-muted/50">
+                  <CardHeader>
+                    <CardTitle className="text-base">{item.exercise.name}</CardTitle>
+                    <CardDescription className="capitalize">
+                      {item.exercise.muscleGroup}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-2xl font-semibold">{item.last.weight} kg</span>
+                      <DeltaBadge delta={item.delta} />
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Prvi unos: {item.first.weight} kg</span>
+                      <span>Max: {item.max} kg</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {item.entryCount} {item.entryCount === 1 ? "unos" : "unosa"}
+                    </span>
+                  </CardContent>
+                </Card>
+              </Link>
+            </CardGridItem>
           ))}
-        </div>
+        </CardGrid>
       )}
     </AppLayout>
   )

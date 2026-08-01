@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { Pencil, Pill, Plus, Search, Trash2 } from "lucide-react"
 
 import { deleteSupplementRequest, getSupplementsRequest } from "@/api/supplements"
 import { AppLayout } from "@/components/app-layout"
@@ -16,7 +16,18 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
+import { CardGridSkeleton } from "@/components/ui/card-grid-skeleton"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Input } from "@/components/ui/input"
 import { useAuth } from "@/context/AuthContext"
 
 function SupplementCard({ supplement, isAdmin, onDeleteRequest }) {
@@ -24,6 +35,9 @@ function SupplementCard({ supplement, isAdmin, onDeleteRequest }) {
     <Card className="h-full transition-colors hover:bg-muted/50">
       <CardHeader>
         <CardTitle>{supplement.name}</CardTitle>
+        {supplement.description && (
+          <CardDescription className="line-clamp-2">{supplement.description}</CardDescription>
+        )}
         {isAdmin && (
           <CardAction className="flex gap-2">
             <Button variant="outline" size="icon" asChild>
@@ -71,6 +85,7 @@ export default function Supplements() {
   const isAdmin = user?.role === "admin"
   const [supplements, setSupplements] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [query, setQuery] = useState("")
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -99,9 +114,23 @@ export default function Supplements() {
     }
   }
 
+  const trimmedQuery = query.trim().toLowerCase()
+  const visibleSupplements = trimmedQuery
+    ? supplements.filter((supplement) => supplement.name.toLowerCase().includes(trimmedQuery))
+    : supplements
+
   return (
     <AppLayout breadcrumb="Suplementi">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="relative">
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="w-56 pl-8"
+            placeholder="Pretraži suplemente..."
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
         {isAdmin && (
           <Button asChild>
             <Link to="/supplements/new">
@@ -113,20 +142,42 @@ export default function Supplements() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje suplemenata...</p>
-      ) : supplements.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nema suplemenata za prikaz</p>
+        <CardGridSkeleton />
+      ) : visibleSupplements.length === 0 ? (
+        <EmptyState
+          icon={Pill}
+          title="Nema suplemenata za prikaz"
+          description={
+            supplements.length > 0
+              ? "Promeni pretragu da vidiš druge suplemente."
+              : isAdmin
+                ? "Dodaj prvi suplement da ga korisnici mogu pronaći."
+                : "Trenutno nema dostupnih suplemenata."
+          }
+          action={
+            supplements.length === 0 &&
+            isAdmin && (
+              <Button asChild size="sm">
+                <Link to="/supplements/new">
+                  <Plus />
+                  Dodaj suplement
+                </Link>
+              </Button>
+            )
+          }
+        />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {supplements.map((supplement) => (
-            <SupplementCard
-              key={supplement._id}
-              supplement={supplement}
-              isAdmin={isAdmin}
-              onDeleteRequest={setDeleteTarget}
-            />
+        <CardGrid className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {visibleSupplements.map((supplement) => (
+            <CardGridItem key={supplement._id}>
+              <SupplementCard
+                supplement={supplement}
+                isAdmin={isAdmin}
+                onDeleteRequest={setDeleteTarget}
+              />
+            </CardGridItem>
           ))}
-        </div>
+        </CardGrid>
       )}
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>

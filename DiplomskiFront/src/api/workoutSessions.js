@@ -19,6 +19,11 @@ export async function completeWorkoutDayRequest(payload) {
   return data
 }
 
+export async function skipWorkoutDayRequest(payload) {
+  const { data } = await apiClient.post("/workout-sessions/skip", payload)
+  return data
+}
+
 export async function deleteWorkoutSessionRequest(id) {
   const { data } = await apiClient.delete(`/workout-sessions/${id}`)
   return data

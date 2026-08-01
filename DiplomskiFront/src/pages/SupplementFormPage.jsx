@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import { getSupplementRequest } from "@/api/supplements"
 import { AppLayout } from "@/components/app-layout"
 import { SupplementForm } from "@/components/supplement-form"
+import { FormSkeleton } from "@/components/ui/form-skeleton"
 
 export default function SupplementFormPage() {
   const { id } = useParams()
@@ -29,7 +30,7 @@ export default function SupplementFormPage() {
     <AppLayout breadcrumb={isEditing ? "Izmena suplementa" : "Novi suplement"}>
       <div className="mx-auto w-full max-w-xl">
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Učitavanje...</p>
+          <FormSkeleton fields={3} />
         ) : (
           <SupplementForm supplement={supplement} />
         )}

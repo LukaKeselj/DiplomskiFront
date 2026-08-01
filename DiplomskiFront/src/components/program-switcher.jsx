@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
-import toast from "react-hot-toast"
 import { ChevronsUpDown, Dumbbell, Plus } from "lucide-react"
 
-import { activateWorkoutPlanRequest, getWorkoutPlansRequest } from "@/api/workoutPlans"
+import { getWorkoutPlansRequest } from "@/api/workoutPlans"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,12 +19,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/AuthContext"
+import { useActivateWorkoutPlan } from "@/hooks/use-activate-workout-plan"
 
 export function ProgramSwitcher() {
   const { isMobile } = useSidebar()
-  const { user, updateUser } = useAuth()
+  const { user } = useAuth()
   const [plans, setPlans] = useState([])
-  const [isActivating, setIsActivating] = useState(false)
+  const { isActivating, activate } = useActivateWorkoutPlan()
 
   useEffect(() => {
     getWorkoutPlansRequest()
@@ -34,19 +34,6 @@ export function ProgramSwitcher() {
   }, [])
 
   const activePlan = plans.find((plan) => plan._id === user?.activeWorkoutPlan)
-
-  async function handleActivate(planId) {
-    setIsActivating(true)
-    try {
-      const updatedUser = await activateWorkoutPlanRequest(planId)
-      updateUser(updatedUser)
-      toast.success("Plan je aktiviran")
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Aktivacija nije uspela")
-    } finally {
-      setIsActivating(false)
-    }
-  }
 
   return (
     <SidebarMenu>
@@ -99,7 +86,7 @@ export function ProgramSwitcher() {
                 <DropdownMenuItem
                   key={plan._id}
                   disabled={isActivating || plan._id === user?.activeWorkoutPlan}
-                  onClick={() => handleActivate(plan._id)}
+                  onClick={() => activate(plan._id)}
                   className="gap-2 p-2"
                 >
                   <div className="flex size-6 items-center justify-center rounded-md border">

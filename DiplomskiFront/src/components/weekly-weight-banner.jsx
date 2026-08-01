@@ -7,7 +7,7 @@ import { getWeeklyWeightStatusRequest, logWeightRequest } from "@/api/weightLogs
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-export function WeeklyWeightBanner() {
+export function WeeklyWeightBanner({ onWeightLogged }) {
   const [status, setStatus] = useState(null)
   const [weight, setWeight] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -33,6 +33,7 @@ export function WeeklyWeightBanner() {
       toast.success("Težina je zabeležena")
       setWeight("")
       setStatus((prev) => ({ ...prev, hasLoggedThisWeek: true }))
+      onWeightLogged?.()
     } catch (error) {
       toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
     } finally {

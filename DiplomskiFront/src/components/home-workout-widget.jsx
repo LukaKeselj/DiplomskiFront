@@ -7,15 +7,18 @@ import { getExercisesRequest } from "@/api/exercises"
 import { getActiveWorkoutPlanRequest } from "@/api/workoutPlans"
 import {
   completeWorkoutDayRequest,
-  getNextWorkoutDayRequest,
   getWorkoutSessionsRequest,
+  skipWorkoutDayRequest,
 } from "@/api/workoutSessions"
 import { getWorkoutLogsRequest } from "@/api/workoutLogs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
+import { Skeleton } from "@/components/ui/skeleton"
 import { DayExerciseCard } from "@/components/day-exercise-card"
 import { useAuth } from "@/context/AuthContext"
 import { formatFullDateLabel } from "@/lib/utils"
+import { getWorkoutScheduleForDate, isBeforeActivation } from "@/lib/workout-cycle"
 
 function toDateKey(date) {
   const year = date.getFullYear()
@@ -24,13 +27,7 @@ function toDateKey(date) {
   return `${year}-${month}-${day}`
 }
 
-function daysBetweenKeys(fromKey, toKey) {
-  const [fy, fm, fd] = fromKey.split("-").map(Number)
-  const [ty, tm, td] = toKey.split("-").map(Number)
-  return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / 86400000)
-}
-
-export function HomeWorkoutWidget({ date }) {
+export function HomeWorkoutWidget({ date, onSessionChange }) {
   const { user } = useAuth()
   const selectedDate = useMemo(() => date ?? new Date(), [date])
   const dateKey = useMemo(() => toDateKey(selectedDate), [selectedDate])
@@ -40,13 +37,14 @@ export function HomeWorkoutWidget({ date }) {
   const isFuture = dateKey > todayKey
 
   const [plan, setPlan] = useState(null)
-  const [nextDay, setNextDay] = useState(null)
   const [sessions, setSessions] = useState([])
   const [exercises, setExercises] = useState([])
   const [workoutLogs, setWorkoutLogs] = useState([])
   const [isLoading, setIsLoading] = useState(Boolean(user?.activeWorkoutPlan))
   const [isCompleting, setIsCompleting] = useState(false)
   const [justCompleted, setJustCompleted] = useState(false)
+  const [isSkipping, setIsSkipping] = useState(false)
+  const [justSkipped, setJustSkipped] = useState(false)
   const scrollRef = useRef(null)
 
   function scrollByAmount(amount) {
@@ -58,13 +56,11 @@ export function HomeWorkoutWidget({ date }) {
 
     Promise.all([
       getActiveWorkoutPlanRequest(),
-      getNextWorkoutDayRequest(user.activeWorkoutPlan),
       getWorkoutSessionsRequest(user.activeWorkoutPlan),
       getExercisesRequest(),
     ])
-      .then(([planData, nextDayData, sessionsData, exercisesData]) => {
+      .then(([planData, sessionsData, exercisesData]) => {
         setPlan(planData)
-        setNextDay(nextDayData)
         setSessions(sessionsData)
         setExercises(exercisesData)
       })
@@ -96,45 +92,62 @@ export function HomeWorkoutWidget({ date }) {
     [sessions, dateKey]
   )
 
-  const completedDay = useMemo(() => {
-    if (!sessionForDate || !plan) return null
-    return plan.days.find((day) => day._id === sessionForDate.day) ?? null
-  }, [sessionForDate, plan])
+  const scheduledForDate = useMemo(
+    () => getWorkoutScheduleForDate(plan, user?.activeWorkoutPlanStartDate, selectedDate),
+    [plan, user?.activeWorkoutPlanStartDate, selectedDate]
+  )
 
-  const nextDayIndex = useMemo(() => {
-    if (!plan || !nextDay?.day) return -1
-    return plan.days.findIndex((day) => day._id === nextDay.day._id)
-  }, [plan, nextDay])
+  const beforeActivation = useMemo(
+    () => isBeforeActivation(user?.activeWorkoutPlanStartDate, selectedDate),
+    [user?.activeWorkoutPlanStartDate, selectedDate]
+  )
 
-  // Preview-only projection: assumes the plan's days repeat in order starting
-  // from the next un-completed day, one per day. Not authoritative — the real
-  // next day is only decided once the previous one is actually completed.
-  const previewDay = useMemo(() => {
-    if (!plan || !isFuture || nextDayIndex === -1 || plan.days.length === 0) return null
-    const diff = daysBetweenKeys(todayKey, dateKey)
-    const index = (nextDayIndex + diff) % plan.days.length
-    return plan.days[index]
-  }, [plan, isFuture, nextDayIndex, todayKey, dateKey])
+  const dayToShow = scheduledForDate.day
+  const isRestDay = scheduledForDate.isRestDay === true
+  const isEmptyPlan = scheduledForDate.isRestDay === null
 
-  const dayToShow = isToday ? nextDay?.day : isPast ? completedDay : previewDay
-  const isRestDay = Boolean(dayToShow && dayToShow.exercises.length === 0)
+  const isCompletedForDate = sessionForDate?.status === "completed" || (isToday && justCompleted)
+  const isSkippedForDate = sessionForDate?.status === "skipped" || (isToday && justSkipped)
+  const missedPast = isPast && dayToShow && !sessionForDate
+  const showExercises = dayToShow && !isSkippedForDate && !missedPast
 
   async function handleCompleteDay() {
-    if (!user?.activeWorkoutPlan || !nextDay?.day) return
+    if (!user?.activeWorkoutPlan || !dayToShow) return
 
     setIsCompleting(true)
     try {
       await completeWorkoutDayRequest({
         workoutPlan: user.activeWorkoutPlan,
-        day: nextDay.day._id,
+        day: dayToShow._id,
         date: dateKey,
       })
       toast.success("Dan je označen kao odrađen")
       setJustCompleted(true)
+      onSessionChange?.()
     } catch (error) {
       toast.error(error.response?.data?.message || "Nije uspelo označavanje dana")
     } finally {
       setIsCompleting(false)
+    }
+  }
+
+  async function handleSkipDay() {
+    if (!user?.activeWorkoutPlan || !dayToShow) return
+
+    setIsSkipping(true)
+    try {
+      await skipWorkoutDayRequest({
+        workoutPlan: user.activeWorkoutPlan,
+        day: dayToShow._id,
+        date: dateKey,
+      })
+      toast.success("Dan je preskočen")
+      setJustSkipped(true)
+      onSessionChange?.()
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nije uspelo preskakanje dana")
+    } finally {
+      setIsSkipping(false)
     }
   }
 
@@ -153,17 +166,26 @@ export function HomeWorkoutWidget({ date }) {
               {plan?.name ?? "Nema aktivnog plana"}
             </p>
           </div>
-          {isToday && justCompleted && (
+          {isToday && isCompletedForDate && (
             <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
               <Check className="size-3.5" />
               Odrađeno
+            </span>
+          )}
+          {isToday && isSkippedForDate && (
+            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+              Preskočeno
             </span>
           )}
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-4">
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Učitavanje...</p>
+          <div className="flex gap-3 overflow-hidden">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <Skeleton key={i} className="h-40 w-80 shrink-0 sm:w-96" />
+            ))}
+          </div>
         ) : !plan ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border py-8 text-center">
             <p className="text-sm text-muted-foreground">Nemaš aktivan plan treninga</p>
@@ -171,22 +193,27 @@ export function HomeWorkoutWidget({ date }) {
               <Link to="/workout-plans">Izaberi plan</Link>
             </Button>
           </div>
-        ) : !isToday && !dayToShow ? (
-          isPast ? (
-            <p className="text-sm text-muted-foreground">Nije bilo treninga ovog dana</p>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Aktiviraj plan i odradi bar jedan trening da bi video pregled narednih dana.
-            </p>
-          )
-        ) : dayToShow ? (
+        ) : beforeActivation ? (
+          <p className="text-sm text-muted-foreground">Plan tog dana još nije bio aktivan</p>
+        ) : isEmptyPlan ? (
+          <p className="text-sm text-muted-foreground">Nema dana u ovom planu</p>
+        ) : isRestDay ? (
+          <>
+            <p className="text-lg font-semibold">Dan odmora</p>
+            <p className="text-sm text-muted-foreground">Danas nema zakazanog treninga.</p>
+          </>
+        ) : (
           <>
             <div className="flex items-center justify-between gap-2">
               <p className="text-lg font-semibold">
                 {dayToShow.dayName}
                 {isPast && (
                   <span className="ml-2 text-xs font-normal text-muted-foreground">
-                    — odrađeno
+                    {isSkippedForDate
+                      ? "— preskočeno"
+                      : isCompletedForDate
+                        ? "— odrađeno"
+                        : "— nije odrađeno"}
                   </span>
                 )}
                 {isFuture && (
@@ -196,13 +223,23 @@ export function HomeWorkoutWidget({ date }) {
                 )}
               </p>
               <div className="flex items-center gap-2">
-                {isToday && !justCompleted && !isRestDay && (
-                  <Button size="sm" onClick={handleCompleteDay} disabled={isCompleting}>
-                    <Check />
-                    {isCompleting ? "Čuvanje..." : "Završi dan"}
-                  </Button>
+                {isToday && !isCompletedForDate && !isSkippedForDate && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleSkipDay}
+                      disabled={isCompleting || isSkipping}
+                    >
+                      {isSkipping ? "Čuvanje..." : "Preskoči dan"}
+                    </Button>
+                    <Button size="sm" onClick={handleCompleteDay} disabled={isCompleting || isSkipping}>
+                      <Check />
+                      {isCompleting ? "Čuvanje..." : "Završi dan"}
+                    </Button>
+                  </>
                 )}
-                {!isRestDay && dayToShow.exercises.length > 1 && (
+                {showExercises && dayToShow.exercises.length > 1 && (
                   <div className="flex items-center gap-1">
                     <Button
                       type="button"
@@ -224,15 +261,17 @@ export function HomeWorkoutWidget({ date }) {
                 )}
               </div>
             </div>
-            {isRestDay ? (
-              <p className="text-sm text-muted-foreground">Dan odmora</p>
+            {isSkippedForDate ? (
+              <p className="text-sm text-muted-foreground">Ovaj dan je preskočen</p>
+            ) : missedPast ? (
+              <p className="text-sm text-muted-foreground">Trening nije odrađen</p>
             ) : (
-              <div
+              <CardGrid
                 ref={scrollRef}
                 className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
                 {dayToShow.exercises.map((item, index) => (
-                  <div key={item._id} className="w-80 shrink-0 snap-start sm:w-96">
+                  <CardGridItem key={item._id} className="w-80 shrink-0 snap-start sm:w-96">
                     <DayExerciseCard
                       order={index + 1}
                       item={item}
@@ -247,13 +286,11 @@ export function HomeWorkoutWidget({ date }) {
                         ])
                       }
                     />
-                  </div>
+                  </CardGridItem>
                 ))}
-              </div>
+              </CardGrid>
             )}
           </>
-        ) : (
-          <p className="text-sm text-muted-foreground">Nema dana u ovom planu</p>
         )}
       </CardContent>
     </Card>

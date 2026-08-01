@@ -1,13 +1,12 @@
 import { useState } from "react"
-import { Link, useLocation } from "react-router"
 import {
   Apple,
   Dumbbell,
+  Gauge,
   House,
   ListChecks,
   MapPin,
   Pill,
-  Settings2,
   ShieldCheck,
   TrendingUp,
   Users,
@@ -21,7 +20,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -32,22 +30,12 @@ import { useAuth } from "@/context/AuthContext"
 
 const data = {
   navMain: [
-    {
-      title: "Treninzi",
-      url: "#",
-      icon: Dumbbell,
-      isActive: true,
-      items: [{ title: "Planovi treninga", url: "/workout-plans" }],
-    },
-    {
-      title: "Vežbe",
-      url: "#",
-      icon: ListChecks,
-      items: [{ title: "Sve vežbe", url: "/exercises" }],
-    },
+    { title: "Pregled", url: "/", icon: House },
+    { title: "Treninzi", url: "/workout-plans", icon: Dumbbell },
+    { title: "Vežbe", url: "/exercises", icon: ListChecks },
+    { title: "Fitness Score", url: "/fitness-score", icon: Gauge },
     {
       title: "Napredak",
-      url: "#",
       icon: TrendingUp,
       items: [
         { title: "Telesna težina", url: "/body-weight" },
@@ -56,7 +44,6 @@ const data = {
     },
     {
       title: "Ishrana",
-      url: "#",
       icon: Apple,
       items: [
         { title: "Dnevnik ishrane", url: "/nutrition-log" },
@@ -65,86 +52,38 @@ const data = {
     },
     {
       title: "Suplementi",
-      url: "#",
       icon: Pill,
       items: [
-        { title: "Katalog", url: "/supplements" },
+        { title: "Svi suplementi", url: "/supplements" },
         { title: "Moj režim", url: "/my-supplements" },
       ],
     },
-    {
-      title: "Teretane",
-      url: "#",
-      icon: MapPin,
-      items: [{ title: "U okolini", url: "/nearby-gyms" }],
-    },
-    {
-      title: "Podešavanja",
-      url: "#",
-      icon: Settings2,
-      items: [{ title: "Nalog", url: "#", action: "account" }],
-    },
+    { title: "Teretane", url: "/nearby-gyms", icon: MapPin },
   ],
 }
 
 const adminNavMain = [
-  {
-    title: "Treninzi",
-    url: "#",
-    icon: Dumbbell,
-    isActive: true,
-    items: [{ title: "Planovi treninga", url: "/workout-plans" }],
-  },
-  {
-    title: "Vežbe",
-    url: "#",
-    icon: ListChecks,
-    isActive: true,
-    items: [
-      { title: "Sve vežbe", url: "/exercises" },
-      { title: "Dodaj vežbu", url: "/exercises/new" },
-    ],
-  },
+  { title: "Treninzi", url: "/workout-plans", icon: Dumbbell },
+  { title: "Vežbe", url: "/exercises", icon: ListChecks },
   {
     title: "Suplementi",
-    url: "#",
     icon: Pill,
     items: [
-      { title: "Katalog", url: "/supplements" },
+      { title: "Svi suplementi", url: "/supplements" },
       { title: "Dodaj suplement", url: "/supplements/new" },
       { title: "Moj režim", url: "/my-supplements" },
     ],
   },
   {
     title: "Ishrana",
-    url: "#",
     icon: Apple,
     items: [
       { title: "Dnevnik ishrane", url: "/nutrition-log" },
       { title: "Planovi ishrane", url: "/nutrition-plans" },
     ],
   },
-  {
-    title: "Teretane",
-    url: "#",
-    icon: MapPin,
-    items: [{ title: "U okolini", url: "/nearby-gyms" }],
-  },
-  {
-    title: "Korisnici",
-    url: "#",
-    icon: Users,
-    items: [
-      { title: "Svi korisnici", url: "/" },
-      { title: "Blokirani korisnici", url: "/?usersView=blocked" },
-    ],
-  },
-  {
-    title: "Podešavanja",
-    url: "#",
-    icon: Settings2,
-    items: [{ title: "Nalog", url: "#", action: "account" }],
-  },
+  { title: "Teretane", url: "/nearby-gyms", icon: MapPin },
+  { title: "Korisnici", url: "/", icon: Users },
 ]
 
 function AdminHeader() {
@@ -169,7 +108,6 @@ export function AppSidebar({ ...props }) {
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
   const [isAccountOpen, setIsAccountOpen] = useState(false)
-  const location = useLocation()
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -177,24 +115,7 @@ export function AppSidebar({ ...props }) {
         {isAdmin ? <AdminHeader /> : <ProgramSwitcher />}
       </SidebarHeader>
       <SidebarContent>
-        {!isAdmin && (
-          <SidebarGroup>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/"} tooltip="Pregled">
-                  <Link to="/">
-                    <House />
-                    <span>Pregled</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
-        )}
-        <NavMain
-          items={isAdmin ? adminNavMain : data.navMain}
-          onOpenAccount={() => setIsAccountOpen(true)}
-        />
+        <NavMain items={isAdmin ? adminNavMain : data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser onOpenAccount={() => setIsAccountOpen(true)} />

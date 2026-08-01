@@ -7,12 +7,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 export function SupplementForm({ supplement }) {
   const isEditing = Boolean(supplement)
   const navigate = useNavigate()
   const [name, setName] = useState(supplement?.name ?? "")
   const [imageUrl, setImageUrl] = useState(supplement?.imageUrl ?? "")
+  const [description, setDescription] = useState(supplement?.description ?? "")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(event) {
@@ -23,7 +25,7 @@ export function SupplementForm({ supplement }) {
       return
     }
 
-    const payload = { name: name.trim(), imageUrl }
+    const payload = { name: name.trim(), imageUrl, description: description.trim() }
 
     setIsSubmitting(true)
     try {
@@ -75,6 +77,16 @@ export function SupplementForm({ supplement }) {
             value={name}
             onChange={(event) => setName(event.target.value)}
             required
+          />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="supplement-description">Opis / namena</FieldLabel>
+          <Textarea
+            id="supplement-description"
+            placeholder="Za šta se ovaj suplement koristi..."
+            rows={4}
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
           />
         </Field>
         <div className="flex gap-2">

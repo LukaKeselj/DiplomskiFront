@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/context/AuthContext"
 import { ExerciseProgress } from "@/components/exercise-progress"
 import { getYoutubeEmbedUrl } from "@/lib/youtube"
@@ -64,7 +65,17 @@ export default function ExerciseDetail() {
   return (
     <AppLayout breadcrumb={exercise?.name ?? "Vežba"}>
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje...</p>
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-4 w-1/3" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="aspect-video w-full" />
+            </CardContent>
+          </Card>
+        </div>
       ) : exercise ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <Card>

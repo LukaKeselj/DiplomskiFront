@@ -1,14 +1,9 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
 import { ChevronRight, Pencil, Trash2 } from "lucide-react"
 
-import {
-  activateWorkoutPlanRequest,
-  deleteWorkoutPlanRequest,
-  getWorkoutPlanRequest,
-} from "@/api/workoutPlans"
-import { getNextWorkoutDayRequest } from "@/api/workoutSessions"
+import { deleteWorkoutPlanRequest, getWorkoutPlanRequest } from "@/api/workoutPlans"
 import { AppLayout } from "@/components/app-layout"
 import {
   AlertDialog,
@@ -28,18 +23,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/context/AuthContext"
+import { useActivateWorkoutPlan } from "@/hooks/use-activate-workout-plan"
+import { getWorkoutScheduleForDate } from "@/lib/workout-cycle"
 
 export default function WorkoutPlanDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user, updateUser } = useAuth()
+  const { user } = useAuth()
   const [plan, setPlan] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isActivating, setIsActivating] = useState(false)
-  const [nextDay, setNextDay] = useState(null)
+  const { isActivating, activate } = useActivateWorkoutPlan()
 
   const isActivePlan = user?.activeWorkoutPlan === id
 
@@ -57,24 +55,10 @@ export default function WorkoutPlanDetail() {
       .finally(() => setIsLoading(false))
   }, [id, navigate])
 
-  useEffect(() => {
-    getNextWorkoutDayRequest(id)
-      .then(setNextDay)
-      .catch(() => {})
-  }, [id])
-
-  async function handleActivate() {
-    setIsActivating(true)
-    try {
-      const updatedUser = await activateWorkoutPlanRequest(id)
-      updateUser(updatedUser)
-      toast.success("Plan je aktiviran")
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Aktivacija nije uspela")
-    } finally {
-      setIsActivating(false)
-    }
-  }
+  const scheduledToday = useMemo(() => {
+    if (!isActivePlan || !plan) return null
+    return getWorkoutScheduleForDate(plan, user?.activeWorkoutPlanStartDate, new Date())
+  }, [isActivePlan, plan, user?.activeWorkoutPlanStartDate])
 
   async function handleDelete() {
     setIsDeleting(true)
@@ -95,7 +79,20 @@ export default function WorkoutPlanDetail() {
   return (
     <AppLayout breadcrumb={plan?.name ?? "Plan"}>
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje...</p>
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+          <div className="flex items-center justify-between gap-2">
+            <Skeleton className="h-7 w-40" />
+            <Skeleton className="h-9 w-24" />
+          </div>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-1/3" />
+                <Skeleton className="h-4 w-1/4" />
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
       ) : plan ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
@@ -109,7 +106,7 @@ export default function WorkoutPlanDetail() {
             </div>
             <div className="flex gap-2">
               {!isActivePlan && (
-                <Button onClick={handleActivate} disabled={isActivating}>
+                <Button onClick={() => activate(id)} disabled={isActivating}>
                   {isActivating ? "Aktiviranje..." : "Aktiviraj"}
                 </Button>
               )}
@@ -130,28 +127,32 @@ export default function WorkoutPlanDetail() {
             </div>
           </div>
 
-          {plan.days.map((day) => (
-            <Link key={day._id} to={`/workout-plans/${plan._id}/days/${day._id}`}>
-              <Card className="transition-colors hover:bg-muted/50">
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <CardTitle>{day.dayName}</CardTitle>
-                    {nextDay?.day?._id === day._id && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                        Sledeći
-                      </span>
-                    )}
-                  </div>
-                  <CardDescription>
-                    {day.exercises.length} {day.exercises.length === 1 ? "vežba" : "vežbi"}
-                  </CardDescription>
-                  <CardAction>
-                    <ChevronRight className="size-4 text-muted-foreground" />
-                  </CardAction>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
+          <CardGrid className="contents">
+            {plan.days.map((day) => (
+              <CardGridItem key={day._id}>
+                <Link to={`/workout-plans/${plan._id}/days/${day._id}`}>
+                  <Card className="transition-colors hover:bg-muted/50">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <CardTitle>{day.dayName}</CardTitle>
+                        {scheduledToday?.day?._id === day._id && (
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                            Sledeći
+                          </span>
+                        )}
+                      </div>
+                      <CardDescription>
+                        {day.exercises.length} {day.exercises.length === 1 ? "vežba" : "vežbi"}
+                      </CardDescription>
+                      <CardAction>
+                        <ChevronRight className="size-4 text-muted-foreground" />
+                      </CardAction>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              </CardGridItem>
+            ))}
+          </CardGrid>
 
           <Button variant="outline" onClick={() => navigate("/workout-plans")}>
             Nazad na listu

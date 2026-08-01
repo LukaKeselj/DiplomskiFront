@@ -52,7 +52,12 @@ export function AppLayout({ breadcrumb, children }) {
           </div>
           <ThemeToggle className="mr-4" />
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        <div
+          key={location.pathname}
+          className="flex flex-1 flex-col gap-4 p-4 pt-0 animate-in fade-in-0 slide-in-from-bottom-2 duration-300 ease-out"
+        >
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

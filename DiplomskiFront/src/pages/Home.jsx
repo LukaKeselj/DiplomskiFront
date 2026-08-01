@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { useSearchParams } from "react-router"
+import { Users } from "lucide-react"
 
 import { getAllUsersRequest, setUserBlockedStatusRequest } from "@/api/users"
 import { getExercisesRequest } from "@/api/exercises"
 import { AppLayout } from "@/components/app-layout"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { EmptyState } from "@/components/ui/empty-state"
 import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Sheet,
   SheetContent,
@@ -18,9 +21,11 @@ import {
 import { useAuth } from "@/context/AuthContext"
 import { cn, formatFullDateLabel } from "@/lib/utils"
 import { WeeklyWeightBanner } from "@/components/weekly-weight-banner"
+import { HomeFitnessScoreWidget } from "@/components/home-fitness-score-widget"
 import { HomeWorkoutWidget } from "@/components/home-workout-widget"
 import { HomeNutritionWidget } from "@/components/home-nutrition-widget"
 import { HomeSupplementsWidget } from "@/components/home-supplements-widget"
+import { HomeStopwatchWidget } from "@/components/home-stopwatch-widget"
 import { HomeCalendar } from "@/components/home-calendar"
 
 export default function Home() {
@@ -34,6 +39,11 @@ export default function Home() {
   const [isTogglingBlock, setIsTogglingBlock] = useState(false)
   const [selectedDate, setSelectedDate] = useState(() => new Date())
   const [nutritionRefreshKey, setNutritionRefreshKey] = useState(0)
+  const [scoreRefreshKey, setScoreRefreshKey] = useState(0)
+
+  function bumpScoreRefresh() {
+    setScoreRefreshKey((key) => key + 1)
+  }
 
   useEffect(() => {
     if (!isAdmin) return
@@ -53,12 +63,8 @@ export default function Home() {
       .finally(() => setIsLoadingExercises(false))
   }, [isAdmin])
 
-  const [searchParams] = useSearchParams()
-  const usersView = searchParams.get("usersView") === "blocked" ? "blocked" : "all"
-
   const totalUsers = users.length
   const blockedUsers = users.filter((u) => u.isBlocked).length
-  const visibleUsers = usersView === "blocked" ? users.filter((u) => u.isBlocked) : users
 
   async function handleToggleBlock() {
     if (!selectedUser) return
@@ -79,11 +85,7 @@ export default function Home() {
     }
   }
 
-  const breadcrumb = isAdmin
-    ? usersView === "blocked"
-      ? "Blokirani korisnici"
-      : "Svi korisnici"
-    : "Pregled"
+  const breadcrumb = isAdmin ? "Korisnici" : "Pregled"
 
   return (
     <AppLayout breadcrumb={breadcrumb}>
@@ -92,31 +94,39 @@ export default function Home() {
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
               <span className="text-sm text-muted-foreground">Ukupno korisnika</span>
-              <span className="text-2xl font-semibold">{isLoadingUsers ? "—" : totalUsers}</span>
+              {isLoadingUsers ? (
+                <Skeleton className="h-8 w-12" />
+              ) : (
+                <span className="text-2xl font-semibold">{totalUsers}</span>
+              )}
             </div>
             <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
               <span className="text-sm text-muted-foreground">Blokirani korisnici</span>
-              <span className="text-2xl font-semibold">{isLoadingUsers ? "—" : blockedUsers}</span>
+              {isLoadingUsers ? (
+                <Skeleton className="h-8 w-12" />
+              ) : (
+                <span className="text-2xl font-semibold">{blockedUsers}</span>
+              )}
             </div>
             <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
               <span className="text-sm text-muted-foreground">Vežbe u bazi</span>
-              <span className="text-2xl font-semibold">
-                {isLoadingExercises ? "—" : exerciseCount}
-              </span>
+              {isLoadingExercises ? (
+                <Skeleton className="h-8 w-12" />
+              ) : (
+                <span className="text-2xl font-semibold">{exerciseCount}</span>
+              )}
             </div>
           </div>
           <div className="flex-1 rounded-xl bg-muted/50 p-4">
-            <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-              {usersView === "blocked" ? "Blokirani korisnici" : "Svi korisnici"}
-            </h2>
+            <h2 className="mb-3 text-sm font-medium text-muted-foreground">Korisnici</h2>
             {isLoadingUsers ? (
-              <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
-                Učitavanje korisnika...
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
               </div>
-            ) : visibleUsers.length === 0 ? (
-              <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground md:min-h-min">
-                {usersView === "blocked" ? "Nema blokiranih korisnika" : "Nema korisnika za prikaz"}
-              </div>
+            ) : users.length === 0 ? (
+              <EmptyState icon={Users} title="Nema korisnika za prikaz" />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -130,13 +140,23 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {visibleUsers.map((u) => (
+                    {users.map((u) => (
                       <tr
                         key={u._id}
                         onClick={() => setSelectedUser(u)}
                         className="cursor-pointer border-b transition-colors last:border-0 hover:bg-muted"
                       >
-                        <td className="py-2 pr-4">{`${u.name} ${u.surname}`}</td>
+                        <td className="py-2 pr-4">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="size-7">
+                              <AvatarImage src={u.profileImage} alt={`${u.name} ${u.surname}`} />
+                              <AvatarFallback className="text-xs">
+                                {`${u.name?.[0] ?? ""}${u.surname?.[0] ?? ""}`.toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            {`${u.name} ${u.surname}`}
+                          </div>
+                        </td>
                         <td className="py-2 pr-4">{u.username}</td>
                         <td className="py-2 pr-4">{u.email}</td>
                         <td className="py-2 pr-4 capitalize">{u.role}</td>
@@ -168,20 +188,25 @@ export default function Home() {
             </h1>
             <p className="text-sm text-muted-foreground">{formatFullDateLabel(new Date())}</p>
           </div>
-          <WeeklyWeightBanner />
+          <HomeFitnessScoreWidget refreshKey={scoreRefreshKey} />
           <HomeCalendar
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
             refreshKey={nutritionRefreshKey}
           />
+          <WeeklyWeightBanner onWeightLogged={bumpScoreRefresh} />
           <Separator />
-          <HomeWorkoutWidget date={selectedDate} />
+          <HomeStopwatchWidget />
+          <HomeWorkoutWidget date={selectedDate} onSessionChange={bumpScoreRefresh} />
           <div className="grid items-start gap-4 md:grid-cols-2">
             <HomeNutritionWidget
               date={selectedDate}
-              onLogChange={() => setNutritionRefreshKey((key) => key + 1)}
+              onLogChange={() => {
+                setNutritionRefreshKey((key) => key + 1)
+                bumpScoreRefresh()
+              }}
             />
-            <HomeSupplementsWidget date={selectedDate} />
+            <HomeSupplementsWidget date={selectedDate} onSupplementChange={bumpScoreRefresh} />
           </div>
         </>
       )}
@@ -196,6 +221,15 @@ export default function Home() {
             </SheetHeader>
             {selectedUser && (
               <div className="flex flex-col gap-3 px-4 text-sm">
+                <Avatar className="size-16">
+                  <AvatarImage
+                    src={selectedUser.profileImage}
+                    alt={`${selectedUser.name} ${selectedUser.surname}`}
+                  />
+                  <AvatarFallback className="text-lg">
+                    {`${selectedUser.name?.[0] ?? ""}${selectedUser.surname?.[0] ?? ""}`.toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Korisničko ime</span>
                   <span>{selectedUser.username}</span>

@@ -20,9 +20,11 @@ import NearbyGyms from "@/pages/NearbyGyms"
 import NutritionLog from "@/pages/NutritionLog"
 import BodyWeight from "@/pages/BodyWeight"
 import ExerciseProgressOverview from "@/pages/ExerciseProgressOverview"
+import FitnessScore from "@/pages/FitnessScore"
 import NutritionPlans from "@/pages/NutritionPlans"
 import NutritionPlanDetail from "@/pages/NutritionPlanDetail"
 import NutritionPlanFormPage from "@/pages/NutritionPlanFormPage"
+import NotFound from "@/pages/NotFound"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
 
 export function AppRoutes() {
@@ -194,6 +196,14 @@ export function AppRoutes() {
         }
       />
       <Route
+        path="/fitness-score"
+        element={
+          <ProtectedRoute>
+            <FitnessScore />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/nutrition-plans"
         element={
           <ProtectedRoute>
@@ -225,6 +235,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

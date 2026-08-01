@@ -39,6 +39,9 @@ export function WeightHistoryChart({ logs, className }) {
           stroke="var(--color-weight)"
           strokeWidth={2}
           dot={{ fill: "var(--color-weight)" }}
+          isAnimationActive
+          animationDuration={1000}
+          animationEasing="ease-out"
         />
       </LineChart>
     </ChartContainer>

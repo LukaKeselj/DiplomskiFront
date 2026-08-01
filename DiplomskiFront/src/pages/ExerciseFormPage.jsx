@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import { getExerciseRequest } from "@/api/exercises"
 import { AppLayout } from "@/components/app-layout"
 import { ExerciseForm } from "@/components/exercise-form"
+import { FormSkeleton } from "@/components/ui/form-skeleton"
 
 export default function ExerciseFormPage() {
   const { id } = useParams()
@@ -29,7 +30,7 @@ export default function ExerciseFormPage() {
     <AppLayout breadcrumb={isEditing ? "Izmena vežbe" : "Nova vežba"}>
       <div className="mx-auto w-full max-w-xl">
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Učitavanje...</p>
+          <FormSkeleton fields={4} />
         ) : (
           <ExerciseForm exercise={exercise} />
         )}

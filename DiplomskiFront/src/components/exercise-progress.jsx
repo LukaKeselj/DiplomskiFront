@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { WeightHistoryChart } from "@/components/weight-history-chart"
 
 function todayDateString() {
@@ -124,7 +125,7 @@ export function ExerciseProgress({ exerciseId }) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Učitavanje...</p>
+          <Skeleton className="h-48 w-full" />
         ) : logs.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Zabeleži prvi rezultat da bi pratio/la napredak na ovoj vežbi

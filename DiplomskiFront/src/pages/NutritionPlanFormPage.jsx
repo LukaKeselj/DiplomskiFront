@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import { getNutritionPlanRequest } from "@/api/nutritionPlans"
 import { AppLayout } from "@/components/app-layout"
 import { NutritionPlanForm } from "@/components/nutrition-plan-form"
+import { FormSkeleton } from "@/components/ui/form-skeleton"
 
 export default function NutritionPlanFormPage() {
   const { id } = useParams()
@@ -33,7 +34,7 @@ export default function NutritionPlanFormPage() {
     <AppLayout breadcrumb={isEditing ? "Izmena plana ishrane" : "Novi plan ishrane"}>
       <div className="mx-auto w-full max-w-2xl">
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Učitavanje...</p>
+          <FormSkeleton fields={5} />
         ) : (
           <NutritionPlanForm plan={plan} />
         )}

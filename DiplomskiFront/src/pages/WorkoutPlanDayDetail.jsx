@@ -5,10 +5,15 @@ import { ArrowLeft, Check } from "lucide-react"
 
 import { getWorkoutPlanRequest } from "@/api/workoutPlans"
 import { getExercisesRequest } from "@/api/exercises"
-import { completeWorkoutDayRequest, getNextWorkoutDayRequest } from "@/api/workoutSessions"
+import { completeWorkoutDayRequest } from "@/api/workoutSessions"
 import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
+import { Card, CardHeader } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
+import { Skeleton } from "@/components/ui/skeleton"
 import { DayExerciseCard } from "@/components/day-exercise-card"
+import { useAuth } from "@/context/AuthContext"
+import { getWorkoutScheduleForDate } from "@/lib/workout-cycle"
 
 function todayDateString() {
   return new Date().toISOString().slice(0, 10)
@@ -17,10 +22,10 @@ function todayDateString() {
 export default function WorkoutPlanDayDetail() {
   const { id, dayId } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [plan, setPlan] = useState(null)
   const [exercises, setExercises] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [nextDay, setNextDay] = useState(null)
   const [isCompleting, setIsCompleting] = useState(false)
   const [justCompleted, setJustCompleted] = useState(false)
 
@@ -41,11 +46,12 @@ export default function WorkoutPlanDayDetail() {
       .finally(() => setIsLoading(false))
   }, [id, navigate])
 
-  useEffect(() => {
-    getNextWorkoutDayRequest(id)
-      .then(setNextDay)
-      .catch(() => {})
-  }, [id, justCompleted])
+  const isActivePlan = user?.activeWorkoutPlan === id
+
+  const nextDay = useMemo(() => {
+    if (!isActivePlan || !plan) return null
+    return getWorkoutScheduleForDate(plan, user?.activeWorkoutPlanStartDate, new Date())
+  }, [isActivePlan, plan, user?.activeWorkoutPlanStartDate])
 
   const exerciseById = useMemo(() => {
     const map = new Map()
@@ -80,7 +86,23 @@ export default function WorkoutPlanDayDetail() {
   return (
     <AppLayout breadcrumb={day?.dayName ?? "Dan"}>
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje...</p>
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+          <Skeleton className="h-9 w-32" />
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-1/2" />
+                <Skeleton className="h-4 w-1/3" />
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
       ) : day ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <div>
@@ -118,16 +140,17 @@ export default function WorkoutPlanDayDetail() {
             ) : null}
           </div>
 
-          <div className="flex flex-col gap-3">
+          <CardGrid className="flex flex-col gap-3">
             {day.exercises.map((item, index) => (
-              <DayExerciseCard
-                key={item._id}
-                order={index + 1}
-                item={item}
-                exercise={exerciseById.get(item.exercise)}
-              />
+              <CardGridItem key={item._id}>
+                <DayExerciseCard
+                  order={index + 1}
+                  item={item}
+                  exercise={exerciseById.get(item.exercise)}
+                />
+              </CardGridItem>
             ))}
-          </div>
+          </CardGrid>
         </div>
       ) : null}
     </AppLayout>

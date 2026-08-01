@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Skeleton } from "@/components/ui/skeleton"
 import { WeightHistoryChart } from "@/components/weight-history-chart"
 import { cn, formatFullDateLabel } from "@/lib/utils"
 
@@ -93,7 +94,7 @@ export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
               <div className="rounded-lg border border-border p-3">
                 <h4 className="mb-2 text-xs font-medium text-muted-foreground">Napredak težine</h4>
                 {isLoading ? (
-                  <p className="text-sm text-muted-foreground">Učitavanje...</p>
+                  <Skeleton className="h-40 w-full" />
                 ) : weightLogs.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nema unetih merenja težine</p>
                 ) : (
@@ -105,7 +106,14 @@ export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
             <div className="rounded-lg border border-border p-3">
               <h4 className="mb-2 text-xs font-medium text-muted-foreground">Ishrana ovog dana</h4>
               {isLoading ? (
-                <p className="text-sm text-muted-foreground">Učitavanje...</p>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex flex-col gap-1.5">
+                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="h-3 w-12" />
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                   {SUMMARY_ITEMS.map((item) => (

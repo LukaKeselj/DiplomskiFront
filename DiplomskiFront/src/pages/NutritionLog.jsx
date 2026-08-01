@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
-import { BarChart3, Pencil, Plus, Trash2 } from "lucide-react"
+import { BarChart3, Pencil, Plus, Trash2, UtensilsCrossed } from "lucide-react"
 
 import {
   deleteNutritionLogRequest,
@@ -20,6 +20,7 @@ import {
 import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
 import {
   Dialog,
   DialogContent,
@@ -27,7 +28,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { EmptyState } from "@/components/ui/empty-state"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { NutritionLogForm } from "@/components/nutrition-log-form"
 import { NutritionWeeklyChart } from "@/components/nutrition-weekly-chart"
 import { cn } from "@/lib/utils"
@@ -177,37 +180,58 @@ export default function NutritionLog() {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje...</p>
-      ) : entries.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nema unosa za izabrani dan</p>
-      ) : (
         <div className="flex flex-col gap-3">
-          {entries.map((entry) => (
-            <Card key={entry._id}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
               <CardHeader>
-                <CardTitle>{entry.foodName}</CardTitle>
-                <CardDescription className="flex flex-wrap items-center gap-x-1.5">
-                  {ENTRY_STATS.map((stat, index) => (
-                    <span key={stat.key} className="flex items-center gap-1.5">
-                      {index > 0 && <span className="text-muted-foreground">•</span>}
-                      <span className={cn("font-medium", stat.color)}>
-                        {stat.format(entry[stat.key])}
-                      </span>
-                    </span>
-                  ))}
-                </CardDescription>
-                <CardAction className="flex items-center gap-2">
-                  <Button variant="outline" size="icon" onClick={() => openEditForm(entry)}>
-                    <Pencil />
-                  </Button>
-                  <Button variant="destructive" size="icon" onClick={() => setDeleteTarget(entry)}>
-                    <Trash2 />
-                  </Button>
-                </CardAction>
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-3 w-2/3" />
               </CardHeader>
             </Card>
           ))}
         </div>
+      ) : entries.length === 0 ? (
+        <EmptyState
+          icon={UtensilsCrossed}
+          title="Nema unosa za izabrani dan"
+          description="Dodaj šta si jeo/la da bi pratio unos kalorija i makronutrijenata."
+          action={
+            <Button size="sm" onClick={openAddForm}>
+              <Plus />
+              Dodaj unos
+            </Button>
+          }
+        />
+      ) : (
+        <CardGrid className="flex flex-col gap-3">
+          {entries.map((entry) => (
+            <CardGridItem key={entry._id} hover={false}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>{entry.foodName}</CardTitle>
+                  <CardDescription className="flex flex-wrap items-center gap-x-1.5">
+                    {ENTRY_STATS.map((stat, index) => (
+                      <span key={stat.key} className="flex items-center gap-1.5">
+                        {index > 0 && <span className="text-muted-foreground">•</span>}
+                        <span className={cn("font-medium", stat.color)}>
+                          {stat.format(entry[stat.key])}
+                        </span>
+                      </span>
+                    ))}
+                  </CardDescription>
+                  <CardAction className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" onClick={() => openEditForm(entry)}>
+                      <Pencil />
+                    </Button>
+                    <Button variant="destructive" size="icon" onClick={() => setDeleteTarget(entry)}>
+                      <Trash2 />
+                    </Button>
+                  </CardAction>
+                </CardHeader>
+              </Card>
+            </CardGridItem>
+          ))}
+        </CardGrid>
       )}
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { Accessibility, SquareArrowOutUpRight } from "lucide-react"
+import { Accessibility, MapPin, SquareArrowOutUpRight } from "lucide-react"
 import {
   APIProvider,
   AdvancedMarker,
@@ -14,6 +14,9 @@ import {
 import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -154,31 +157,45 @@ function NearbyGymsView({ userLocation }) {
           />
         </Map>
       </div>
-      <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto">
+      <div className="max-h-[70vh] overflow-y-auto">
         {isSearching ? (
-          <p className="text-sm text-muted-foreground">Tražimo teretane...</p>
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
         ) : gyms.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Nema teretana u okolini ({SEARCH_RADIUS_METERS / 1000} km)
-          </p>
+          <EmptyState
+            icon={MapPin}
+            title="Nema teretana u okolini"
+            description={`Nismo pronašli teretane u prečniku od ${SEARCH_RADIUS_METERS / 1000} km.`}
+          />
         ) : (
-          gyms.map((gym) => (
-            <Card
-              key={gym.id}
-              className={cn(
-                "cursor-pointer transition-colors hover:bg-muted/50",
-                selectedGymId === gym.id && "bg-muted/50"
-              )}
-              onClick={() => setSelectedGymId(gym.id)}
-            >
-              <CardHeader>
-                <CardTitle className="text-sm">{gym.displayName}</CardTitle>
-                {gym.formattedAddress && (
-                  <CardDescription>{gym.formattedAddress}</CardDescription>
-                )}
-              </CardHeader>
-            </Card>
-          ))
+          <CardGrid className="flex flex-col gap-2">
+            {gyms.map((gym) => (
+              <CardGridItem key={gym.id}>
+                <Card
+                  className={cn(
+                    "cursor-pointer transition-colors hover:bg-muted/50",
+                    selectedGymId === gym.id && "bg-muted/50"
+                  )}
+                  onClick={() => setSelectedGymId(gym.id)}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-sm">{gym.displayName}</CardTitle>
+                    {gym.formattedAddress && (
+                      <CardDescription>{gym.formattedAddress}</CardDescription>
+                    )}
+                  </CardHeader>
+                </Card>
+              </CardGridItem>
+            ))}
+          </CardGrid>
         )}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Scale, Trash2 } from "lucide-react"
 
 import { deleteWeightLogRequest, getWeightLogsRequest, logWeightRequest } from "@/api/weightLogs"
 import {
@@ -16,6 +16,7 @@ import {
 import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
 import {
   Dialog,
   DialogContent,
@@ -23,8 +24,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { EmptyState } from "@/components/ui/empty-state"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { WeightHistoryChart } from "@/components/weight-history-chart"
 
 function todayDateString() {
@@ -118,9 +121,38 @@ export default function BodyWeight() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje...</p>
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>Istorija</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-48 w-full" />
+            </CardContent>
+          </Card>
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Card key={i} size="sm">
+                <CardHeader>
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-3 w-20" />
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </>
       ) : logs.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nema unetih merenja</p>
+        <EmptyState
+          icon={Scale}
+          title="Nema unetih merenja"
+          description="Dodaj prvo merenje da počneš da pratiš svoju telesnu težinu."
+          action={
+            <Button size="sm" onClick={openAddForm}>
+              <Plus />
+              Dodaj merenje
+            </Button>
+          }
+        />
       ) : (
         <>
           <Card>
@@ -132,25 +164,27 @@ export default function BodyWeight() {
             </CardContent>
           </Card>
 
-          <div className="flex flex-col gap-2">
+          <CardGrid className="flex flex-col gap-2">
             {logs.map((log) => (
-              <Card key={log._id} size="sm">
-                <CardHeader>
-                  <CardTitle className="text-sm">{log.weight} kg</CardTitle>
-                  <span className="text-xs text-muted-foreground">{log.date.slice(0, 10)}</span>
-                  <CardAction>
-                    <Button
-                      variant="destructive"
-                      size="icon-sm"
-                      onClick={() => setDeleteTarget(log)}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </CardAction>
-                </CardHeader>
-              </Card>
+              <CardGridItem key={log._id} hover={false}>
+                <Card size="sm">
+                  <CardHeader>
+                    <CardTitle className="text-sm">{log.weight} kg</CardTitle>
+                    <span className="text-xs text-muted-foreground">{log.date.slice(0, 10)}</span>
+                    <CardAction>
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        onClick={() => setDeleteTarget(log)}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </CardAction>
+                  </CardHeader>
+                </Card>
+              </CardGridItem>
             ))}
-          </div>
+          </CardGrid>
         </>
       )}
 

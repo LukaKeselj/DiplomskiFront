@@ -10,6 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const DAY_LABELS = ["Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub"]
 
@@ -78,7 +79,7 @@ export function NutritionWeeklyChart({ endDate }) {
   }, [endDate])
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Učitavanje...</p>
+    return <Skeleton className="h-64 w-full" />
   }
 
   return (

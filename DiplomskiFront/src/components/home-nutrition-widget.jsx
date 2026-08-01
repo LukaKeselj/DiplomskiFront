@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
+import { Skeleton } from "@/components/ui/skeleton"
 import { NutritionLogForm } from "@/components/nutrition-log-form"
 import { useAuth } from "@/context/AuthContext"
 import { cn, formatFullDateLabel } from "@/lib/utils"
@@ -161,7 +162,11 @@ export function HomeNutritionWidget({ date, onLogChange }) {
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Učitavanje...</p>
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-8 w-full" />
+            ))}
+          </div>
         ) : (
           <>
             <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">

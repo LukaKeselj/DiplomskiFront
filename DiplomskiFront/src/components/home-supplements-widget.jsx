@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
+import { Skeleton } from "@/components/ui/skeleton"
 import { UserSupplementForm } from "@/components/user-supplement-form"
 import { cn, formatFullDateLabel } from "@/lib/utils"
 
@@ -29,7 +30,7 @@ function toDateKey(date) {
   return `${year}-${month}-${day}`
 }
 
-export function HomeSupplementsWidget({ date }) {
+export function HomeSupplementsWidget({ date, onSupplementChange }) {
   const selectedDate = useMemo(() => date ?? new Date(), [date])
   const dateKey = useMemo(() => toDateKey(selectedDate), [selectedDate])
   const todayKey = useMemo(() => toDateKey(new Date()), [])
@@ -41,6 +42,7 @@ export function HomeSupplementsWidget({ date }) {
   const [takenMap, setTakenMap] = useState({})
   const [isLoading, setIsLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [detailEntry, setDetailEntry] = useState(null)
 
   useEffect(() => {
     Promise.all([
@@ -80,6 +82,7 @@ export function HomeSupplementsWidget({ date }) {
         date: dateKey,
         taken: nextTaken,
       })
+      onSupplementChange?.()
     } catch (error) {
       setTakenMap((prev) => ({ ...prev, [userSupplementId]: !nextTaken }))
       toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
@@ -121,7 +124,11 @@ export function HomeSupplementsWidget({ date }) {
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Učitavanje...</p>
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-8 w-full" />
+            ))}
+          </div>
         ) : (
           <>
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -141,7 +148,15 @@ export function HomeSupplementsWidget({ date }) {
                       return (
                         <div
                           key={item._id}
-                          className="flex items-center gap-2 rounded-lg px-1.5 py-1.5 text-sm text-muted-foreground"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setDetailEntry({ item, supplement })}
+                          onKeyDown={(event) => {
+                            if (event.key !== "Enter" && event.key !== " ") return
+                            event.preventDefault()
+                            setDetailEntry({ item, supplement })
+                          }}
+                          className="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/50"
                         >
                           <span className="truncate">
                             {supplement?.name ?? "Nepoznat suplement"}
@@ -152,14 +167,24 @@ export function HomeSupplementsWidget({ date }) {
                     }
 
                     return (
-                      <label
+                      <div
                         key={item._id}
-                        className="flex items-center gap-2 rounded-lg px-1.5 py-1.5 text-sm transition-colors hover:bg-muted/50"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setDetailEntry({ item, supplement })}
+                        onKeyDown={(event) => {
+                          if (event.key !== "Enter" && event.key !== " ") return
+                          event.preventDefault()
+                          setDetailEntry({ item, supplement })
+                        }}
+                        className="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1.5 text-sm transition-colors hover:bg-muted/50"
                       >
-                        <Checkbox
-                          checked={taken}
-                          onCheckedChange={(checked) => handleToggle(item._id, checked === true)}
-                        />
+                        <span onClick={(event) => event.stopPropagation()}>
+                          <Checkbox
+                            checked={taken}
+                            onCheckedChange={(checked) => handleToggle(item._id, checked === true)}
+                          />
+                        </span>
                         <span
                           className={cn(
                             "truncate",
@@ -171,7 +196,7 @@ export function HomeSupplementsWidget({ date }) {
                         <span className="ml-auto shrink-0 text-xs text-muted-foreground">
                           {item.dosage}
                         </span>
-                      </label>
+                      </div>
                     )
                   })}
                 </div>
@@ -206,6 +231,31 @@ export function HomeSupplementsWidget({ date }) {
               onCancel={() => setIsFormOpen(false)}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!detailEntry} onOpenChange={(open) => !open && setDetailEntry(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{detailEntry?.supplement?.name ?? "Nepoznat suplement"}</DialogTitle>
+            <DialogDescription>
+              {[detailEntry?.item?.dosage, detailEntry?.item?.timeOfDay]
+                .filter(Boolean)
+                .join(" • ")}
+            </DialogDescription>
+          </DialogHeader>
+          {detailEntry?.supplement?.imageUrl && (
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
+              <img
+                src={detailEntry.supplement.imageUrl}
+                alt=""
+                className="h-full w-full object-contain"
+              />
+            </div>
+          )}
+          <p className="text-sm text-muted-foreground">
+            {detailEntry?.supplement?.description || "Nema unetog opisa za ovaj suplement."}
+          </p>
         </DialogContent>
       </Dialog>
     </Card>

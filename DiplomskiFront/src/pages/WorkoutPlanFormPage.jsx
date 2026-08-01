@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import { getWorkoutPlanRequest } from "@/api/workoutPlans"
 import { AppLayout } from "@/components/app-layout"
 import { WorkoutPlanForm } from "@/components/workout-plan-form"
+import { FormSkeleton } from "@/components/ui/form-skeleton"
 
 export default function WorkoutPlanFormPage() {
   const { id } = useParams()
@@ -33,7 +34,7 @@ export default function WorkoutPlanFormPage() {
     <AppLayout breadcrumb={isEditing ? "Izmena plana" : "Novi plan"}>
       <div className="mx-auto w-full max-w-2xl">
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Učitavanje...</p>
+          <FormSkeleton fields={5} />
         ) : (
           <WorkoutPlanForm plan={plan} />
         )}

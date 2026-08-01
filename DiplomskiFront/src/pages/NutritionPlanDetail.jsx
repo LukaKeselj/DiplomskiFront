@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
 import { getNutritionCycleDayIndex, isBeforeActivation } from "@/lib/nutrition-cycle"
@@ -91,7 +93,20 @@ export default function NutritionPlanDetail() {
   return (
     <AppLayout breadcrumb={plan?.name ?? "Plan ishrane"}>
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje...</p>
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+          <div className="flex items-center justify-between gap-2">
+            <Skeleton className="h-7 w-40" />
+            <Skeleton className="h-9 w-24" />
+          </div>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-1/3" />
+                <Skeleton className="h-4 w-1/4" />
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
       ) : plan ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
@@ -126,51 +141,54 @@ export default function NutritionPlanDetail() {
             </div>
           </div>
 
-          {plan.days.map((day, dayIndex) => {
-            const items = day.items ?? []
-            const isToday = dayIndex === todayDayIndex
-            return (
-              <Card
-                key={day._id ?? dayIndex}
-                className={cn(
-                  isToday &&
-                    "border-primary shadow-[0_0_0_1px] shadow-primary ring-4 ring-primary/20"
-                )}
-              >
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <CardTitle>{day.dayName}</CardTitle>
-                    {isToday && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                        Danas
-                      </span>
+          <CardGrid className="contents">
+            {plan.days.map((day, dayIndex) => {
+              const items = day.items ?? []
+              const isToday = dayIndex === todayDayIndex
+              return (
+                <CardGridItem key={day._id ?? dayIndex} hover={false}>
+                  <Card
+                    className={cn(
+                      isToday &&
+                        "border-primary shadow-[0_0_0_1px] shadow-primary ring-4 ring-primary/20"
                     )}
-                  </div>
-                  <CardDescription>
-                    {items.length === 0
-                      ? "Nema planiranih namirnica"
-                      : `${items.length} ${items.length === 1 ? "namirnica" : "namirnica"}`}
-                  </CardDescription>
-                </CardHeader>
-                {items.length > 0 && (
-                  <CardContent className="flex flex-col gap-1.5">
-                    {items.map((item) => (
-                      <div
-                        key={item._id}
-                        className="flex flex-col gap-0.5 rounded-lg border px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <span className="text-sm font-medium">{item.foodName}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {item.calories} kcal • {item.protein}g protein • {item.fat}g masti •{" "}
-                          {item.carbs}g UH
-                        </span>
+                  >
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <CardTitle>{day.dayName}</CardTitle>
+                        {isToday && (
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                            Danas
+                          </span>
+                        )}
                       </div>
-                    ))}
-                  </CardContent>
-                )}
-              </Card>
-            )
-          })}
+                      <CardDescription>
+                        {items.length === 0
+                          ? "Nema planiranih namirnica"
+                          : `${items.length} ${items.length === 1 ? "namirnica" : "namirnica"}`}
+                      </CardDescription>
+                    </CardHeader>
+                    {items.length > 0 && (
+                      <CardContent className="flex flex-col gap-1.5">
+                        {items.map((item) => (
+                          <div
+                            key={item._id}
+                            className="flex flex-col gap-0.5 rounded-lg border px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <span className="text-sm font-medium">{item.foodName}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {item.calories} kcal • {item.protein}g protein • {item.fat}g masti •{" "}
+                              {item.carbs}g UH
+                            </span>
+                          </div>
+                        ))}
+                      </CardContent>
+                    )}
+                  </Card>
+                </CardGridItem>
+              )
+            })}
+          </CardGrid>
 
           <Button variant="outline" onClick={() => navigate("/nutrition-plans")}>
             Nazad na listu

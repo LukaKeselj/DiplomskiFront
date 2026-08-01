@@ -36,6 +36,19 @@ function ChartContainer({
 }) {
   const uniqueId = React.useId()
   const chartId = `chart-${id ?? uniqueId.replace(/:/g, "")}`
+  // ResponsiveContainer's first real resize measurement lands right after mount —
+  // if the chart (and its entrance animation) is already mounted when that hits,
+  // recharts snaps straight to the final frame instead of animating. Holding off
+  // the chart itself for two frames lets that first resize settle first.
+  const [isSettled, setIsSettled] = React.useState(false)
+  const rafRef = React.useRef(null)
+
+  React.useEffect(() => {
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = requestAnimationFrame(() => setIsSettled(true))
+    })
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [])
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -49,7 +62,7 @@ function ChartContainer({
         {...props}>
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer initialDimension={initialDimension}>
-          {children}
+          {isSettled ? children : <div />}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>

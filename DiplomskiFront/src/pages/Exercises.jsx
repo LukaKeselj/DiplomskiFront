@@ -1,18 +1,33 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 import toast from "react-hot-toast"
-import { Play, Plus } from "lucide-react"
+import { Activity, Pencil, Play, Plus, Search, Trash2 } from "lucide-react"
 
-import { getExercisesRequest } from "@/api/exercises"
+import { deleteExerciseRequest, getExercisesRequest } from "@/api/exercises"
 import { AppLayout } from "@/components/app-layout"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { CardGrid, CardGridItem } from "@/components/ui/card-grid"
+import { CardGridSkeleton } from "@/components/ui/card-grid-skeleton"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -24,7 +39,8 @@ import { useAuth } from "@/context/AuthContext"
 import { MUSCLE_GROUPS } from "@/lib/muscle-groups"
 import { getYoutubeEmbedUrl, getYoutubeThumbnailUrl } from "@/lib/youtube"
 
-function ExerciseCard({ exercise }) {
+function ExerciseCard({ exercise, isAdmin, onDeleteRequest }) {
+  const navigate = useNavigate()
   const [isPlaying, setIsPlaying] = useState(false)
   const thumbnailUrl = getYoutubeThumbnailUrl(exercise.videoUrl)
   const embedUrl = getYoutubeEmbedUrl(exercise.videoUrl)
@@ -42,12 +58,34 @@ function ExerciseCard({ exercise }) {
     setIsPlaying(true)
   }
 
+  function handleEditClick(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    navigate(`/exercises/${exercise._id}/edit`)
+  }
+
+  function handleDeleteClick(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    onDeleteRequest(exercise)
+  }
+
   return (
     <Link to={`/exercises/${exercise._id}`}>
       <Card className="h-full transition-colors hover:bg-muted/50">
         <CardHeader>
           <CardTitle>{exercise.name}</CardTitle>
           <CardDescription className="capitalize">{exercise.muscleGroup}</CardDescription>
+          {isAdmin && (
+            <CardAction className="flex gap-2">
+              <Button variant="outline" size="icon" onClick={handleEditClick}>
+                <Pencil />
+              </Button>
+              <Button variant="destructive" size="icon" onClick={handleDeleteClick}>
+                <Trash2 />
+              </Button>
+            </CardAction>
+          )}
         </CardHeader>
         {(thumbnailUrl || exercise.equipment) && (
           <CardContent className="flex flex-col gap-3">
@@ -96,6 +134,9 @@ export default function Exercises() {
   const [exercises, setExercises] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [muscleGroupFilter, setMuscleGroupFilter] = useState("all")
+  const [query, setQuery] = useState("")
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     getExercisesRequest()
@@ -106,27 +147,56 @@ export default function Exercises() {
       .finally(() => setIsLoading(false))
   }, [])
 
-  const visibleExercises =
-    muscleGroupFilter === "all"
-      ? exercises
-      : exercises.filter((exercise) => exercise.muscleGroup === muscleGroupFilter)
+  async function handleDelete() {
+    if (!deleteTarget) return
+
+    setIsDeleting(true)
+    try {
+      await deleteExerciseRequest(deleteTarget._id)
+      setExercises((prev) => prev.filter((item) => item._id !== deleteTarget._id))
+      toast.success("Vežba je obrisana")
+      setDeleteTarget(null)
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Brisanje vežbe nije uspelo")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const trimmedQuery = query.trim().toLowerCase()
+  const visibleExercises = exercises.filter((exercise) => {
+    const matchesGroup = muscleGroupFilter === "all" || exercise.muscleGroup === muscleGroupFilter
+    const matchesQuery = !trimmedQuery || exercise.name.toLowerCase().includes(trimmedQuery)
+    return matchesGroup && matchesQuery
+  })
 
   return (
     <AppLayout breadcrumb="Vežbe">
-      <div className="flex items-center justify-between gap-4">
-        <Select value={muscleGroupFilter} onValueChange={setMuscleGroupFilter}>
-          <SelectTrigger className="w-56">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Sve mišićne grupe</SelectItem>
-            {MUSCLE_GROUPS.map((group) => (
-              <SelectItem key={group.value} value={group.value}>
-                {group.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="w-56 pl-8"
+              placeholder="Pretraži vežbe..."
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
+          <Select value={muscleGroupFilter} onValueChange={setMuscleGroupFilter}>
+            <SelectTrigger className="w-56">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Sve mišićne grupe</SelectItem>
+              {MUSCLE_GROUPS.map((group) => (
+                <SelectItem key={group.value} value={group.value}>
+                  {group.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         {isAdmin && (
           <Button asChild>
             <Link to="/exercises/new">
@@ -138,16 +208,58 @@ export default function Exercises() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Učitavanje vežbi...</p>
+        <CardGridSkeleton />
       ) : visibleExercises.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nema vežbi za prikaz</p>
+        <EmptyState
+          icon={Activity}
+          title="Nema vežbi za prikaz"
+          description={
+            isAdmin
+              ? "Dodaj prvu vežbu ili promeni pretragu/filter."
+              : "Promeni pretragu ili filter mišićne grupe."
+          }
+          action={
+            isAdmin && (
+              <Button asChild size="sm">
+                <Link to="/exercises/new">
+                  <Plus />
+                  Dodaj vežbu
+                </Link>
+              </Button>
+            )
+          }
+        />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <CardGrid className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleExercises.map((exercise) => (
-            <ExerciseCard key={exercise._id} exercise={exercise} />
+            <CardGridItem key={exercise._id}>
+              <ExerciseCard
+                exercise={exercise}
+                isAdmin={isAdmin}
+                onDeleteRequest={setDeleteTarget}
+              />
+            </CardGridItem>
           ))}
-        </div>
+        </CardGrid>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Obrisati vežbu?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Da li si siguran da želiš da obrišeš vežbu &quot;{deleteTarget?.name}&quot;? Ova
+              akcija se ne može poništiti.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? "Brisanje..." : "Obriši"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   )
 }
