@@ -51,7 +51,7 @@ const data = {
       icon: TrendingUp,
       items: [
         { title: "Telesna težina", url: "/body-weight" },
-        { title: "Vežbe", url: "/exercise-progress" },
+        { title: "Progres vežbi", url: "/exercise-progress" },
       ],
     },
     {

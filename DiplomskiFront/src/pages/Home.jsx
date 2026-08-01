@@ -6,6 +6,7 @@ import { getAllUsersRequest, setUserBlockedStatusRequest } from "@/api/users"
 import { getExercisesRequest } from "@/api/exercises"
 import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
   SheetContent,
@@ -173,6 +174,7 @@ export default function Home() {
             onSelectDate={setSelectedDate}
             refreshKey={nutritionRefreshKey}
           />
+          <Separator />
           <HomeWorkoutWidget date={selectedDate} />
           <div className="grid items-start gap-4 md:grid-cols-2">
             <HomeNutritionWidget

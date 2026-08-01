@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
 import { Pencil, Trash2 } from "lucide-react"
@@ -22,6 +22,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/AuthContext"
+import { cn } from "@/lib/utils"
+import { getNutritionCycleDayIndex, isBeforeActivation } from "@/lib/nutrition-cycle"
 
 export default function NutritionPlanDetail() {
   const { id } = useParams()
@@ -34,6 +36,14 @@ export default function NutritionPlanDetail() {
   const [isActivating, setIsActivating] = useState(false)
 
   const isActivePlan = user?.activeNutritionPlan === id
+
+  const activeNutritionPlanStartDate = user?.activeNutritionPlanStartDate
+
+  const todayDayIndex = useMemo(() => {
+    if (!isActivePlan || !plan?.days?.length) return -1
+    if (isBeforeActivation(activeNutritionPlanStartDate, new Date())) return -1
+    return getNutritionCycleDayIndex(activeNutritionPlanStartDate, new Date(), plan.days.length)
+  }, [isActivePlan, plan, activeNutritionPlanStartDate])
 
   useEffect(() => {
     getNutritionPlanRequest(id)
@@ -118,10 +128,24 @@ export default function NutritionPlanDetail() {
 
           {plan.days.map((day, dayIndex) => {
             const items = day.items ?? []
+            const isToday = dayIndex === todayDayIndex
             return (
-              <Card key={day._id ?? dayIndex}>
+              <Card
+                key={day._id ?? dayIndex}
+                className={cn(
+                  isToday &&
+                    "border-primary shadow-[0_0_0_1px] shadow-primary ring-4 ring-primary/20"
+                )}
+              >
                 <CardHeader>
-                  <CardTitle>{day.dayName}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle>{day.dayName}</CardTitle>
+                    {isToday && (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        Danas
+                      </span>
+                    )}
+                  </div>
                   <CardDescription>
                     {items.length === 0
                       ? "Nema planiranih namirnica"
@@ -131,9 +155,12 @@ export default function NutritionPlanDetail() {
                 {items.length > 0 && (
                   <CardContent className="flex flex-col gap-1.5">
                     {items.map((item) => (
-                      <div key={item._id} className="flex items-center justify-between text-sm">
-                        <span>{item.foodName}</span>
-                        <span className="text-muted-foreground">
+                      <div
+                        key={item._id}
+                        className="flex flex-col gap-0.5 rounded-lg border px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <span className="text-sm font-medium">{item.foodName}</span>
+                        <span className="text-xs text-muted-foreground">
                           {item.calories} kcal • {item.protein}g protein • {item.fat}g masti •{" "}
                           {item.carbs}g UH
                         </span>
