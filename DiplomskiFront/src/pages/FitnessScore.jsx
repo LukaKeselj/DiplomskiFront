@@ -35,13 +35,13 @@ const BREAKDOWN_ROWS = [
     key: "nutrition",
     label: "Ishrana",
     icon: Apple,
-    describe: (b) => `${b.loggedDays}/${b.totalDays} dana sa unosom`,
+    describe: (b) => (b.expected > 0 ? `${b.completed}/${b.expected} stavki iz plana` : `${b.loggedDays}/${b.totalDays} dana sa unosom`),
   },
   {
     key: "weight",
     label: "Težina",
     icon: Scale,
-    describe: (b) => (b.logged ? "Uneta ove nedelje" : "Nije uneta ove nedelje"),
+    describe: (b) => (b.logged ? `BMI ${b.bmi} (${b.weight} kg)` : "Nije uneta ove nedelje"),
   },
   {
     key: "supplements",

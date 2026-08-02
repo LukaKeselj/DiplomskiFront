@@ -4,6 +4,7 @@ import Register from "@/pages/Register"
 import ForgotPassword from "@/pages/ForgotPassword"
 import ResetPassword from "@/pages/ResetPassword"
 import CompleteProfile from "@/pages/CompleteProfile"
+import Landing from "@/pages/Landing"
 import Home from "@/pages/Home"
 import Exercises from "@/pages/Exercises"
 import ExerciseDetail from "@/pages/ExerciseDetail"
@@ -26,6 +27,12 @@ import NutritionPlanDetail from "@/pages/NutritionPlanDetail"
 import NutritionPlanFormPage from "@/pages/NutritionPlanFormPage"
 import NotFound from "@/pages/NotFound"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
+import { useAuth } from "@/context/AuthContext"
+
+function RootRoute() {
+  const { user } = useAuth()
+  return user ? <Home /> : <Landing />
+}
 
 export function AppRoutes() {
   return (
@@ -35,14 +42,7 @@ export function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/complete-profile" element={<CompleteProfile />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/" element={<RootRoute />} />
       <Route
         path="/exercises"
         element={
