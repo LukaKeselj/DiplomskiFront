@@ -2,6 +2,7 @@ import { Component } from "react"
 import { Dumbbell } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import i18n from "@/i18n"
 
 export class ErrorBoundary extends Component {
   state = { hasError: false }
@@ -25,15 +26,15 @@ export class ErrorBoundary extends Component {
           <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <Dumbbell className="size-4" />
           </div>
-          IronLog
+          {i18n.t("common.appName")}
         </div>
         <div className="space-y-2">
-          <h1 className="text-xl font-medium">Nešto je pošlo po zlu</h1>
-          <p className="text-sm text-muted-foreground">
-            Došlo je do neočekivane greške. Osveži stranicu i pokušaj ponovo.
-          </p>
+          <h1 className="text-xl font-medium">{i18n.t("errorBoundary.title")}</h1>
+          <p className="text-sm text-muted-foreground">{i18n.t("errorBoundary.description")}</p>
         </div>
-        <Button onClick={() => window.location.assign("/")}>Nazad na početnu</Button>
+        <Button onClick={() => window.location.assign("/")}>
+          {i18n.t("errorBoundary.backHome")}
+        </Button>
       </div>
     )
   }

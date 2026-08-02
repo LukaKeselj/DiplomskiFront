@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router"
+import { useTranslation } from "react-i18next"
 import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -24,6 +25,7 @@ export function NavUser({ onOpenAccount }) {
   const { isMobile } = useSidebar()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   async function handleLogout() {
     await logout()
@@ -79,13 +81,13 @@ export function NavUser({ onOpenAccount }) {
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={onOpenAccount}>
                 <BadgeCheck />
-                Nalog
+                {t("sidebar.account")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Odjavi se
+              {t("sidebar.logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router"
+import { useTranslation } from "react-i18next"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -16,10 +17,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageToggle } from "@/components/language-toggle"
 
 export function AppLayout({ breadcrumb, children }) {
   const location = useLocation()
   const isHome = location.pathname === "/"
+  const { t } = useTranslation()
 
   return (
     <SidebarProvider>
@@ -38,7 +41,7 @@ export function AppLayout({ breadcrumb, children }) {
                   <>
                     <BreadcrumbItem>
                       <BreadcrumbLink asChild>
-                        <Link to="/">Početna</Link>
+                        <Link to="/">{t("common.home")}</Link>
                       </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
@@ -50,7 +53,10 @@ export function AppLayout({ breadcrumb, children }) {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <ThemeToggle className="mr-4" />
+          <div className="mr-4 flex items-center gap-2">
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
         </header>
         <div
           key={location.pathname}

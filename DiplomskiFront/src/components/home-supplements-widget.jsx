@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Pill, Plus } from "lucide-react"
 
 import {
@@ -31,6 +32,7 @@ function toDateKey(date) {
 }
 
 export function HomeSupplementsWidget({ date, onSupplementChange }) {
+  const { t } = useTranslation()
   const selectedDate = useMemo(() => date ?? new Date(), [date])
   const dateKey = useMemo(() => toDateKey(selectedDate), [selectedDate])
   const todayKey = useMemo(() => toDateKey(new Date()), [])
@@ -60,9 +62,10 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
         setTakenMap(map)
       })
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje suplemenata")
+        toast.error(error.response?.data?.message || t("home.supplementsWidget.toasts.loadError"))
       })
       .finally(() => setIsLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateKey])
 
   const supplementById = useMemo(() => {
@@ -85,7 +88,7 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
       onSupplementChange?.()
     } catch (error) {
       setTakenMap((prev) => ({ ...prev, [userSupplementId]: !nextTaken }))
-      toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
+      toast.error(error.response?.data?.message || t("home.supplementsWidget.toasts.saveError"))
     }
   }
 
@@ -105,9 +108,11 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-heading text-sm font-medium">
-              {isToday ? "Suplementi danas" : `Suplementi — ${formatFullDateLabel(selectedDate)}`}
+              {isToday
+                ? t("home.supplementsWidget.titleToday")
+                : t("home.supplementsWidget.titleForDate", { date: formatFullDateLabel(selectedDate) })}
             </p>
-            <p className="truncate text-xs text-muted-foreground">Tvoj dnevni režim</p>
+            <p className="truncate text-xs text-muted-foreground">{t("home.supplementsWidget.subtitle")}</p>
           </div>
           {userSupplements.length > 0 && (
             <span className="shrink-0 text-xs font-medium text-muted-foreground">
@@ -135,7 +140,7 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
               {userSupplements.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border py-8 text-center">
                   <p className="text-sm text-muted-foreground">
-                    Nemaš aktivnih suplemenata u režimu
+                    {t("home.supplementsWidget.noSupplements")}
                   </p>
                 </div>
               ) : (
@@ -159,7 +164,7 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
                           className="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/50"
                         >
                           <span className="truncate">
-                            {supplement?.name ?? "Nepoznat suplement"}
+                            {supplement?.name ?? t("home.supplementsWidget.unknownSupplement")}
                           </span>
                           <span className="ml-auto shrink-0 text-xs">{item.dosage}</span>
                         </div>
@@ -191,7 +196,7 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
                             taken && "text-muted-foreground line-through"
                           )}
                         >
-                          {supplement?.name ?? "Nepoznat suplement"}
+                          {supplement?.name ?? t("home.supplementsWidget.unknownSupplement")}
                         </span>
                         <span className="ml-auto shrink-0 text-xs text-muted-foreground">
                           {item.dosage}
@@ -212,7 +217,7 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
                 onClick={() => setIsFormOpen(true)}
               >
                 <Plus />
-                Dodaj suplement
+                {t("home.supplementsWidget.addSupplement")}
               </Button>
             )}
           </>
@@ -222,8 +227,8 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Dodaj suplement</DialogTitle>
-            <DialogDescription>Dodaj suplement iz kataloga u svoj režim.</DialogDescription>
+            <DialogTitle>{t("home.supplementsWidget.addDialog.title")}</DialogTitle>
+            <DialogDescription>{t("home.supplementsWidget.addDialog.description")}</DialogDescription>
           </DialogHeader>
           {isFormOpen && (
             <UserSupplementForm
@@ -237,7 +242,7 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
       <Dialog open={!!detailEntry} onOpenChange={(open) => !open && setDetailEntry(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{detailEntry?.supplement?.name ?? "Nepoznat suplement"}</DialogTitle>
+            <DialogTitle>{detailEntry?.supplement?.name ?? t("home.supplementsWidget.unknownSupplement")}</DialogTitle>
             <DialogDescription>
               {[detailEntry?.item?.dosage, detailEntry?.item?.timeOfDay]
                 .filter(Boolean)
@@ -254,7 +259,7 @@ export function HomeSupplementsWidget({ date, onSupplementChange }) {
             </div>
           )}
           <p className="text-sm text-muted-foreground">
-            {detailEntry?.supplement?.description || "Nema unetog opisa za ovaj suplement."}
+            {detailEntry?.supplement?.description || t("home.supplementsWidget.detailDialog.noDescription")}
           </p>
         </DialogContent>
       </Dialog>

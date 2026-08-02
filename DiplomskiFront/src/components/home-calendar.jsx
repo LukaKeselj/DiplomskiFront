@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { CalendarDays, ChevronDown } from "lucide-react"
 import { srLatn } from "date-fns/locale"
 
@@ -20,13 +21,14 @@ function toDateKey(date) {
 }
 
 const SUMMARY_ITEMS = [
-  { key: "calories", label: "Kalorije", unit: "kcal", color: "text-orange-600 dark:text-orange-400" },
-  { key: "protein", label: "Proteini", unit: "g", color: "text-rose-600 dark:text-rose-400" },
-  { key: "fat", label: "Masti", unit: "g", color: "text-violet-600 dark:text-violet-400" },
-  { key: "carbs", label: "UH", unit: "g", color: "text-blue-600 dark:text-blue-400" },
+  { key: "calories", labelKey: "home.calendar.summary.calories", unit: "kcal", color: "text-orange-600 dark:text-orange-400" },
+  { key: "protein", labelKey: "home.calendar.summary.protein", unit: "g", color: "text-rose-600 dark:text-rose-400" },
+  { key: "fat", labelKey: "home.calendar.summary.fat", unit: "g", color: "text-violet-600 dark:text-violet-400" },
+  { key: "carbs", labelKey: "home.calendar.summary.carbs", unit: "g", color: "text-blue-600 dark:text-blue-400" },
 ]
 
 export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [weightLogs, setWeightLogs] = useState([])
   const [summary, setSummary] = useState(null)
@@ -63,7 +65,7 @@ export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
             <button type="button" className="flex w-full items-center gap-2 text-left">
               <CalendarDays className="size-4 text-muted-foreground" />
               <div className="flex-1">
-                <span className="font-heading text-sm font-medium">Kalendar</span>
+                <span className="font-heading text-sm font-medium">{t("home.calendar.title")}</span>
                 <span className="block text-xs text-muted-foreground">
                   {formatFullDateLabel(selectedDate)}
                 </span>
@@ -78,7 +80,7 @@ export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
               <h3 className="text-sm font-medium">{formatFullDateLabel(selectedDate)}</h3>
               {!isToday && (
                 <Button size="sm" variant="ghost" onClick={() => onSelectDate(new Date())}>
-                  Danas
+                  {t("home.calendar.today")}
                 </Button>
               )}
             </div>
@@ -92,11 +94,11 @@ export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
                 className="rounded-md border p-2"
               />
               <div className="rounded-lg border border-border p-3">
-                <h4 className="mb-2 text-xs font-medium text-muted-foreground">Napredak težine</h4>
+                <h4 className="mb-2 text-xs font-medium text-muted-foreground">{t("home.calendar.weightProgress")}</h4>
                 {isLoading ? (
                   <Skeleton className="h-40 w-full" />
                 ) : weightLogs.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Nema unetih merenja težine</p>
+                  <p className="text-sm text-muted-foreground">{t("home.calendar.noWeightLogs")}</p>
                 ) : (
                   <WeightHistoryChart logs={weightLogs} className="aspect-auto h-40" />
                 )}
@@ -104,7 +106,7 @@ export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
             </div>
 
             <div className="rounded-lg border border-border p-3">
-              <h4 className="mb-2 text-xs font-medium text-muted-foreground">Ishrana ovog dana</h4>
+              <h4 className="mb-2 text-xs font-medium text-muted-foreground">{t("home.calendar.nutritionForDay")}</h4>
               {isLoading ? (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                   {Array.from({ length: 4 }).map((_, i) => (
@@ -124,7 +126,7 @@ export function HomeCalendar({ selectedDate, onSelectDate, refreshKey }) {
                           {item.unit}
                         </span>
                       </span>
-                      <span className="text-xs text-muted-foreground">{item.label}</span>
+                      <span className="text-xs text-muted-foreground">{t(item.labelKey)}</span>
                     </div>
                   ))}
                 </div>

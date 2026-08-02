@@ -1,5 +1,6 @@
 import { useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
@@ -10,6 +11,7 @@ export function ForgotPasswordForm({ className, ...props }) {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSent, setIsSent] = useState(false)
+  const { t } = useTranslation()
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -18,7 +20,7 @@ export function ForgotPasswordForm({ className, ...props }) {
       await forgotPasswordRequest(email)
       setIsSent(true)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong")
+      toast.error(error.response?.data?.message || t("auth.forgotPassword.errors.generic"))
     } finally {
       setIsSubmitting(false)
     }
@@ -28,14 +30,14 @@ export function ForgotPasswordForm({ className, ...props }) {
     return (
       <div className={cn("flex flex-col gap-6", className)} {...props}>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Check your email</h1>
+          <h1 className="text-2xl font-bold">{t("auth.forgotPassword.sentTitle")}</h1>
           <p className="text-sm text-balance text-muted-foreground">
-            If an account exists for {email}, we&apos;ve sent a link to reset your password.
+            {t("auth.forgotPassword.sentDescription", { email })}
           </p>
         </div>
         <FieldDescription className="text-center">
           <a href="/login" className="underline underline-offset-4">
-            Back to login
+            {t("auth.forgotPassword.backToLogin")}
           </a>
         </FieldDescription>
       </div>
@@ -46,13 +48,13 @@ export function ForgotPasswordForm({ className, ...props }) {
     <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Forgot your password?</h1>
+          <h1 className="text-2xl font-bold">{t("auth.forgotPassword.title")}</h1>
           <p className="text-sm text-balance text-muted-foreground">
-            Enter your email and we&apos;ll send you a link to reset it
+            {t("auth.forgotPassword.subtitle")}
           </p>
         </div>
         <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <FieldLabel htmlFor="email">{t("auth.forgotPassword.emailLabel")}</FieldLabel>
           <Input
             id="email"
             type="email"
@@ -64,13 +66,13 @@ export function ForgotPasswordForm({ className, ...props }) {
         </Field>
         <Field>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Sending..." : "Send reset link"}
+            {isSubmitting ? t("auth.forgotPassword.submitting") : t("auth.forgotPassword.submit")}
           </Button>
         </Field>
         <FieldDescription className="text-center">
-          Remember your password?{" "}
+          {t("auth.forgotPassword.rememberPassword")}{" "}
           <a href="/login" className="underline underline-offset-4">
-            Login
+            {t("auth.forgotPassword.login")}
           </a>
         </FieldDescription>
       </FieldGroup>

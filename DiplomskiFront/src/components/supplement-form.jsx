@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 
 import { createSupplementRequest, updateSupplementRequest } from "@/api/supplements"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
 export function SupplementForm({ supplement }) {
+  const { t } = useTranslation()
   const isEditing = Boolean(supplement)
   const navigate = useNavigate()
   const [name, setName] = useState(supplement?.name ?? "")
@@ -21,7 +23,7 @@ export function SupplementForm({ supplement }) {
     event.preventDefault()
 
     if (!name.trim()) {
-      toast.error("Naziv suplementa je obavezan")
+      toast.error(t("supplements.form.nameRequired"))
       return
     }
 
@@ -31,17 +33,17 @@ export function SupplementForm({ supplement }) {
     try {
       if (isEditing) {
         await updateSupplementRequest(supplement._id, payload)
-        toast.success("Suplement je ažuriran")
+        toast.success(t("supplements.form.updateSuccess"))
       } else {
         await createSupplementRequest(payload)
-        toast.success("Suplement je kreiran")
+        toast.success(t("supplements.form.createSuccess"))
       }
       navigate("/supplements")
     } catch (error) {
       if (error.response?.status === 409) {
-        toast.error("Suplement sa tim nazivom već postoji")
+        toast.error(t("supplements.form.duplicateName"))
       } else {
-        toast.error(error.response?.data?.message || "Čuvanje suplementa nije uspelo")
+        toast.error(error.response?.data?.message || t("supplements.form.saveFailed"))
       }
     } finally {
       setIsSubmitting(false)
@@ -59,19 +61,19 @@ export function SupplementForm({ supplement }) {
             </AvatarFallback>
           </Avatar>
           <Field className="flex-1">
-            <FieldLabel htmlFor="supplement-image-url">Link do slike</FieldLabel>
+            <FieldLabel htmlFor="supplement-image-url">{t("supplements.form.imageUrlLabel")}</FieldLabel>
             <Input
               id="supplement-image-url"
               type="url"
-              placeholder="https://..."
+              placeholder={t("supplements.form.imageUrlPlaceholder")}
               value={imageUrl}
               onChange={(event) => setImageUrl(event.target.value)}
             />
-            <FieldDescription>Nalepi link do slike sa neta. Opciono.</FieldDescription>
+            <FieldDescription>{t("supplements.form.imageUrlHint")}</FieldDescription>
           </Field>
         </div>
         <Field>
-          <FieldLabel htmlFor="supplement-name">Naziv suplementa</FieldLabel>
+          <FieldLabel htmlFor="supplement-name">{t("supplements.form.nameLabel")}</FieldLabel>
           <Input
             id="supplement-name"
             value={name}
@@ -80,10 +82,10 @@ export function SupplementForm({ supplement }) {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="supplement-description">Opis / namena</FieldLabel>
+          <FieldLabel htmlFor="supplement-description">{t("supplements.form.descriptionLabel")}</FieldLabel>
           <Textarea
             id="supplement-description"
-            placeholder="Za šta se ovaj suplement koristi..."
+            placeholder={t("supplements.form.descriptionPlaceholder")}
             rows={4}
             value={description}
             onChange={(event) => setDescription(event.target.value)}
@@ -91,10 +93,14 @@ export function SupplementForm({ supplement }) {
         </Field>
         <div className="flex gap-2">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Čuvanje..." : isEditing ? "Sačuvaj izmene" : "Kreiraj suplement"}
+            {isSubmitting
+              ? t("supplements.form.saving")
+              : isEditing
+                ? t("supplements.form.saveChanges")
+                : t("supplements.form.createSupplement")}
           </Button>
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-            Otkaži
+            {t("supplements.form.cancel")}
           </Button>
         </div>
       </FieldGroup>

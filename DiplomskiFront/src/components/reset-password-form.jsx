@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate, useSearchParams } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
@@ -14,27 +15,28 @@ export function ResetPasswordForm({ className, ...props }) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const token = searchParams.get("token")
+  const { t } = useTranslation()
 
   async function handleSubmit(event) {
     event.preventDefault()
 
     if (!token) {
-      toast.error("Reset link is invalid or has expired")
+      toast.error(t("auth.resetPassword.errors.invalidLink"))
       return
     }
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match")
+      toast.error(t("auth.resetPassword.errors.mismatch"))
       return
     }
 
     setIsSubmitting(true)
     try {
       await resetPasswordRequest(token, password)
-      toast.success("Password reset successfully")
+      toast.success(t("auth.resetPassword.success"))
       navigate("/login")
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong")
+      toast.error(error.response?.data?.message || t("auth.resetPassword.errors.generic"))
     } finally {
       setIsSubmitting(false)
     }
@@ -44,13 +46,13 @@ export function ResetPasswordForm({ className, ...props }) {
     <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Reset your password</h1>
+          <h1 className="text-2xl font-bold">{t("auth.resetPassword.title")}</h1>
           <p className="text-sm text-balance text-muted-foreground">
-            Enter a new password for your account
+            {t("auth.resetPassword.subtitle")}
           </p>
         </div>
         <Field>
-          <FieldLabel htmlFor="password">New password</FieldLabel>
+          <FieldLabel htmlFor="password">{t("auth.resetPassword.newPasswordLabel")}</FieldLabel>
           <Input
             id="password"
             type="password"
@@ -60,7 +62,9 @@ export function ResetPasswordForm({ className, ...props }) {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+          <FieldLabel htmlFor="confirmPassword">
+            {t("auth.resetPassword.confirmPasswordLabel")}
+          </FieldLabel>
           <Input
             id="confirmPassword"
             type="password"
@@ -71,12 +75,12 @@ export function ResetPasswordForm({ className, ...props }) {
         </Field>
         <Field>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Resetting..." : "Reset password"}
+            {isSubmitting ? t("auth.resetPassword.submitting") : t("auth.resetPassword.submit")}
           </Button>
         </Field>
         <FieldDescription className="text-center">
           <a href="/login" className="underline underline-offset-4">
-            Back to login
+            {t("auth.resetPassword.backToLogin")}
           </a>
         </FieldDescription>
       </FieldGroup>

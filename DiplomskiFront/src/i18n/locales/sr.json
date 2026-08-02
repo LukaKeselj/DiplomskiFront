@@ -1,0 +1,998 @@
+{
+  "common": {
+    "appName": "IronLog",
+    "gymAlt": "Teretana",
+    "themeToggleLabel": "Promeni temu",
+    "languageToggleLabel": "Promeni jezik",
+    "home": "Početna"
+  },
+  "landing": {
+    "login": "Prijavi se",
+    "badge": "Tvoj lični fitness pratilac",
+    "heroTitle": "Trening, ishrana i napredak na jednom mestu",
+    "heroDescription": "IronLog je aplikacija koja ti pomaže da isplaniraš treninge, pratiš ishranu i suplemente i vidiš svoj napredak kroz vreme — sve na jednom mestu.",
+    "createAccount": "Napravi nalog",
+    "featuresTitle": "Sve što ti treba na jednom mestu",
+    "featuresDescription": "Od planiranja treninga do praćenja napretka — bez žongliranja između aplikacija.",
+    "features": {
+      "workoutPlans": {
+        "title": "Planovi treninga",
+        "description": "Napravi sopstveni plan treninga ili prati gotove programe po danima."
+      },
+      "exerciseLibrary": {
+        "title": "Baza vežbi",
+        "description": "Pretraži vežbe po mišićnim grupama i prati napredak za svaku od njih."
+      },
+      "fitnessScore": {
+        "title": "Fitness Score",
+        "description": "Jedan broj koji sažima trening, ishranu i telesnu težinu za svaki dan."
+      },
+      "nutritionLog": {
+        "title": "Dnevnik ishrane",
+        "description": "Vodi evidenciju obroka i prati unos kalorija i makronutrijenata."
+      },
+      "supplements": {
+        "title": "Suplementi",
+        "description": "Organizuj svoj režim suplementacije i ne propusti nijedan unos."
+      },
+      "progressTracking": {
+        "title": "Praćenje napretka",
+        "description": "Grafici telesne težine i napretka na vežbama kroz vreme."
+      }
+    },
+    "ctaTitle": "Spreman da počneš?",
+    "ctaDescription": "Prijavi se i preuzmi kontrolu nad svojim treninzima i ishranom."
+  },
+  "auth": {
+    "login": {
+      "title": "Prijavi se na nalog",
+      "subtitle": "Unesi svoj email ispod da se prijaviš na nalog",
+      "emailLabel": "Email",
+      "passwordLabel": "Šifra",
+      "forgotPassword": "Zaboravio si šifru?",
+      "submit": "Prijavi se",
+      "submitting": "Prijavljivanje...",
+      "orContinueWith": "Ili nastavi sa",
+      "noAccount": "Nemaš nalog?",
+      "signUp": "Registruj se",
+      "errors": {
+        "loginFailed": "Prijava nije uspela",
+        "googleLoginFailed": "Google prijava nije uspela"
+      }
+    },
+    "register": {
+      "title": "Napravi nalog",
+      "subtitle": "Popuni formu ispod da napraviš nalog",
+      "firstNameLabel": "Ime",
+      "lastNameLabel": "Prezime",
+      "usernameLabel": "Korisničko ime",
+      "emailLabel": "Email",
+      "emailHelp": "Ovo ćemo koristiti da te kontaktiramo. Nećemo deliti tvoj email ni sa kim.",
+      "heightLabel": "Visina (cm)",
+      "passwordLabel": "Šifra",
+      "passwordHelp": "Mora imati najmanje 8 karaktera.",
+      "confirmPasswordLabel": "Potvrdi šifru",
+      "confirmPasswordHelp": "Molimo potvrdi svoju šifru.",
+      "submit": "Napravi nalog",
+      "submitting": "Kreiranje naloga...",
+      "orContinueWith": "Ili nastavi sa",
+      "haveAccount": "Već imaš nalog?",
+      "signIn": "Prijavi se",
+      "errors": {
+        "passwordMismatch": "Šifre se ne poklapaju",
+        "accountCreated": "Nalog je kreiran! Proveri email da potvrdiš nalog.",
+        "registrationFailed": "Registracija nije uspela",
+        "googleSignupFailed": "Google registracija nije uspela"
+      }
+    },
+    "forgotPassword": {
+      "title": "Zaboravio si šifru?",
+      "subtitle": "Unesi svoj email i poslaćemo ti link za resetovanje šifre",
+      "emailLabel": "Email",
+      "submit": "Pošalji link za reset",
+      "submitting": "Slanje...",
+      "rememberPassword": "Setio si se šifre?",
+      "login": "Prijavi se",
+      "sentTitle": "Proveri svoj email",
+      "sentDescription": "Ako nalog postoji za {{email}}, poslali smo link za resetovanje šifre.",
+      "backToLogin": "Nazad na prijavu",
+      "errors": {
+        "generic": "Došlo je do greške"
+      }
+    },
+    "resetPassword": {
+      "title": "Resetuj šifru",
+      "subtitle": "Unesi novu šifru za svoj nalog",
+      "newPasswordLabel": "Nova šifra",
+      "confirmPasswordLabel": "Potvrdi šifru",
+      "submit": "Resetuj šifru",
+      "submitting": "Resetovanje...",
+      "backToLogin": "Nazad na prijavu",
+      "errors": {
+        "invalidLink": "Link za resetovanje je nevažeći ili je istekao",
+        "mismatch": "Šifre se ne poklapaju",
+        "generic": "Došlo je do greške"
+      },
+      "success": "Šifra je uspešno resetovana"
+    }
+  },
+  "sidebar": {
+    "groupLabel": "Platforma",
+    "administration": "Administracija",
+    "nav": {
+      "overview": "Pregled",
+      "workouts": "Treninzi",
+      "exercises": "Vežbe",
+      "fitnessScore": "Fitness Score",
+      "progress": "Napredak",
+      "bodyWeight": "Telesna težina",
+      "exerciseProgress": "Progres vežbi",
+      "nutrition": "Ishrana",
+      "nutritionLog": "Dnevnik ishrane",
+      "nutritionPlans": "Planovi ishrane",
+      "supplements": "Suplementi",
+      "allSupplements": "Svi suplementi",
+      "addSupplement": "Dodaj suplement",
+      "mySupplements": "Moj režim",
+      "gyms": "Teretane",
+      "users": "Korisnici"
+    },
+    "noActivePlan": "Nema aktivnog plana",
+    "active": "Aktivan",
+    "selectPlan": "Izaberi plan",
+    "myPlans": "Moji planovi",
+    "noPlans": "Nemaš planova",
+    "newPlan": "Novi plan",
+    "account": "Nalog",
+    "logout": "Odjavi se"
+  },
+  "account": {
+    "title": "Nalog",
+    "description": "Ažuriraj svoje podatke, sliku i šifru.",
+    "changePicture": "Promeni sliku",
+    "pictureHint": "JPG ili PNG, maksimalno 2MB.",
+    "firstNameLabel": "Ime",
+    "lastNameLabel": "Prezime",
+    "usernameLabel": "Korisničko ime",
+    "emailLabel": "Email",
+    "heightLabel": "Visina (cm)",
+    "changePassword": "Promena šifre",
+    "currentPasswordLabel": "Trenutna šifra",
+    "newPasswordLabel": "Nova šifra",
+    "confirmNewPasswordLabel": "Potvrdi šifru",
+    "passwordHint": "Ostavi prazno ako ne želiš da menjaš šifru.",
+    "save": "Sačuvaj izmene",
+    "saving": "Čuvanje...",
+    "success": "Nalog je ažuriran",
+    "errors": {
+      "imageTooLarge": "Slika je prevelika (maksimalno 2MB)",
+      "fillAllPasswordFields": "Popuni sva polja za promenu šifre",
+      "passwordTooShort": "Nova šifra mora imati bar 8 karaktera",
+      "passwordMismatch": "Nove šifre se ne poklapaju",
+      "updateFailed": "Ažuriranje naloga nije uspelo"
+    }
+  },
+  "notFound": {
+    "title": "Stranica nije pronađena",
+    "description": "Stranica koju tražiš ne postoji ili je premeštena.",
+    "backHome": "Nazad na početnu"
+  },
+  "errorBoundary": {
+    "title": "Nešto je pošlo po zlu",
+    "description": "Došlo je do neočekivane greške. Osveži stranicu i pokušaj ponovo.",
+    "backHome": "Nazad na početnu"
+  },
+  "bodyWeight": {
+    "addMeasurement": "Dodaj merenje",
+    "lastMeasurement": "Poslednje merenje: {{date}}",
+    "noMeasurements": "Nema unetih merenja",
+    "history": "Istorija",
+    "emptyState": {
+      "title": "Nema unetih merenja",
+      "description": "Dodaj prvo merenje da počneš da pratiš svoju telesnu težinu."
+    },
+    "form": {
+      "title": "Dodaj merenje",
+      "description": "Unesi datum i izmerenu težinu.",
+      "dateLabel": "Datum",
+      "weightLabel": "Težina (kg)",
+      "save": "Sačuvaj",
+      "saving": "Čuvanje...",
+      "cancel": "Otkaži"
+    },
+    "deleteDialog": {
+      "title": "Obrisati merenje?",
+      "description": "Da li si siguran da želiš da obrišeš merenje od {{date}}? Ova akcija se ne može poništiti.",
+      "cancel": "Otkaži",
+      "confirm": "Obriši",
+      "deleting": "Brisanje..."
+    },
+    "errors": {
+      "loadFailed": "Neuspešno učitavanje istorije težine",
+      "invalidWeight": "Unesi validnu težinu",
+      "saveFailed": "Čuvanje nije uspelo",
+      "deleteForbidden": "Nemaš dozvolu da obrišeš ovaj zapis",
+      "deleteFailed": "Brisanje nije uspelo"
+    },
+    "success": {
+      "saved": "Merenje je sačuvano",
+      "deleted": "Merenje je obrisano"
+    },
+    "chart": {
+      "weightLabel": "Težina (kg)"
+    }
+  },
+  "fitnessScore": {
+    "thisWeek": "Ova nedelja",
+    "outOf100": "od 100",
+    "trendTitle": "Trend kroz vreme",
+    "trendDescription": "Poslednjih {{count}} nedelja",
+    "emptyState": {
+      "title": "Nema podataka za prikaz",
+      "description": "Probaj ponovo kasnije."
+    },
+    "errors": {
+      "loadFailed": "Neuspešno učitavanje score-a"
+    },
+    "chart": {
+      "overallLabel": "Fitness Score",
+      "scoreLabel": "Score"
+    },
+    "breakdown": {
+      "workout": {
+        "label": "Treninzi",
+        "completed": "{{completed}}/{{expected}} treninga",
+        "noPlan": "Nema aktivnog plana"
+      },
+      "nutrition": {
+        "label": "Ishrana",
+        "completed": "{{completed}}/{{expected}} stavki iz plana",
+        "loggedDays": "{{loggedDays}}/{{totalDays}} dana sa unosom"
+      },
+      "weight": {
+        "label": "Težina",
+        "summary": "BMI {{bmi}} ({{weight}} kg)",
+        "notLogged": "Nije uneta ove nedelje"
+      },
+      "supplements": {
+        "label": "Suplementi",
+        "completed": "{{completed}}/{{expected}} uzeto",
+        "noActive": "Nema aktivnih suplemenata"
+      }
+    }
+  },
+  "profile": {
+    "title": "Dovrši registraciju",
+    "description": "Ulogovan/a preko Google-a kao {{email}}. Još nam trebaju username i visina.",
+    "usernameLabel": "Korisničko ime",
+    "heightLabel": "Visina (cm)",
+    "submit": "Završi registraciju",
+    "submitting": "Kreiranje naloga...",
+    "errors": {
+      "failed": "Nije uspelo kreiranje naloga"
+    }
+  },
+  "gyms": {
+    "breadcrumb": "Teretane u okolini",
+    "apiKeyMissing": "Google Maps API ključ nije podešen (VITE_GOOGLE_MAPS_API_KEY).",
+    "unsupported": "Tvoj pregledač ne podržava geolokaciju.",
+    "locating": "Tražimo tvoju lokaciju...",
+    "locationDeniedMessage": "Nismo mogli da pristupimo tvojoj lokaciji. Proveri dozvole u pregledaču i pokušaj ponovo.",
+    "retry": "Pokušaj ponovo",
+    "openInGoogleMaps": "Otvori u Google Maps",
+    "wheelchairAccessible": "Pristupačan ulaz",
+    "emptyState": {
+      "title": "Nema teretana u okolini",
+      "description": "Nismo pronašli teretane u prečniku od {{radius}} km."
+    },
+    "errors": {
+      "loadFailed": "Neuspešno učitavanje teretana u okolini",
+      "locationDenied": "Nismo mogli da pristupimo tvojoj lokaciji"
+    }
+  },
+  "home": {
+    "greeting": "Zdravo{{name}}",
+    "admin": {
+      "statTiles": {
+        "totalUsers": "Ukupno korisnika",
+        "blockedUsers": "Blokirani korisnici",
+        "exercisesInDb": "Vežbe u bazi"
+      },
+      "usersSection": {
+        "title": "Korisnici",
+        "emptyTitle": "Nema korisnika za prikaz",
+        "table": {
+          "fullName": "Ime i prezime",
+          "username": "Korisničko ime",
+          "email": "Email",
+          "role": "Uloga",
+          "status": "Status"
+        },
+        "statusBlocked": "Blokiran",
+        "statusActive": "Aktivan"
+      },
+      "toasts": {
+        "loadUsersError": "Neuspešno učitavanje korisnika",
+        "loadExercisesError": "Neuspešno učitavanje vežbi",
+        "userBlocked": "Korisnik je blokiran",
+        "userUnblocked": "Korisnik je odblokiran",
+        "toggleBlockError": "Neuspešna izmena statusa korisnika"
+      },
+      "sheet": {
+        "usernameLabel": "Korisničko ime",
+        "heightLabel": "Visina",
+        "roleLabel": "Uloga",
+        "statusLabel": "Status",
+        "saving": "Sačuvavanje...",
+        "unblockUser": "Odblokiraj korisnika",
+        "blockUser": "Blokiraj korisnika"
+      }
+    },
+    "calendar": {
+      "title": "Kalendar",
+      "today": "Danas",
+      "weightProgress": "Napredak težine",
+      "noWeightLogs": "Nema unetih merenja težine",
+      "nutritionForDay": "Ishrana ovog dana",
+      "summary": {
+        "calories": "Kalorije",
+        "protein": "Proteini",
+        "fat": "Masti",
+        "carbs": "UH"
+      }
+    },
+    "fitnessScoreWidget": {
+      "title": "Fitness Score",
+      "thisWeek": "Ova nedelja",
+      "details": "Detalji",
+      "sinceLastWeek": "od prošle nedelje",
+      "breakdown": {
+        "workout": "Treninzi",
+        "workoutEmpty": "Nema aktivnog plana",
+        "nutrition": "Ishrana",
+        "nutritionEmpty": "Nema unosa",
+        "weight": "Težina",
+        "weightEmpty": "Nije unešeno",
+        "supplements": "Suplementi",
+        "supplementsEmpty": "Nema aktivnih suplemenata"
+      }
+    },
+    "nutritionWidget": {
+      "titleToday": "Ishrana danas",
+      "titleForDate": "Ishrana — {{date}}",
+      "noPlan": "Nemaš aktivan plan ishrane",
+      "noPlanCta": "Izaberi plan",
+      "noPlanLabel": "Nema aktivnog plana",
+      "noItemsForDay": "Nema planiranih namirnica za ovaj dan",
+      "extraLabel": "Dodatno",
+      "addFood": "Dodaj namirnicu",
+      "addFoodDialog": {
+        "title": "Dodaj namirnicu",
+        "description": "Pretraži bazu hrane ili unesi podatke ručno."
+      },
+      "toasts": {
+        "saveError": "Čuvanje nije uspelo",
+        "deleteNoPermission": "Nemaš dozvolu da obrišeš ovaj unos",
+        "deleteError": "Brisanje nije uspelo"
+      }
+    },
+    "stopwatchWidget": {
+      "title": "Štoperica",
+      "subtitle": "Za pauze i treninge",
+      "tabs": {
+        "stopwatch": "Štoperica",
+        "intervals": "Serije"
+      },
+      "stopwatch": {
+        "pause": "Pauziraj",
+        "resume": "Nastavi",
+        "start": "Start",
+        "reset": "Reset"
+      },
+      "interval": {
+        "setsLabel": "Serije",
+        "durationLabel": "Trajanje",
+        "restLabel": "Pauza",
+        "dragHint": "Prevuci gore/dole po broju da promeniš vrednost",
+        "start": "Start",
+        "done": "Gotovo! Odradio si {{sets}} serija 💪",
+        "phaseWork": "Rad",
+        "phasePause": "Pauza",
+        "setProgress": "serija {{current}}/{{total}}",
+        "newSet": "Nova serija",
+        "pause": "Pauziraj",
+        "resume": "Nastavi",
+        "skip": "Preskoči",
+        "reset": "Reset"
+      }
+    },
+    "supplementsWidget": {
+      "titleToday": "Suplementi danas",
+      "titleForDate": "Suplementi — {{date}}",
+      "subtitle": "Tvoj dnevni režim",
+      "noSupplements": "Nemaš aktivnih suplemenata u režimu",
+      "unknownSupplement": "Nepoznat suplement",
+      "addSupplement": "Dodaj suplement",
+      "addDialog": {
+        "title": "Dodaj suplement",
+        "description": "Dodaj suplement iz kataloga u svoj režim."
+      },
+      "detailDialog": {
+        "noDescription": "Nema unetog opisa za ovaj suplement."
+      },
+      "toasts": {
+        "loadError": "Neuspešno učitavanje suplemenata",
+        "saveError": "Čuvanje nije uspelo"
+      }
+    },
+    "workoutWidget": {
+      "titleToday": "Trening danas",
+      "titleForDate": "Trening — {{date}}",
+      "noPlan": "Nemaš aktivan plan treninga",
+      "noPlanLabel": "Nema aktivnog plana",
+      "choosePlan": "Izaberi plan",
+      "beforeActivation": "Plan tog dana još nije bio aktivan",
+      "emptyPlan": "Nema dana u ovom planu",
+      "restDay": {
+        "title": "Dan odmora",
+        "subtitle": "Danas nema zakazanog treninga."
+      },
+      "completedBadge": "Odrađeno",
+      "skippedBadge": "Preskočeno",
+      "pastStatus": {
+        "skipped": "— preskočeno",
+        "completed": "— odrađeno",
+        "notCompleted": "— nije odrađeno"
+      },
+      "futureStatus": "— pregled",
+      "skipDay": "Preskoči dan",
+      "completeDay": "Završi dan",
+      "saving": "Čuvanje...",
+      "skippedDay": "Ovaj dan je preskočen",
+      "missedDay": "Trening nije odrađen",
+      "toasts": {
+        "completeSuccess": "Dan je označen kao odrađen",
+        "completeError": "Nije uspelo označavanje dana",
+        "skipSuccess": "Dan je preskočen",
+        "skipError": "Nije uspelo preskakanje dana"
+      }
+    },
+    "weeklyWeightBanner": {
+      "message": "Nisi unela/uneo težinu ove nedelje",
+      "lastMeasurement": "Poslednje merenje: {{weight}} kg ({{date}})",
+      "firstEntry": "Ovo bi bio tvoj prvi unos.",
+      "save": "Sačuvaj",
+      "saving": "Čuvanje...",
+      "history": "Istorija",
+      "toasts": {
+        "invalidWeight": "Unesi validnu težinu",
+        "saved": "Težina je zabeležena",
+        "saveError": "Čuvanje nije uspelo"
+      }
+    }
+  },
+  "workout": {
+    "plans": {
+      "breadcrumb": "Planovi treninga",
+      "searchPlaceholder": "Pretraži planove...",
+      "newPlan": "Novi plan",
+      "active": "Aktivan",
+      "dayCount": { "one": "dan", "other": "dana" },
+      "empty": {
+        "title": "Nema planova za prikaz",
+        "descriptionEmpty": "Napravi svoj prvi plan treninga da počneš sa vežbanjem.",
+        "descriptionFiltered": "Promeni pretragu da vidiš druge planove."
+      },
+      "deleteDialog": {
+        "title": "Obrisati plan?",
+        "description": "Da li si siguran da želiš da obrišeš plan \"{{name}}\"? Ova akcija se ne može poništiti.",
+        "cancel": "Otkaži",
+        "confirm": "Obriši",
+        "confirming": "Brisanje..."
+      },
+      "toasts": {
+        "loadFailed": "Neuspešno učitavanje planova",
+        "deleteSuccess": "Plan je obrisan",
+        "deleteForbidden": "Nemaš dozvolu da obrišeš ovaj plan",
+        "deleteFailed": "Brisanje plana nije uspelo"
+      }
+    },
+    "detail": {
+      "breadcrumbFallback": "Plan",
+      "active": "Aktivan",
+      "activate": "Aktiviraj",
+      "activating": "Aktiviranje...",
+      "edit": "Izmeni",
+      "delete": "Obriši",
+      "deleting": "Brisanje...",
+      "nextBadge": "Sledeći",
+      "backToList": "Nazad na listu",
+      "dayCard": {
+        "exerciseCount": { "one": "vežba", "other": "vežbi" }
+      },
+      "deleteDialog": {
+        "title": "Obrisati plan?",
+        "description": "Da li si siguran da želiš da obrišeš plan \"{{name}}\"? Ova akcija se ne može poništiti.",
+        "cancel": "Otkaži",
+        "confirm": "Obriši"
+      },
+      "toasts": {
+        "accessDenied": "Nemaš pristup ovom planu",
+        "notFound": "Plan nije pronađen",
+        "deleteSuccess": "Plan je obrisan",
+        "deleteForbidden": "Nemaš dozvolu da obrišeš ovaj plan",
+        "deleteFailed": "Brisanje plana nije uspelo"
+      }
+    },
+    "dayDetail": {
+      "breadcrumbFallback": "Dan",
+      "backToPlan": "Nazad na plan",
+      "exerciseCount": { "one": "vežba", "other": "vežbi" },
+      "completedToday": "Odrađeno danas",
+      "finishDay": "Završi dan",
+      "saving": "Čuvanje...",
+      "nextUpLabel": "Sledeći na redu:",
+      "toasts": {
+        "accessDenied": "Nemaš pristup ovom planu",
+        "notFound": "Plan nije pronađen",
+        "dayNotFound": "Dan nije pronađen",
+        "completeSuccess": "Dan je označen kao odrađen",
+        "completeFailed": "Nije uspelo označavanje dana"
+      }
+    },
+    "form": {
+      "breadcrumbEdit": "Izmena plana",
+      "breadcrumbNew": "Novi plan",
+      "planNameLabel": "Naziv plana",
+      "dayNameLabel": "Naziv dana",
+      "dayNamePlaceholder": "npr. Dan 1",
+      "exerciseLabel": "Vežba",
+      "exercisePlaceholder": "Izaberi vežbu",
+      "setsLabel": "Serije",
+      "repsLabel": "Ponavljanja",
+      "restLabel": "Odmor (min)",
+      "addExercise": "Dodaj vežbu",
+      "addDay": "Dodaj dan",
+      "submitCreate": "Kreiraj plan",
+      "submitEdit": "Sačuvaj izmene",
+      "submitting": "Čuvanje...",
+      "cancel": "Otkaži",
+      "toasts": {
+        "accessDenied": "Nemaš pristup ovom planu",
+        "notFound": "Plan nije pronađen",
+        "loadExercisesFailed": "Neuspešno učitavanje vežbi",
+        "nameRequired": "Naziv plana je obavezan",
+        "dayNameRequired": "Naziv dana je obavezan",
+        "updateSuccess": "Plan je ažuriran",
+        "createSuccess": "Plan je kreiran",
+        "editForbidden": "Nemaš dozvolu da izmeniš ovaj plan",
+        "saveFailed": "Čuvanje plana nije uspelo"
+      }
+    },
+    "dayExerciseCard": {
+      "unknownExercise": "Nepoznata vežba",
+      "restMinutes": "Odmor: {{minutes}} min",
+      "playVideoAria": "Pusti video: {{name}}",
+      "historyLink": "Istorija",
+      "fullHistoryLink": "Kompletna istorija",
+      "weightPlaceholder": "kg",
+      "loggedWeight": "Zabeleženo: {{weight}} kg",
+      "saveWeight": "Zabeleži kilažu",
+      "updateWeight": "Ažuriraj kilažu",
+      "saving": "Čuvanje...",
+      "defaultExerciseName": "vežbu",
+      "stats": {
+        "sets": "Serije",
+        "reps": "Ponavljanja",
+        "rest": "Odmor (min)"
+      },
+      "recentProgress": "Nedavni napredak",
+      "loading": "Učitavanje...",
+      "noLogsYet": "Još nema zabeleženih kilaža za ovu vežbu.",
+      "toasts": {
+        "invalidWeight": "Unesi validnu kilažu",
+        "weightSaved": "Kilaža zabeležena za {{name}}",
+        "saveFailed": "Čuvanje nije uspelo"
+      }
+    },
+    "activatePlan": {
+      "toasts": {
+        "success": "Plan je aktiviran",
+        "failed": "Aktivacija nije uspela"
+      }
+    }
+  },
+  "exercises": {
+    "list": {
+      "breadcrumb": "Vežbe",
+      "searchPlaceholder": "Pretraži vežbe...",
+      "allMuscleGroups": "Sve mišićne grupe",
+      "addExercise": "Dodaj vežbu",
+      "playVideoAria": "Pusti video: {{name}}",
+      "empty": {
+        "title": "Nema vežbi za prikaz",
+        "descriptionAdmin": "Dodaj prvu vežbu ili promeni pretragu/filter.",
+        "descriptionUser": "Promeni pretragu ili filter mišićne grupe."
+      },
+      "deleteDialog": {
+        "title": "Obrisati vežbu?",
+        "description": "Da li si siguran da želiš da obrišeš vežbu \"{{name}}\"? Ova akcija se ne može poništiti.",
+        "cancel": "Otkaži",
+        "confirm": "Obriši",
+        "confirming": "Brisanje..."
+      },
+      "toasts": {
+        "loadFailed": "Neuspešno učitavanje vežbi",
+        "deleteSuccess": "Vežba je obrisana",
+        "deleteFailed": "Brisanje vežbe nije uspelo"
+      }
+    },
+    "detail": {
+      "breadcrumbFallback": "Vežba",
+      "backToList": "Nazad na listu",
+      "edit": "Izmeni",
+      "delete": "Obriši",
+      "deleting": "Brisanje...",
+      "deleteDialog": {
+        "title": "Obrisati vežbu?",
+        "description": "Da li si siguran da želiš da obrišeš vežbu \"{{name}}\"? Ova akcija se ne može poništiti.",
+        "cancel": "Otkaži",
+        "confirm": "Obriši"
+      },
+      "toasts": {
+        "notFound": "Vežba nije pronađena",
+        "deleteSuccess": "Vežba je obrisana",
+        "deleteFailed": "Brisanje vežbe nije uspelo"
+      }
+    },
+    "form": {
+      "breadcrumbEdit": "Izmena vežbe",
+      "breadcrumbNew": "Nova vežba",
+      "nameLabel": "Naziv vežbe",
+      "muscleGroupLabel": "Mišićna grupa",
+      "muscleGroupPlaceholder": "Izaberi mišićnu grupu",
+      "equipmentLabel": "Oprema",
+      "equipmentPlaceholder": "npr. Šipka, Bučice",
+      "descriptionLabel": "Opis",
+      "videoLabel": "YouTube link",
+      "videoPlaceholder": "https://www.youtube.com/watch?v=...",
+      "videoHint": "Podržani su youtube.com/watch, youtu.be i /shorts/ linkovi.",
+      "submitCreate": "Kreiraj vežbu",
+      "submitEdit": "Sačuvaj izmene",
+      "submitting": "Čuvanje...",
+      "cancel": "Otkaži",
+      "toasts": {
+        "notFound": "Vežba nije pronađena",
+        "nameRequired": "Naziv vežbe je obavezan",
+        "muscleGroupRequired": "Mišićna grupa je obavezna",
+        "updateSuccess": "Vežba je ažurirana",
+        "createSuccess": "Vežba je kreirana",
+        "saveFailed": "Čuvanje vežbe nije uspelo"
+      }
+    },
+    "progress": {
+      "breadcrumb": "Napredak po vežbama",
+      "empty": {
+        "title": "Još nema zabeleženih kilaža",
+        "description": "Unesi kilažu na nekoj vežbi (na Home stranici ili u detaljima vežbe) da bi pratio/la napredak ovde."
+      },
+      "firstEntry": "Prvi unos: {{weight}} kg",
+      "max": "Max: {{weight}} kg",
+      "entryCount": { "one": "unos", "other": "unosa" },
+      "deltaPositive": "+{{delta}} kg",
+      "deltaNegative": "{{delta}} kg",
+      "deltaZero": "0 kg",
+      "toasts": {
+        "loadFailed": "Neuspešno učitavanje napretka"
+      },
+      "card": {
+        "title": "Moj napredak",
+        "latestLabel": "Poslednje: {{weight}} kg ({{date}})",
+        "noEntries": "Još nema unetih rezultata",
+        "logWeight": "Zabeleži težinu",
+        "emptyHint": "Zabeleži prvi rezultat da bi pratio/la napredak na ovoj vežbi",
+        "dialog": {
+          "title": "Zabeleži težinu",
+          "description": "Unesi datum i kilažu koju si podigao/la.",
+          "dateLabel": "Datum",
+          "weightLabel": "Kilaža (kg)",
+          "save": "Sačuvaj",
+          "saving": "Čuvanje...",
+          "cancel": "Otkaži"
+        },
+        "deleteDialog": {
+          "title": "Obrisati unos?",
+          "description": "Da li si siguran da želiš da obrišeš unos od {{date}}? Ova akcija se ne može poništiti.",
+          "cancel": "Otkaži",
+          "confirm": "Obriši",
+          "confirming": "Brisanje..."
+        },
+        "toasts": {
+          "loadFailed": "Neuspešno učitavanje napretka",
+          "invalidWeight": "Unesi validnu kilažu",
+          "saveSuccess": "Napredak je sačuvan",
+          "saveFailed": "Čuvanje nije uspelo",
+          "deleteSuccess": "Unos je obrisan",
+          "deleteForbidden": "Nemaš dozvolu da obrišeš ovaj zapis",
+          "deleteFailed": "Brisanje nije uspelo"
+        }
+      }
+    },
+    "muscleGroups": {
+      "grudi": "Grudi",
+      "leđa": "Leđa",
+      "noge": "Noge",
+      "ramena": "Ramena",
+      "ruke": "Ruke",
+      "core": "Core"
+    }
+  },
+  "nutrition": {
+    "log": {
+      "loadError": "Neuspešno učitavanje dnevnika ishrane",
+      "weeklyOverview": "Nedeljni pregled",
+      "addEntry": "Dodaj unos",
+      "dailyTotal": "Dnevni total",
+      "summary": {
+        "calories": "Kalorije",
+        "protein": "Proteini",
+        "fat": "Masti",
+        "carbs": "Ugljeni hidrati",
+        "fiber": "Vlakna"
+      },
+      "entryStats": {
+        "calories": "{{value}} kcal",
+        "protein": "{{value}}g protein",
+        "fat": "{{value}}g masti",
+        "carbs": "{{value}}g UH",
+        "fiber": "{{value}}g vlakna"
+      },
+      "empty": {
+        "title": "Nema unosa za izabrani dan",
+        "description": "Dodaj šta si jeo/la da bi pratio unos kalorija i makronutrijenata."
+      },
+      "deleteSuccess": "Unos je obrisan",
+      "deleteForbidden": "Nemaš dozvolu da obrišeš ovaj zapis",
+      "deleteFailed": "Brisanje nije uspelo",
+      "dialog": {
+        "editTitle": "Izmena unosa",
+        "addTitle": "Dodaj unos",
+        "editDescription": "Izmeni podatke o unetoj namirnici.",
+        "addDescription": "Pretraži bazu hrane ili unesi podatke ručno."
+      },
+      "weeklyDialog": {
+        "title": "Nedeljni pregled",
+        "description": "Raspodela kalorija po makroima za poslednjih 7 dana (zaključno sa {{date}})."
+      },
+      "deleteDialog": {
+        "title": "Obrisati unos?",
+        "description": "Da li si siguran da želiš da obrišeš \"{{name}}\" iz dnevnika? Ova akcija se ne može poništiti.",
+        "cancel": "Otkaži",
+        "confirm": "Obriši",
+        "deleting": "Brisanje..."
+      }
+    },
+    "plans": {
+      "loadError": "Neuspešno učitavanje planova ishrane",
+      "activeBadge": "Aktivan",
+      "day": "dan",
+      "days": "dana",
+      "inCycle": "u ciklusu",
+      "foodItemsTotal": "namirnica ukupno",
+      "searchPlaceholder": "Pretraži planove...",
+      "newPlan": "Novi plan",
+      "empty": {
+        "title": "Nema planova za prikaz",
+        "descriptionEmpty": "Napravi svoj prvi plan ishrane da počneš sa praćenjem.",
+        "descriptionFiltered": "Promeni pretragu da vidiš druge planove."
+      },
+      "deleteSuccess": "Plan je obrisan",
+      "deleteForbidden": "Nemaš dozvolu da obrišeš ovaj plan",
+      "deleteFailed": "Brisanje plana nije uspelo",
+      "deleteDialog": {
+        "title": "Obrisati plan?",
+        "description": "Da li si siguran da želiš da obrišeš plan \"{{name}}\"? Ova akcija se ne može poništiti.",
+        "cancel": "Otkaži",
+        "confirm": "Obriši",
+        "deleting": "Brisanje..."
+      }
+    },
+    "planDetail": {
+      "breadcrumbFallback": "Plan ishrane",
+      "accessDenied": "Nemaš pristup ovom planu",
+      "notFound": "Plan nije pronađen",
+      "activateSuccess": "Plan je aktiviran",
+      "activateFailed": "Aktivacija nije uspela",
+      "deleteSuccess": "Plan je obrisan",
+      "deleteForbidden": "Nemaš dozvolu da obrišeš ovaj plan",
+      "deleteFailed": "Brisanje plana nije uspelo",
+      "activeBadge": "Aktivan",
+      "todayBadge": "Danas",
+      "activating": "Aktiviranje...",
+      "activate": "Aktiviraj",
+      "edit": "Izmeni",
+      "deleting": "Brisanje...",
+      "delete": "Obriši",
+      "noItems": "Nema planiranih namirnica",
+      "itemsCount": "{{count}} namirnica",
+      "itemMacros": "{{calories}} kcal • {{protein}}g protein • {{fat}}g masti • {{carbs}}g UH",
+      "backToList": "Nazad na listu",
+      "deleteDialog": {
+        "title": "Obrisati plan?",
+        "description": "Da li si siguran da želiš da obrišeš plan \"{{name}}\"? Ova akcija se ne može poništiti.",
+        "cancel": "Otkaži",
+        "confirm": "Obriši"
+      }
+    },
+    "planForm": {
+      "breadcrumbEdit": "Izmena plana ishrane",
+      "breadcrumbNew": "Novi plan ishrane",
+      "accessDenied": "Nemaš pristup ovom planu",
+      "notFound": "Plan nije pronađen",
+      "defaultDayName": "Dan {{number}}",
+      "defaultDayNameFallback": "Dan 1",
+      "planNameLabel": "Naziv plana",
+      "cycleNote": "Dani se ne vezuju za stvarni dan u nedelji — kad aktiviraš plan, dan aktivacije postaje \"{{dayName}}\", pa plan ide redom i vrti se u krug.",
+      "dayNameLabel": "Naziv dana",
+      "dayNamePlaceholder": "npr. Dan 1",
+      "foodNameLabel": "Namirnica",
+      "caloriesLabel": "Kcal",
+      "proteinLabel": "Protein (g)",
+      "fatLabel": "Masti (g)",
+      "carbsLabel": "UH (g)",
+      "fiberLabel": "Vlakna (g)",
+      "addFoodItem": "Dodaj namirnicu",
+      "addDay": "Dodaj dan",
+      "planNameRequired": "Naziv plana je obavezan",
+      "dayNameRequired": "Naziv dana je obavezan",
+      "itemValidation": "Svaka namirnica mora imati naziv, kalorije, proteine, masti i ugljene hidrate",
+      "updateSuccess": "Plan je ažuriran",
+      "createSuccess": "Plan je kreiran",
+      "updateForbidden": "Nemaš dozvolu da izmeniš ovaj plan",
+      "saveFailed": "Čuvanje plana nije uspelo",
+      "saving": "Čuvanje...",
+      "saveChanges": "Sačuvaj izmene",
+      "createPlan": "Kreiraj plan",
+      "cancel": "Otkaži"
+    },
+    "logForm": {
+      "searchTab": "Pretraga",
+      "manualTab": "Ručni unos",
+      "searchLabel": "Pretraga hrane",
+      "searchPlaceholder": "npr. piletina, pirinač...",
+      "searching": "Pretraga...",
+      "noResults": "Nema rezultata",
+      "changeFood": "Promeni namirnicu",
+      "loadingServings": "Učitavanje porcija...",
+      "servingLabel": "Porcija",
+      "gramsLabel": "Gramaža (g)",
+      "servingCountLabel": "Količina (broj porcija)",
+      "noGramsHint": "Ova porcija nema definisanu gramažu — unesi broj porcija (npr. 1.5).",
+      "computed": {
+        "protein": "protein",
+        "fat": "masti",
+        "carbs": "UH",
+        "fiber": "vlakna"
+      },
+      "addEntry": "Dodaj unos",
+      "saving": "Čuvanje...",
+      "cancel": "Otkaži",
+      "manualNameLabel": "Naziv namirnice",
+      "manualCaloriesLabel": "Kalorije (kcal)",
+      "manualProteinLabel": "Proteini (g)",
+      "manualFatLabel": "Masti (g)",
+      "manualCarbsLabel": "Ugljeni hidrati (g)",
+      "manualFiberLabel": "Vlakna (g)",
+      "saveChanges": "Sačuvaj izmene",
+      "searchFailed": "Pretraga hrane nije uspela",
+      "foodDetailsFailed": "Učitavanje namirnice nije uspelo",
+      "updateSuccess": "Unos je ažuriran",
+      "createSuccess": "Unos je dodat u dnevnik",
+      "updateForbidden": "Nemaš dozvolu da izmeniš ovaj zapis",
+      "saveFailed": "Čuvanje nije uspelo",
+      "selectFoodAndServing": "Izaberi namirnicu i porciju",
+      "gramsMustBePositive": "Gramaža mora biti veća od 0",
+      "amountMustBePositive": "Količina mora biti veća od 0",
+      "nameRequired": "Naziv namirnice je obavezan",
+      "numbersRequired": "Kalorije, proteini, masti, ugljeni hidrati i vlakna moraju biti brojevi"
+    },
+    "weeklyChart": {
+      "days": ["Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub"],
+      "protein": "Proteini",
+      "fat": "Masti",
+      "carbs": "Ugljeni hidrati",
+      "loadError": "Neuspešno učitavanje nedeljne statistike"
+    }
+  },
+  "supplements": {
+    "list": {
+      "loadError": "Neuspešno učitavanje suplemenata",
+      "addToMyRoutine": "Dodaj u moj režim",
+      "searchPlaceholder": "Pretraži suplemente...",
+      "addSupplement": "Dodaj suplement",
+      "empty": {
+        "title": "Nema suplemenata za prikaz",
+        "filteredDescription": "Promeni pretragu da vidiš druge suplemente.",
+        "adminDescription": "Dodaj prvi suplement da ga korisnici mogu pronaći.",
+        "userDescription": "Trenutno nema dostupnih suplemenata."
+      },
+      "deleteSuccess": "Suplement je obrisan",
+      "deleteFailed": "Brisanje suplementa nije uspelo",
+      "deleteDialog": {
+        "title": "Obrisati suplement?",
+        "description": "Da li si siguran da želiš da obrišeš suplement \"{{name}}\"? Ova akcija se ne može poništiti.",
+        "cancel": "Otkaži",
+        "confirm": "Obriši",
+        "deleting": "Brisanje..."
+      }
+    },
+    "mySupplements": {
+      "loadError": "Neuspešno učitavanje režima",
+      "toggleFailed": "Čuvanje nije uspelo",
+      "addSupplement": "Dodaj suplement",
+      "empty": {
+        "title": "Nemaš dodatih suplemenata u režimu",
+        "description": "Dodaj suplement iz baze da počneš da pratiš svoj režim."
+      },
+      "unknownSupplement": "Nepoznat suplement",
+      "inactiveSuffix": " • Neaktivan",
+      "takenToday": "Uzeto danas",
+      "removeSuccess": "Suplement je uklonjen iz režima",
+      "deleteForbidden": "Nemaš dozvolu da obrišeš ovaj zapis",
+      "deleteFailed": "Brisanje nije uspelo",
+      "deleteDialog": {
+        "title": "Ukloniti suplement iz režima?",
+        "description": "Da li si siguran da želiš da ukloniš \"{{name}}\" iz svog režima? Ova akcija se ne može poništiti.",
+        "fallbackName": "ovaj suplement",
+        "cancel": "Otkaži",
+        "confirm": "Obriši",
+        "deleting": "Brisanje..."
+      }
+    },
+    "form": {
+      "breadcrumbEdit": "Izmena suplementa",
+      "breadcrumbNew": "Novi suplement",
+      "notFound": "Suplement nije pronađen",
+      "nameRequired": "Naziv suplementa je obavezan",
+      "updateSuccess": "Suplement je ažuriran",
+      "createSuccess": "Suplement je kreiran",
+      "duplicateName": "Suplement sa tim nazivom već postoji",
+      "saveFailed": "Čuvanje suplementa nije uspelo",
+      "imageUrlLabel": "Link do slike",
+      "imageUrlPlaceholder": "https://...",
+      "imageUrlHint": "Nalepi link do slike sa neta. Opciono.",
+      "nameLabel": "Naziv suplementa",
+      "descriptionLabel": "Opis / namena",
+      "descriptionPlaceholder": "Za šta se ovaj suplement koristi...",
+      "saving": "Čuvanje...",
+      "saveChanges": "Sačuvaj izmene",
+      "createSupplement": "Kreiraj suplement",
+      "cancel": "Otkaži"
+    },
+    "userForm": {
+      "breadcrumbEdit": "Izmena suplementa",
+      "breadcrumbAdd": "Dodaj suplement u režim",
+      "accessDenied": "Nemaš pristup ovom zapisu",
+      "notFound": "Zapis nije pronađen",
+      "loadError": "Neuspešno učitavanje suplemenata",
+      "supplementRequired": "Suplement je obavezan",
+      "dosageRequired": "Doza je obavezna",
+      "timeRequired": "Vreme uzimanja je obavezno",
+      "updateSuccess": "Suplement u režimu je ažuriran",
+      "createSuccess": "Suplement je dodat u tvoj režim",
+      "updateForbidden": "Nemaš dozvolu da izmeniš ovaj zapis",
+      "saveFailed": "Čuvanje nije uspelo",
+      "supplementLabel": "Suplement",
+      "supplementPlaceholder": "Izaberi suplement",
+      "dosageLabel": "Doza",
+      "dosagePlaceholder": "npr. 500mg",
+      "timeLabel": "Vreme uzimanja",
+      "timePlaceholder": "npr. ujutru, pre treninga",
+      "activeLabel": "Aktivan",
+      "saving": "Čuvanje...",
+      "saveChanges": "Sačuvaj izmene",
+      "addToRoutine": "Dodaj u režim",
+      "cancel": "Otkaži"
+    }
+  }
+}

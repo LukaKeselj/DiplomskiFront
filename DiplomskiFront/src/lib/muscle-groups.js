@@ -1,8 +1,8 @@
 export const MUSCLE_GROUPS = [
-  { value: "grudi", label: "Grudi" },
-  { value: "leđa", label: "Leđa" },
-  { value: "noge", label: "Noge" },
-  { value: "ramena", label: "Ramena" },
-  { value: "ruke", label: "Ruke" },
-  { value: "core", label: "Core" },
+  { value: "grudi", labelKey: "exercises.muscleGroups.grudi" },
+  { value: "leđa", labelKey: "exercises.muscleGroups.leđa" },
+  { value: "noge", labelKey: "exercises.muscleGroups.noge" },
+  { value: "ramena", labelKey: "exercises.muscleGroups.ramena" },
+  { value: "ruke", labelKey: "exercises.muscleGroups.ruke" },
+  { value: "core", labelKey: "exercises.muscleGroups.core" },
 ]

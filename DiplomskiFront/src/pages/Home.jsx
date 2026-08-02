@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Users } from "lucide-react"
 
 import { getAllUsersRequest, setUserBlockedStatusRequest } from "@/api/users"
@@ -30,6 +31,7 @@ import { HomeCalendar } from "@/components/home-calendar"
 import { MotionSection } from "@/components/ui/motion-section"
 
 export default function Home() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
   const [users, setUsers] = useState([])
@@ -52,16 +54,17 @@ export default function Home() {
     getAllUsersRequest()
       .then(setUsers)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje korisnika")
+        toast.error(error.response?.data?.message || t("home.admin.toasts.loadUsersError"))
       })
       .finally(() => setIsLoadingUsers(false))
 
     getExercisesRequest()
       .then((exercises) => setExerciseCount(exercises.length))
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje vežbi")
+        toast.error(error.response?.data?.message || t("home.admin.toasts.loadExercisesError"))
       })
       .finally(() => setIsLoadingExercises(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin])
 
   const totalUsers = users.length
@@ -78,15 +81,19 @@ export default function Home() {
       )
       setUsers((prev) => prev.map((u) => (u._id === updatedUser._id ? updatedUser : u)))
       setSelectedUser(updatedUser)
-      toast.success(updatedUser.isBlocked ? "Korisnik je blokiran" : "Korisnik je odblokiran")
+      toast.success(
+        updatedUser.isBlocked
+          ? t("home.admin.toasts.userBlocked")
+          : t("home.admin.toasts.userUnblocked")
+      )
     } catch (error) {
-      toast.error(error.response?.data?.message || "Neuspešna izmena statusa korisnika")
+      toast.error(error.response?.data?.message || t("home.admin.toasts.toggleBlockError"))
     } finally {
       setIsTogglingBlock(false)
     }
   }
 
-  const breadcrumb = isAdmin ? "Korisnici" : "Pregled"
+  const breadcrumb = isAdmin ? t("sidebar.nav.users") : t("sidebar.nav.overview")
 
   return (
     <AppLayout breadcrumb={breadcrumb}>
@@ -94,7 +101,7 @@ export default function Home() {
         <>
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-              <span className="text-sm text-muted-foreground">Ukupno korisnika</span>
+              <span className="text-sm text-muted-foreground">{t("home.admin.statTiles.totalUsers")}</span>
               {isLoadingUsers ? (
                 <Skeleton className="h-8 w-12" />
               ) : (
@@ -102,7 +109,7 @@ export default function Home() {
               )}
             </div>
             <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-              <span className="text-sm text-muted-foreground">Blokirani korisnici</span>
+              <span className="text-sm text-muted-foreground">{t("home.admin.statTiles.blockedUsers")}</span>
               {isLoadingUsers ? (
                 <Skeleton className="h-8 w-12" />
               ) : (
@@ -110,7 +117,7 @@ export default function Home() {
               )}
             </div>
             <div className="flex flex-col justify-between rounded-xl bg-muted/50 p-4">
-              <span className="text-sm text-muted-foreground">Vežbe u bazi</span>
+              <span className="text-sm text-muted-foreground">{t("home.admin.statTiles.exercisesInDb")}</span>
               {isLoadingExercises ? (
                 <Skeleton className="h-8 w-12" />
               ) : (
@@ -119,7 +126,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex-1 rounded-xl bg-muted/50 p-4">
-            <h2 className="mb-3 text-sm font-medium text-muted-foreground">Korisnici</h2>
+            <h2 className="mb-3 text-sm font-medium text-muted-foreground">{t("home.admin.usersSection.title")}</h2>
             {isLoadingUsers ? (
               <div className="flex flex-col gap-2">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -127,17 +134,17 @@ export default function Home() {
                 ))}
               </div>
             ) : users.length === 0 ? (
-              <EmptyState icon={Users} title="Nema korisnika za prikaz" />
+              <EmptyState icon={Users} title={t("home.admin.usersSection.emptyTitle")} />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b text-left text-muted-foreground">
-                      <th className="pb-2 pr-4 font-medium">Ime i prezime</th>
-                      <th className="pb-2 pr-4 font-medium">Korisničko ime</th>
-                      <th className="pb-2 pr-4 font-medium">Email</th>
-                      <th className="pb-2 pr-4 font-medium">Uloga</th>
-                      <th className="pb-2 font-medium">Status</th>
+                      <th className="pb-2 pr-4 font-medium">{t("home.admin.usersSection.table.fullName")}</th>
+                      <th className="pb-2 pr-4 font-medium">{t("home.admin.usersSection.table.username")}</th>
+                      <th className="pb-2 pr-4 font-medium">{t("home.admin.usersSection.table.email")}</th>
+                      <th className="pb-2 pr-4 font-medium">{t("home.admin.usersSection.table.role")}</th>
+                      <th className="pb-2 font-medium">{t("home.admin.usersSection.table.status")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -170,7 +177,9 @@ export default function Home() {
                                 : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                             )}
                           >
-                            {u.isBlocked ? "Blokiran" : "Aktivan"}
+                            {u.isBlocked
+                              ? t("home.admin.usersSection.statusBlocked")
+                              : t("home.admin.usersSection.statusActive")}
                           </span>
                         </td>
                       </tr>
@@ -185,7 +194,7 @@ export default function Home() {
         <>
           <div>
             <h1 className="font-heading text-2xl font-semibold">
-              Zdravo{user?.name ? `, ${user.name}` : ""}
+              {t("home.greeting", { name: user?.name ? `, ${user.name}` : "" })}
             </h1>
             <p className="text-sm text-muted-foreground">{formatFullDateLabel(new Date())}</p>
           </div>
@@ -246,19 +255,19 @@ export default function Home() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Korisničko ime</span>
+                  <span className="text-muted-foreground">{t("home.admin.sheet.usernameLabel")}</span>
                   <span>{selectedUser.username}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Visina</span>
+                  <span className="text-muted-foreground">{t("home.admin.sheet.heightLabel")}</span>
                   <span>{selectedUser.height} cm</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Uloga</span>
+                  <span className="text-muted-foreground">{t("home.admin.sheet.roleLabel")}</span>
                   <span className="capitalize">{selectedUser.role}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Status</span>
+                  <span className="text-muted-foreground">{t("home.admin.sheet.statusLabel")}</span>
                   <span
                     className={cn(
                       "rounded-full px-2 py-0.5 text-xs font-medium",
@@ -267,7 +276,9 @@ export default function Home() {
                         : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                     )}
                   >
-                    {selectedUser.isBlocked ? "Blokiran" : "Aktivan"}
+                    {selectedUser.isBlocked
+                      ? t("home.admin.usersSection.statusBlocked")
+                      : t("home.admin.usersSection.statusActive")}
                   </span>
                 </div>
               </div>
@@ -279,10 +290,10 @@ export default function Home() {
                 onClick={handleToggleBlock}
               >
                 {isTogglingBlock
-                  ? "Sačuvavanje..."
+                  ? t("home.admin.sheet.saving")
                   : selectedUser?.isBlocked
-                    ? "Odblokiraj korisnika"
-                    : "Blokiraj korisnika"}
+                    ? t("home.admin.sheet.unblockUser")
+                    : t("home.admin.sheet.blockUser")}
               </Button>
             </SheetFooter>
           </SheetContent>

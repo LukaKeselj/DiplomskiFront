@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { LineChart, Minus, TrendingDown, TrendingUp } from "lucide-react"
 
 import { getExercisesRequest } from "@/api/exercises"
@@ -12,10 +13,12 @@ import { CardGridSkeleton } from "@/components/ui/card-grid-skeleton"
 import { EmptyState } from "@/components/ui/empty-state"
 
 function DeltaBadge({ delta }) {
+  const { t } = useTranslation()
   if (delta > 0) {
     return (
       <span className="flex items-center gap-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-        <TrendingUp className="size-4" />+{delta} kg
+        <TrendingUp className="size-4" />
+        {t("exercises.progress.deltaPositive", { delta })}
       </span>
     )
   }
@@ -23,18 +26,20 @@ function DeltaBadge({ delta }) {
     return (
       <span className="flex items-center gap-1 text-sm font-medium text-rose-600 dark:text-rose-400">
         <TrendingDown className="size-4" />
-        {delta} kg
+        {t("exercises.progress.deltaNegative", { delta })}
       </span>
     )
   }
   return (
     <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
-      <Minus className="size-4" />0 kg
+      <Minus className="size-4" />
+      {t("exercises.progress.deltaZero")}
     </span>
   )
 }
 
 export default function ExerciseProgressOverview() {
+  const { t } = useTranslation()
   const [exercises, setExercises] = useState([])
   const [logs, setLogs] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -46,10 +51,10 @@ export default function ExerciseProgressOverview() {
         setLogs(logsData)
       })
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje napretka")
+        toast.error(error.response?.data?.message || t("exercises.progress.toasts.loadFailed"))
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
 
   const exerciseById = useMemo(() => {
     const map = new Map()
@@ -87,14 +92,14 @@ export default function ExerciseProgressOverview() {
   }, [logs, exerciseById])
 
   return (
-    <AppLayout breadcrumb="Napredak po vežbama">
+    <AppLayout breadcrumb={t("exercises.progress.breadcrumb")}>
       {isLoading ? (
         <CardGridSkeleton />
       ) : progressByExercise.length === 0 ? (
         <EmptyState
           icon={LineChart}
-          title="Još nema zabeleženih kilaža"
-          description="Unesi kilažu na nekoj vežbi (na Home stranici ili u detaljima vežbe) da bi pratio/la napredak ovde."
+          title={t("exercises.progress.empty.title")}
+          description={t("exercises.progress.empty.description")}
         />
       ) : (
         <CardGrid className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -114,11 +119,16 @@ export default function ExerciseProgressOverview() {
                       <DeltaBadge delta={item.delta} />
                     </div>
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Prvi unos: {item.first.weight} kg</span>
-                      <span>Max: {item.max} kg</span>
+                      <span>{t("exercises.progress.firstEntry", { weight: item.first.weight })}</span>
+                      <span>{t("exercises.progress.max", { weight: item.max })}</span>
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      {item.entryCount} {item.entryCount === 1 ? "unos" : "unosa"}
+                      {item.entryCount}{" "}
+                      {t(
+                        item.entryCount === 1
+                          ? "exercises.progress.entryCount.one"
+                          : "exercises.progress.entryCount.other"
+                      )}
                     </span>
                   </CardContent>
                 </Card>

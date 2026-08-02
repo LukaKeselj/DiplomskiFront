@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Pencil, Trash2 } from "lucide-react"
 
 import {
@@ -28,6 +29,7 @@ import { cn } from "@/lib/utils"
 import { getNutritionCycleDayIndex, isBeforeActivation } from "@/lib/nutrition-cycle"
 
 export default function NutritionPlanDetail() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const { user, updateUser } = useAuth()
@@ -52,23 +54,23 @@ export default function NutritionPlanDetail() {
       .then(setPlan)
       .catch((error) => {
         if (error.response?.status === 403) {
-          toast.error("Nemaš pristup ovom planu")
+          toast.error(t("nutrition.planDetail.accessDenied"))
         } else {
-          toast.error(error.response?.data?.message || "Plan nije pronađen")
+          toast.error(error.response?.data?.message || t("nutrition.planDetail.notFound"))
         }
         navigate("/nutrition-plans")
       })
       .finally(() => setIsLoading(false))
-  }, [id, navigate])
+  }, [id, navigate, t])
 
   async function handleActivate() {
     setIsActivating(true)
     try {
       const updatedUser = await activateNutritionPlanRequest(id)
       updateUser(updatedUser)
-      toast.success("Plan je aktiviran")
+      toast.success(t("nutrition.planDetail.activateSuccess"))
     } catch (error) {
-      toast.error(error.response?.data?.message || "Aktivacija nije uspela")
+      toast.error(error.response?.data?.message || t("nutrition.planDetail.activateFailed"))
     } finally {
       setIsActivating(false)
     }
@@ -78,20 +80,20 @@ export default function NutritionPlanDetail() {
     setIsDeleting(true)
     try {
       await deleteNutritionPlanRequest(id)
-      toast.success("Plan je obrisan")
+      toast.success(t("nutrition.planDetail.deleteSuccess"))
       navigate("/nutrition-plans")
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj plan")
+        toast.error(t("nutrition.planDetail.deleteForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje plana nije uspelo")
+        toast.error(error.response?.data?.message || t("nutrition.planDetail.deleteFailed"))
       }
       setIsDeleting(false)
     }
   }
 
   return (
-    <AppLayout breadcrumb={plan?.name ?? "Plan ishrane"}>
+    <AppLayout breadcrumb={plan?.name ?? t("nutrition.planDetail.breadcrumbFallback")}>
       {isLoading ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
@@ -114,20 +116,20 @@ export default function NutritionPlanDetail() {
               <h1 className="text-xl font-medium">{plan.name}</h1>
               {isActivePlan && (
                 <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                  Aktivan
+                  {t("nutrition.planDetail.activeBadge")}
                 </span>
               )}
             </div>
             <div className="flex gap-2">
               {!isActivePlan && (
                 <Button onClick={handleActivate} disabled={isActivating}>
-                  {isActivating ? "Aktiviranje..." : "Aktiviraj"}
+                  {isActivating ? t("nutrition.planDetail.activating") : t("nutrition.planDetail.activate")}
                 </Button>
               )}
               <Button variant="outline" asChild>
                 <Link to={`/nutrition-plans/${plan._id}/edit`}>
                   <Pencil />
-                  Izmeni
+                  {t("nutrition.planDetail.edit")}
                 </Link>
               </Button>
               <Button
@@ -136,7 +138,7 @@ export default function NutritionPlanDetail() {
                 disabled={isDeleting}
               >
                 <Trash2 />
-                {isDeleting ? "Brisanje..." : "Obriši"}
+                {isDeleting ? t("nutrition.planDetail.deleting") : t("nutrition.planDetail.delete")}
               </Button>
             </div>
           </div>
@@ -158,14 +160,14 @@ export default function NutritionPlanDetail() {
                         <CardTitle>{day.dayName}</CardTitle>
                         {isToday && (
                           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                            Danas
+                            {t("nutrition.planDetail.todayBadge")}
                           </span>
                         )}
                       </div>
                       <CardDescription>
                         {items.length === 0
-                          ? "Nema planiranih namirnica"
-                          : `${items.length} ${items.length === 1 ? "namirnica" : "namirnica"}`}
+                          ? t("nutrition.planDetail.noItems")
+                          : t("nutrition.planDetail.itemsCount", { count: items.length })}
                       </CardDescription>
                     </CardHeader>
                     {items.length > 0 && (
@@ -177,8 +179,12 @@ export default function NutritionPlanDetail() {
                           >
                             <span className="text-sm font-medium">{item.foodName}</span>
                             <span className="text-xs text-muted-foreground">
-                              {item.calories} kcal • {item.protein}g protein • {item.fat}g masti •{" "}
-                              {item.carbs}g UH
+                              {t("nutrition.planDetail.itemMacros", {
+                                calories: item.calories,
+                                protein: item.protein,
+                                fat: item.fat,
+                                carbs: item.carbs,
+                              })}
                             </span>
                           </div>
                         ))}
@@ -191,23 +197,22 @@ export default function NutritionPlanDetail() {
           </CardGrid>
 
           <Button variant="outline" onClick={() => navigate("/nutrition-plans")}>
-            Nazad na listu
+            {t("nutrition.planDetail.backToList")}
           </Button>
         </div>
       ) : null}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati plan?</AlertDialogTitle>
+            <AlertDialogTitle>{t("nutrition.planDetail.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš plan &quot;{plan?.name}&quot;? Ova akcija se ne
-              može poništiti.
+              {t("nutrition.planDetail.deleteDialog.description", { name: plan?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("nutrition.planDetail.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete}>
-              Obriši
+              {t("nutrition.planDetail.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

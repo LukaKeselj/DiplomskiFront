@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Check, Dumbbell, Play } from "lucide-react"
 
 import { getWorkoutLogsRequest, logWorkoutWeightRequest } from "@/api/workoutLogs"
@@ -28,6 +29,7 @@ export function DayExerciseCard({
   loggedWeight = null,
   onWeightSaved,
 }) {
+  const { t } = useTranslation()
   const [isPlaying, setIsPlaying] = useState(false)
   const [weight, setWeight] = useState(loggedWeight != null ? String(loggedWeight) : "")
   const [isSaving, setIsSaving] = useState(false)
@@ -65,7 +67,7 @@ export function DayExerciseCard({
   async function handleSaveWeight() {
     const weightNumber = Number(weight)
     if (!(weightNumber > 0)) {
-      toast.error("Unesi validnu kilažu")
+      toast.error(t("workout.dayExerciseCard.toasts.invalidWeight"))
       return
     }
 
@@ -76,10 +78,14 @@ export function DayExerciseCard({
         date: date ?? todayDateString(),
         weight: weightNumber,
       })
-      toast.success(`Kilaža zabeležena za ${exercise?.name ?? "vežbu"}`)
+      toast.success(
+        t("workout.dayExerciseCard.toasts.weightSaved", {
+          name: exercise?.name ?? t("workout.dayExerciseCard.defaultExerciseName"),
+        })
+      )
       onWeightSaved?.(weightNumber)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
+      toast.error(error.response?.data?.message || t("workout.dayExerciseCard.toasts.saveFailed"))
     } finally {
       setIsSaving(false)
     }
@@ -106,7 +112,9 @@ export function DayExerciseCard({
               </span>
             )}
             <div>
-              <p className="text-sm font-medium">{exercise?.name ?? "Nepoznata vežba"}</p>
+              <p className="text-sm font-medium">
+                {exercise?.name ?? t("workout.dayExerciseCard.unknownExercise")}
+              </p>
               {exercise?.muscleGroup && (
                 <p className="text-xs text-muted-foreground capitalize">{exercise.muscleGroup}</p>
               )}
@@ -117,7 +125,9 @@ export function DayExerciseCard({
               {item.targetSets} x {item.targetReps}
             </span>
             {typeof item.restMinutes === "number" && (
-              <p className="text-xs text-muted-foreground">Odmor: {item.restMinutes} min</p>
+              <p className="text-xs text-muted-foreground">
+                {t("workout.dayExerciseCard.restMinutes", { minutes: item.restMinutes })}
+              </p>
             )}
           </div>
         </div>
@@ -138,7 +148,7 @@ export function DayExerciseCard({
             <div
               role="button"
               tabIndex={0}
-              aria-label={`Pusti video: ${exercise.name}`}
+              aria-label={t("workout.dayExerciseCard.playVideoAria", { name: exercise.name })}
               onClick={handlePlayClick}
               onKeyDown={handlePlayKeyDown}
               className="absolute inset-0 h-full w-full cursor-pointer"
@@ -160,7 +170,7 @@ export function DayExerciseCard({
                 onClick={(event) => event.stopPropagation()}
                 className="text-xs text-muted-foreground underline-offset-4 hover:underline"
               >
-                Istorija
+                {t("workout.dayExerciseCard.historyLink")}
               </Link>
             </div>
           )
@@ -172,7 +182,7 @@ export function DayExerciseCard({
             {loggedWeight != null && (
               <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
                 <Check className="size-3.5" />
-                Zabeleženo: {loggedWeight} kg
+                {t("workout.dayExerciseCard.loggedWeight", { weight: loggedWeight })}
               </span>
             )}
             <div className="flex items-center gap-2">
@@ -180,7 +190,7 @@ export function DayExerciseCard({
                 type="number"
                 step="0.5"
                 min="0"
-                placeholder="kg"
+                placeholder={t("workout.dayExerciseCard.weightPlaceholder")}
                 className="w-24"
                 value={weight}
                 onChange={(event) => setWeight(event.target.value)}
@@ -193,17 +203,17 @@ export function DayExerciseCard({
                 disabled={isSaving}
               >
                 {isSaving
-                  ? "Čuvanje..."
+                  ? t("workout.dayExerciseCard.saving")
                   : loggedWeight != null
-                    ? "Ažuriraj kilažu"
-                    : "Zabeleži kilažu"}
+                    ? t("workout.dayExerciseCard.updateWeight")
+                    : t("workout.dayExerciseCard.saveWeight")}
               </Button>
               {exercise && (
                 <Link
                   to={`/exercises/${exercise._id}`}
                   className="ml-auto text-xs text-muted-foreground underline-offset-4 hover:underline"
                 >
-                  Istorija
+                  {t("workout.dayExerciseCard.historyLink")}
                 </Link>
               )}
             </div>
@@ -214,7 +224,7 @@ export function DayExerciseCard({
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{exercise?.name ?? "Nepoznata vežba"}</DialogTitle>
+            <DialogTitle>{exercise?.name ?? t("workout.dayExerciseCard.unknownExercise")}</DialogTitle>
             <DialogDescription className="capitalize">
               {[exercise?.muscleGroup, exercise?.equipment].filter(Boolean).join(" • ")}
             </DialogDescription>
@@ -240,27 +250,29 @@ export function DayExerciseCard({
             <div className="grid grid-cols-3 gap-4 rounded-lg border border-border p-3 text-center">
               <div>
                 <p className="text-lg font-semibold">{item.targetSets}</p>
-                <p className="text-xs text-muted-foreground">Serije</p>
+                <p className="text-xs text-muted-foreground">{t("workout.dayExerciseCard.stats.sets")}</p>
               </div>
               <div>
                 <p className="text-lg font-semibold">{item.targetReps}</p>
-                <p className="text-xs text-muted-foreground">Ponavljanja</p>
+                <p className="text-xs text-muted-foreground">{t("workout.dayExerciseCard.stats.reps")}</p>
               </div>
               <div>
                 <p className="text-lg font-semibold">
                   {typeof item.restMinutes === "number" ? item.restMinutes : "—"}
                 </p>
-                <p className="text-xs text-muted-foreground">Odmor (min)</p>
+                <p className="text-xs text-muted-foreground">{t("workout.dayExerciseCard.stats.rest")}</p>
               </div>
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-medium text-muted-foreground">Nedavni napredak</p>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                {t("workout.dayExerciseCard.recentProgress")}
+              </p>
               {recentLogs === null ? (
-                <p className="text-sm text-muted-foreground">Učitavanje...</p>
+                <p className="text-sm text-muted-foreground">{t("workout.dayExerciseCard.loading")}</p>
               ) : recentLogs.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  Još nema zabeleženih kilaža za ovu vežbu.
+                  {t("workout.dayExerciseCard.noLogsYet")}
                 </p>
               ) : (
                 <div className="flex flex-col gap-1.5">
@@ -280,7 +292,7 @@ export function DayExerciseCard({
                   to={`/exercises/${exercise._id}`}
                   className="mt-2 inline-block text-xs text-muted-foreground underline-offset-4 hover:underline"
                 >
-                  Kompletna istorija
+                  {t("workout.dayExerciseCard.fullHistoryLink")}
                 </Link>
               )}
             </div>

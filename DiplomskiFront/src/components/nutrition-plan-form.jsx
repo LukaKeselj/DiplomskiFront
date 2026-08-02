@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Plus, Trash2 } from "lucide-react"
 
 import { createNutritionPlanRequest, updateNutritionPlanRequest } from "@/api/nutritionPlans"
@@ -19,12 +20,16 @@ function emptyItem() {
   return { uid: nextUid(), foodName: "", calories: "", protein: "", fat: "", carbs: "", fiber: "" }
 }
 
-function emptyDay(dayNumber) {
-  return { uid: nextUid(), dayName: `Dan ${dayNumber}`, items: [emptyItem()] }
+function emptyDay(dayNumber, t) {
+  return {
+    uid: nextUid(),
+    dayName: t("nutrition.planForm.defaultDayName", { number: dayNumber }),
+    items: [emptyItem()],
+  }
 }
 
-function daysFromPlan(plan) {
-  if (!plan?.days?.length) return [emptyDay(1)]
+function daysFromPlan(plan, t) {
+  if (!plan?.days?.length) return [emptyDay(1, t)]
 
   return plan.days.map((day) => ({
     uid: day._id ?? nextUid(),
@@ -44,10 +49,11 @@ function daysFromPlan(plan) {
 }
 
 export function NutritionPlanForm({ plan }) {
+  const { t } = useTranslation()
   const isEditing = Boolean(plan)
   const navigate = useNavigate()
   const [name, setName] = useState(plan?.name ?? "")
-  const [days, setDays] = useState(() => daysFromPlan(plan))
+  const [days, setDays] = useState(() => daysFromPlan(plan, t))
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   function handleDayNameChange(dayIndex, value) {
@@ -57,7 +63,7 @@ export function NutritionPlanForm({ plan }) {
   }
 
   function handleAddDay() {
-    setDays((prev) => [...prev, emptyDay(prev.length + 1)])
+    setDays((prev) => [...prev, emptyDay(prev.length + 1, t)])
   }
 
   function handleRemoveDay(dayIndex) {
@@ -99,11 +105,11 @@ export function NutritionPlanForm({ plan }) {
     event.preventDefault()
 
     if (!name.trim()) {
-      toast.error("Naziv plana je obavezan")
+      toast.error(t("nutrition.planForm.planNameRequired"))
       return
     }
     if (days.some((day) => !day.dayName.trim())) {
-      toast.error("Naziv dana je obavezan")
+      toast.error(t("nutrition.planForm.dayNameRequired"))
       return
     }
 
@@ -116,7 +122,7 @@ export function NutritionPlanForm({ plan }) {
       })
 
     if (invalidItem) {
-      toast.error("Svaka namirnica mora imati naziv, kalorije, proteine, masti i ugljene hidrate")
+      toast.error(t("nutrition.planForm.itemValidation"))
       return
     }
 
@@ -141,13 +147,13 @@ export function NutritionPlanForm({ plan }) {
         ? await updateNutritionPlanRequest(plan._id, payload)
         : await createNutritionPlanRequest(payload)
 
-      toast.success(isEditing ? "Plan je ažuriran" : "Plan je kreiran")
+      toast.success(isEditing ? t("nutrition.planForm.updateSuccess") : t("nutrition.planForm.createSuccess"))
       navigate(`/nutrition-plans/${savedPlan._id}`)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da izmeniš ovaj plan")
+        toast.error(t("nutrition.planForm.updateForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Čuvanje plana nije uspelo")
+        toast.error(error.response?.data?.message || t("nutrition.planForm.saveFailed"))
       }
     } finally {
       setIsSubmitting(false)
@@ -158,7 +164,7 @@ export function NutritionPlanForm({ plan }) {
     <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="nutrition-plan-name">Naziv plana</FieldLabel>
+          <FieldLabel htmlFor="nutrition-plan-name">{t("nutrition.planForm.planNameLabel")}</FieldLabel>
           <Input
             id="nutrition-plan-name"
             value={name}
@@ -169,8 +175,9 @@ export function NutritionPlanForm({ plan }) {
       </FieldGroup>
 
       <p className="text-sm text-muted-foreground">
-        Dani se ne vezuju za stvarni dan u nedelji — kad aktiviraš plan, dan aktivacije postaje
-        &quot;{days[0]?.dayName || "Dan 1"}&quot;, pa plan ide redom i vrti se u krug.
+        {t("nutrition.planForm.cycleNote", {
+          dayName: days[0]?.dayName || t("nutrition.planForm.defaultDayNameFallback"),
+        })}
       </p>
 
       <div className="flex flex-col gap-4">
@@ -178,10 +185,10 @@ export function NutritionPlanForm({ plan }) {
           <Card key={day.uid}>
             <CardHeader className="flex-row items-end justify-between gap-2">
               <Field className="flex-1">
-                <FieldLabel htmlFor={`day-name-${day.uid}`}>Naziv dana</FieldLabel>
+                <FieldLabel htmlFor={`day-name-${day.uid}`}>{t("nutrition.planForm.dayNameLabel")}</FieldLabel>
                 <Input
                   id={`day-name-${day.uid}`}
-                  placeholder="npr. Dan 1"
+                  placeholder={t("nutrition.planForm.dayNamePlaceholder")}
                   value={day.dayName}
                   onChange={(event) => handleDayNameChange(dayIndex, event.target.value)}
                   required
@@ -205,7 +212,7 @@ export function NutritionPlanForm({ plan }) {
                   className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-end"
                 >
                   <Field className="flex-1">
-                    <FieldLabel htmlFor={`food-name-${item.uid}`}>Namirnica</FieldLabel>
+                    <FieldLabel htmlFor={`food-name-${item.uid}`}>{t("nutrition.planForm.foodNameLabel")}</FieldLabel>
                     <Input
                       id={`food-name-${item.uid}`}
                       value={item.foodName}
@@ -215,7 +222,7 @@ export function NutritionPlanForm({ plan }) {
                     />
                   </Field>
                   <Field className="w-full sm:w-20">
-                    <FieldLabel htmlFor={`calories-${item.uid}`}>Kcal</FieldLabel>
+                    <FieldLabel htmlFor={`calories-${item.uid}`}>{t("nutrition.planForm.caloriesLabel")}</FieldLabel>
                     <Input
                       id={`calories-${item.uid}`}
                       type="number"
@@ -227,7 +234,7 @@ export function NutritionPlanForm({ plan }) {
                     />
                   </Field>
                   <Field className="w-full sm:w-20">
-                    <FieldLabel htmlFor={`protein-${item.uid}`}>Protein (g)</FieldLabel>
+                    <FieldLabel htmlFor={`protein-${item.uid}`}>{t("nutrition.planForm.proteinLabel")}</FieldLabel>
                     <Input
                       id={`protein-${item.uid}`}
                       type="number"
@@ -239,7 +246,7 @@ export function NutritionPlanForm({ plan }) {
                     />
                   </Field>
                   <Field className="w-full sm:w-20">
-                    <FieldLabel htmlFor={`fat-${item.uid}`}>Masti (g)</FieldLabel>
+                    <FieldLabel htmlFor={`fat-${item.uid}`}>{t("nutrition.planForm.fatLabel")}</FieldLabel>
                     <Input
                       id={`fat-${item.uid}`}
                       type="number"
@@ -251,7 +258,7 @@ export function NutritionPlanForm({ plan }) {
                     />
                   </Field>
                   <Field className="w-full sm:w-20">
-                    <FieldLabel htmlFor={`carbs-${item.uid}`}>UH (g)</FieldLabel>
+                    <FieldLabel htmlFor={`carbs-${item.uid}`}>{t("nutrition.planForm.carbsLabel")}</FieldLabel>
                     <Input
                       id={`carbs-${item.uid}`}
                       type="number"
@@ -263,7 +270,7 @@ export function NutritionPlanForm({ plan }) {
                     />
                   </Field>
                   <Field className="w-full sm:w-20">
-                    <FieldLabel htmlFor={`fiber-${item.uid}`}>Vlakna (g)</FieldLabel>
+                    <FieldLabel htmlFor={`fiber-${item.uid}`}>{t("nutrition.planForm.fiberLabel")}</FieldLabel>
                     <Input
                       id={`fiber-${item.uid}`}
                       type="number"
@@ -289,7 +296,7 @@ export function NutritionPlanForm({ plan }) {
               ))}
               <Button type="button" variant="outline" size="sm" onClick={() => handleAddItem(dayIndex)}>
                 <Plus />
-                Dodaj namirnicu
+                {t("nutrition.planForm.addFoodItem")}
               </Button>
             </CardContent>
           </Card>
@@ -299,16 +306,20 @@ export function NutritionPlanForm({ plan }) {
       <div>
         <Button type="button" variant="outline" onClick={handleAddDay}>
           <Plus />
-          Dodaj dan
+          {t("nutrition.planForm.addDay")}
         </Button>
       </div>
 
       <div className="flex gap-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Čuvanje..." : isEditing ? "Sačuvaj izmene" : "Kreiraj plan"}
+          {isSubmitting
+            ? t("nutrition.planForm.saving")
+            : isEditing
+              ? t("nutrition.planForm.saveChanges")
+              : t("nutrition.planForm.createPlan")}
         </Button>
         <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-          Otkaži
+          {t("nutrition.planForm.cancel")}
         </Button>
       </div>
     </form>

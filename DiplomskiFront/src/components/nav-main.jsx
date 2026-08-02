@@ -1,5 +1,6 @@
 import { ChevronRight } from "lucide-react"
 import { Link, useLocation } from "react-router"
+import { useTranslation } from "react-i18next"
 
 import {
   Collapsible,
@@ -22,10 +23,11 @@ export function NavMain({ items }) {
   const location = useLocation()
   const currentUrl = `${location.pathname}${location.search}`
   const { openSections, setSectionOpen } = useSidebarNav()
+  const { t } = useTranslation()
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platforma</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("sidebar.groupLabel")}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           if (!item.items) {

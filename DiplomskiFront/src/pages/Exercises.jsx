@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Activity, Pencil, Play, Plus, Search, Trash2 } from "lucide-react"
 
 import { deleteExerciseRequest, getExercisesRequest } from "@/api/exercises"
@@ -40,6 +41,7 @@ import { MUSCLE_GROUPS } from "@/lib/muscle-groups"
 import { getYoutubeEmbedUrl, getYoutubeThumbnailUrl } from "@/lib/youtube"
 
 function ExerciseCard({ exercise, isAdmin, onDeleteRequest }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [isPlaying, setIsPlaying] = useState(false)
   const thumbnailUrl = getYoutubeThumbnailUrl(exercise.videoUrl)
@@ -103,7 +105,7 @@ function ExerciseCard({ exercise, isAdmin, onDeleteRequest }) {
                   <div
                     role="button"
                     tabIndex={0}
-                    aria-label={`Pusti video: ${exercise.name}`}
+                    aria-label={t("exercises.list.playVideoAria", { name: exercise.name })}
                     onClick={handlePlayClick}
                     onKeyDown={handlePlayKeyDown}
                     className="absolute inset-0 h-full w-full cursor-pointer"
@@ -129,6 +131,7 @@ function ExerciseCard({ exercise, isAdmin, onDeleteRequest }) {
 }
 
 export default function Exercises() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
   const [exercises, setExercises] = useState([])
@@ -142,10 +145,10 @@ export default function Exercises() {
     getExercisesRequest()
       .then(setExercises)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje vežbi")
+        toast.error(error.response?.data?.message || t("exercises.list.toasts.loadFailed"))
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
 
   async function handleDelete() {
     if (!deleteTarget) return
@@ -154,10 +157,10 @@ export default function Exercises() {
     try {
       await deleteExerciseRequest(deleteTarget._id)
       setExercises((prev) => prev.filter((item) => item._id !== deleteTarget._id))
-      toast.success("Vežba je obrisana")
+      toast.success(t("exercises.list.toasts.deleteSuccess"))
       setDeleteTarget(null)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Brisanje vežbe nije uspelo")
+      toast.error(error.response?.data?.message || t("exercises.list.toasts.deleteFailed"))
     } finally {
       setIsDeleting(false)
     }
@@ -171,14 +174,14 @@ export default function Exercises() {
   })
 
   return (
-    <AppLayout breadcrumb="Vežbe">
+    <AppLayout breadcrumb={t("exercises.list.breadcrumb")}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="w-56 pl-8"
-              placeholder="Pretraži vežbe..."
+              placeholder={t("exercises.list.searchPlaceholder")}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
@@ -188,10 +191,10 @@ export default function Exercises() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Sve mišićne grupe</SelectItem>
+              <SelectItem value="all">{t("exercises.list.allMuscleGroups")}</SelectItem>
               {MUSCLE_GROUPS.map((group) => (
                 <SelectItem key={group.value} value={group.value}>
-                  {group.label}
+                  {t(group.labelKey)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -201,7 +204,7 @@ export default function Exercises() {
           <Button asChild>
             <Link to="/exercises/new">
               <Plus />
-              Dodaj vežbu
+              {t("exercises.list.addExercise")}
             </Link>
           </Button>
         )}
@@ -212,18 +215,18 @@ export default function Exercises() {
       ) : visibleExercises.length === 0 ? (
         <EmptyState
           icon={Activity}
-          title="Nema vežbi za prikaz"
+          title={t("exercises.list.empty.title")}
           description={
             isAdmin
-              ? "Dodaj prvu vežbu ili promeni pretragu/filter."
-              : "Promeni pretragu ili filter mišićne grupe."
+              ? t("exercises.list.empty.descriptionAdmin")
+              : t("exercises.list.empty.descriptionUser")
           }
           action={
             isAdmin && (
               <Button asChild size="sm">
                 <Link to="/exercises/new">
                   <Plus />
-                  Dodaj vežbu
+                  {t("exercises.list.addExercise")}
                 </Link>
               </Button>
             )
@@ -246,16 +249,15 @@ export default function Exercises() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati vežbu?</AlertDialogTitle>
+            <AlertDialogTitle>{t("exercises.list.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš vežbu &quot;{deleteTarget?.name}&quot;? Ova
-              akcija se ne može poništiti.
+              {t("exercises.list.deleteDialog.description", { name: deleteTarget?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("exercises.list.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Brisanje..." : "Obriši"}
+              {isDeleting ? t("exercises.list.deleteDialog.confirming") : t("exercises.list.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

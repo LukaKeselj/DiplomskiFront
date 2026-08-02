@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Plus, Trash2 } from "lucide-react"
 
 import { deleteWorkoutLogRequest, getWorkoutLogsRequest, logWorkoutWeightRequest } from "@/api/workoutLogs"
@@ -39,6 +40,7 @@ function todayDateString() {
 }
 
 export function ExerciseProgress({ exerciseId }) {
+  const { t } = useTranslation()
   const today = useMemo(() => todayDateString(), [])
   const [logs, setLogs] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -53,10 +55,10 @@ export function ExerciseProgress({ exerciseId }) {
     getWorkoutLogsRequest({ exercise: exerciseId })
       .then(setLogs)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje napretka")
+        toast.error(error.response?.data?.message || t("exercises.progress.card.toasts.loadFailed"))
       })
       .finally(() => setIsLoading(false))
-  }, [exerciseId, reloadNonce])
+  }, [exerciseId, reloadNonce, t])
 
   function openAddForm() {
     setForm({ date: today, weight: "" })
@@ -68,18 +70,18 @@ export function ExerciseProgress({ exerciseId }) {
 
     const weightNumber = Number(form.weight)
     if (!(weightNumber > 0)) {
-      toast.error("Unesi validnu kilažu")
+      toast.error(t("exercises.progress.card.toasts.invalidWeight"))
       return
     }
 
     setIsSubmitting(true)
     try {
       await logWorkoutWeightRequest({ exercise: exerciseId, date: form.date, weight: weightNumber })
-      toast.success("Napredak je sačuvan")
+      toast.success(t("exercises.progress.card.toasts.saveSuccess"))
       setIsFormOpen(false)
       setReloadNonce((prev) => prev + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
+      toast.error(error.response?.data?.message || t("exercises.progress.card.toasts.saveFailed"))
     } finally {
       setIsSubmitting(false)
     }
@@ -91,14 +93,14 @@ export function ExerciseProgress({ exerciseId }) {
     setIsDeleting(true)
     try {
       await deleteWorkoutLogRequest(deleteTarget._id)
-      toast.success("Unos je obrisan")
+      toast.success(t("exercises.progress.card.toasts.deleteSuccess"))
       setDeleteTarget(null)
       setReloadNonce((prev) => prev + 1)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj zapis")
+        toast.error(t("exercises.progress.card.toasts.deleteForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje nije uspelo")
+        toast.error(error.response?.data?.message || t("exercises.progress.card.toasts.deleteFailed"))
       }
     } finally {
       setIsDeleting(false)
@@ -110,16 +112,19 @@ export function ExerciseProgress({ exerciseId }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Moj napredak</CardTitle>
+        <CardTitle>{t("exercises.progress.card.title")}</CardTitle>
         <CardDescription>
           {latest
-            ? `Poslednje: ${latest.weight} kg (${latest.date.slice(0, 10)})`
-            : "Još nema unetih rezultata"}
+            ? t("exercises.progress.card.latestLabel", {
+                weight: latest.weight,
+                date: latest.date.slice(0, 10),
+              })
+            : t("exercises.progress.card.noEntries")}
         </CardDescription>
         <CardAction>
           <Button size="sm" onClick={openAddForm}>
             <Plus />
-            Zabeleži težinu
+            {t("exercises.progress.card.logWeight")}
           </Button>
         </CardAction>
       </CardHeader>
@@ -128,7 +133,7 @@ export function ExerciseProgress({ exerciseId }) {
           <Skeleton className="h-48 w-full" />
         ) : logs.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Zabeleži prvi rezultat da bi pratio/la napredak na ovoj vežbi
+            {t("exercises.progress.card.emptyHint")}
           </p>
         ) : (
           <>
@@ -160,13 +165,13 @@ export function ExerciseProgress({ exerciseId }) {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Zabeleži težinu</DialogTitle>
-            <DialogDescription>Unesi datum i kilažu koju si podigao/la.</DialogDescription>
+            <DialogTitle>{t("exercises.progress.card.dialog.title")}</DialogTitle>
+            <DialogDescription>{t("exercises.progress.card.dialog.description")}</DialogDescription>
           </DialogHeader>
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="workout-log-date">Datum</FieldLabel>
+                <FieldLabel htmlFor="workout-log-date">{t("exercises.progress.card.dialog.dateLabel")}</FieldLabel>
                 <Input
                   id="workout-log-date"
                   type="date"
@@ -181,7 +186,7 @@ export function ExerciseProgress({ exerciseId }) {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="workout-log-weight">Kilaža (kg)</FieldLabel>
+                <FieldLabel htmlFor="workout-log-weight">{t("exercises.progress.card.dialog.weightLabel")}</FieldLabel>
                 <Input
                   id="workout-log-weight"
                   type="number"
@@ -196,10 +201,10 @@ export function ExerciseProgress({ exerciseId }) {
             </FieldGroup>
             <div className="flex gap-2">
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Čuvanje..." : "Sačuvaj"}
+                {isSubmitting ? t("exercises.progress.card.dialog.saving") : t("exercises.progress.card.dialog.save")}
               </Button>
               <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
-                Otkaži
+                {t("exercises.progress.card.dialog.cancel")}
               </Button>
             </div>
           </form>
@@ -209,16 +214,19 @@ export function ExerciseProgress({ exerciseId }) {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati unos?</AlertDialogTitle>
+            <AlertDialogTitle>{t("exercises.progress.card.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš unos od {deleteTarget?.date?.slice(0, 10)}?
-              Ova akcija se ne može poništiti.
+              {t("exercises.progress.card.deleteDialog.description", {
+                date: deleteTarget?.date?.slice(0, 10),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("exercises.progress.card.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Brisanje..." : "Obriši"}
+              {isDeleting
+                ? t("exercises.progress.card.deleteDialog.confirming")
+                : t("exercises.progress.card.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

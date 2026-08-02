@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Navigate, useLocation, useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,6 +16,7 @@ import { useAuth } from "@/context/AuthContext"
 import { completeGoogleRegistrationRequest } from "@/api/auth"
 
 export default function CompleteProfile() {
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -39,7 +41,7 @@ export default function CompleteProfile() {
       login(data)
       navigate("/")
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nije uspelo kreiranje naloga")
+      toast.error(error.response?.data?.message || t("profile.errors.failed"))
     } finally {
       setIsSubmitting(false)
     }
@@ -50,16 +52,16 @@ export default function CompleteProfile() {
       <div className="w-full max-w-sm">
         <Card>
           <CardHeader>
-            <CardTitle>Dovrši registraciju</CardTitle>
+            <CardTitle>{t("profile.title")}</CardTitle>
             <CardDescription>
-              Ulogovan/a preko Google-a kao {profile.email}. Još nam trebaju username i visina.
+              {t("profile.description", { email: profile.email })}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="username">Username</FieldLabel>
+                  <FieldLabel htmlFor="username">{t("profile.usernameLabel")}</FieldLabel>
                   <Input
                     id="username"
                     type="text"
@@ -69,7 +71,7 @@ export default function CompleteProfile() {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="height">Height (cm)</FieldLabel>
+                  <FieldLabel htmlFor="height">{t("profile.heightLabel")}</FieldLabel>
                   <Input
                     id="height"
                     type="number"
@@ -80,7 +82,7 @@ export default function CompleteProfile() {
                 </Field>
                 <Field>
                   <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Kreiranje naloga..." : "Završi registraciju"}
+                    {isSubmitting ? t("profile.submitting") : t("profile.submit")}
                   </Button>
                 </Field>
               </FieldGroup>

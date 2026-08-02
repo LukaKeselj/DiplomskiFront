@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Search } from "lucide-react"
 
 import {
@@ -30,6 +31,7 @@ function parseServingGrams(description) {
 }
 
 export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
+  const { t } = useTranslation()
   const isEditing = Boolean(entry)
 
   const [mode, setMode] = useState(isEditing ? "manual" : "search")
@@ -65,13 +67,13 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
       searchFoodRequest(trimmedQuery)
         .then(setResults)
         .catch((error) => {
-          toast.error(error.response?.data?.message || "Pretraga hrane nije uspela")
+          toast.error(error.response?.data?.message || t("nutrition.logForm.searchFailed"))
         })
         .finally(() => setIsSearching(false))
     }, 400)
 
     return () => clearTimeout(timeoutId)
-  }, [trimmedQuery, mode, selectedFood])
+  }, [trimmedQuery, mode, selectedFood, t])
 
   function handleSelectFood(food) {
     setSelectedFood(food)
@@ -81,7 +83,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
     getFoodDetailsRequest(food.foodId)
       .then((data) => setServings(data.servings ?? []))
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Učitavanje namirnice nije uspelo")
+        toast.error(error.response?.data?.message || t("nutrition.logForm.foodDetailsFailed"))
       })
       .finally(() => setIsLoadingServings(false))
   }
@@ -109,17 +111,17 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
       let saved
       if (isEditing) {
         saved = await updateNutritionLogRequest(entry._id, payload)
-        toast.success("Unos je ažuriran")
+        toast.success(t("nutrition.logForm.updateSuccess"))
       } else {
         saved = await createNutritionLogRequest(payload)
-        toast.success("Unos je dodat u dnevnik")
+        toast.success(t("nutrition.logForm.createSuccess"))
       }
       onSaved(saved)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da izmeniš ovaj zapis")
+        toast.error(t("nutrition.logForm.updateForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
+        toast.error(error.response?.data?.message || t("nutrition.logForm.saveFailed"))
       }
     } finally {
       setIsSubmitting(false)
@@ -145,11 +147,15 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
     event.preventDefault()
 
     if (!selectedFood || !selectedServing) {
-      toast.error("Izaberi namirnicu i porciju")
+      toast.error(t("nutrition.logForm.selectFoodAndServing"))
       return
     }
     if (!(ratio > 0)) {
-      toast.error(servingGrams ? "Gramaža mora biti veća od 0" : "Količina mora biti veća od 0")
+      toast.error(
+        servingGrams
+          ? t("nutrition.logForm.gramsMustBePositive")
+          : t("nutrition.logForm.amountMustBePositive")
+      )
       return
     }
 
@@ -165,7 +171,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
     event.preventDefault()
 
     if (!manualForm.name.trim()) {
-      toast.error("Naziv namirnice je obavezan")
+      toast.error(t("nutrition.logForm.nameRequired"))
       return
     }
 
@@ -176,7 +182,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
     const fiber = manualForm.fiber.trim() ? Number(manualForm.fiber) : 0
 
     if ([calories, protein, fat, carbs, fiber].some((value) => Number.isNaN(value))) {
-      toast.error("Kalorije, proteini, masti, ugljeni hidrati i vlakna moraju biti brojevi")
+      toast.error(t("nutrition.logForm.numbersRequired"))
       return
     }
 
@@ -201,7 +207,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
             size="sm"
             onClick={() => setMode("search")}
           >
-            Pretraga
+            {t("nutrition.logForm.searchTab")}
           </Button>
           <Button
             type="button"
@@ -209,7 +215,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
             size="sm"
             onClick={() => setMode("manual")}
           >
-            Ručni unos
+            {t("nutrition.logForm.manualTab")}
           </Button>
         </div>
       )}
@@ -219,20 +225,20 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
           {!selectedFood ? (
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="nutrition-food-search">Pretraga hrane</FieldLabel>
+                <FieldLabel htmlFor="nutrition-food-search">{t("nutrition.logForm.searchLabel")}</FieldLabel>
                 <div className="relative">
                   <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="nutrition-food-search"
                     className="pl-8"
-                    placeholder="npr. piletina, pirinač..."
+                    placeholder={t("nutrition.logForm.searchPlaceholder")}
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                   />
                 </div>
               </Field>
               {trimmedQuery && isSearching ? (
-                <p className="text-sm text-muted-foreground">Pretraga...</p>
+                <p className="text-sm text-muted-foreground">{t("nutrition.logForm.searching")}</p>
               ) : visibleResults.length > 0 ? (
                 <div className="grid max-h-72 grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2">
                   {visibleResults.map((food) => (
@@ -248,7 +254,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                   ))}
                 </div>
               ) : trimmedQuery ? (
-                <p className="text-sm text-muted-foreground">Nema rezultata</p>
+                <p className="text-sm text-muted-foreground">{t("nutrition.logForm.noResults")}</p>
               ) : null}
             </FieldGroup>
           ) : (
@@ -256,16 +262,16 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
               <Field orientation="horizontal">
                 <FieldLabel className="flex-1">{selectedFood.name}</FieldLabel>
                 <Button type="button" variant="outline" size="sm" onClick={handleChangeFood}>
-                  Promeni namirnicu
+                  {t("nutrition.logForm.changeFood")}
                 </Button>
               </Field>
 
               {isLoadingServings ? (
-                <p className="text-sm text-muted-foreground">Učitavanje porcija...</p>
+                <p className="text-sm text-muted-foreground">{t("nutrition.logForm.loadingServings")}</p>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field>
-                    <FieldLabel>Porcija</FieldLabel>
+                    <FieldLabel>{t("nutrition.logForm.servingLabel")}</FieldLabel>
                     <div className="flex max-h-72 flex-col gap-1 overflow-y-auto">
                       {servings.map((serving) => (
                         <button
@@ -289,7 +295,9 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                     <FieldGroup>
                       <Field>
                         <FieldLabel htmlFor="nutrition-amount">
-                          {servingGrams ? "Gramaža (g)" : "Količina (broj porcija)"}
+                          {servingGrams
+                            ? t("nutrition.logForm.gramsLabel")
+                            : t("nutrition.logForm.servingCountLabel")}
                         </FieldLabel>
                         <Input
                           id="nutrition-amount"
@@ -301,7 +309,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                         />
                         {!servingGrams && (
                           <p className="text-xs text-muted-foreground">
-                            Ova porcija nema definisanu gramažu — unesi broj porcija (npr. 1.5).
+                            {t("nutrition.logForm.noGramsHint")}
                           </p>
                         )}
                       </Field>
@@ -314,19 +322,19 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                           </div>
                           <div>
                             <div className="font-medium">{computed.protein}g</div>
-                            <div className="text-muted-foreground">protein</div>
+                            <div className="text-muted-foreground">{t("nutrition.logForm.computed.protein")}</div>
                           </div>
                           <div>
                             <div className="font-medium">{computed.fat}g</div>
-                            <div className="text-muted-foreground">masti</div>
+                            <div className="text-muted-foreground">{t("nutrition.logForm.computed.fat")}</div>
                           </div>
                           <div>
                             <div className="font-medium">{computed.carbs}g</div>
-                            <div className="text-muted-foreground">UH</div>
+                            <div className="text-muted-foreground">{t("nutrition.logForm.computed.carbs")}</div>
                           </div>
                           <div>
                             <div className="font-medium">{computed.fiber}g</div>
-                            <div className="text-muted-foreground">vlakna</div>
+                            <div className="text-muted-foreground">{t("nutrition.logForm.computed.fiber")}</div>
                           </div>
                         </div>
                       )}
@@ -339,10 +347,10 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
 
           <div className="flex gap-2">
             <Button type="submit" disabled={isSubmitting || !selectedServing}>
-              {isSubmitting ? "Čuvanje..." : "Dodaj unos"}
+              {isSubmitting ? t("nutrition.logForm.saving") : t("nutrition.logForm.addEntry")}
             </Button>
             <Button type="button" variant="outline" onClick={onCancel}>
-              Otkaži
+              {t("nutrition.logForm.cancel")}
             </Button>
           </div>
         </form>
@@ -350,7 +358,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
         <form className="flex flex-col gap-4" onSubmit={handleManualSubmit}>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="nutrition-manual-name">Naziv namirnice</FieldLabel>
+              <FieldLabel htmlFor="nutrition-manual-name">{t("nutrition.logForm.manualNameLabel")}</FieldLabel>
               <Input
                 id="nutrition-manual-name"
                 value={manualForm.name}
@@ -359,7 +367,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
             </Field>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Field>
-                <FieldLabel htmlFor="nutrition-manual-calories">Kalorije (kcal)</FieldLabel>
+                <FieldLabel htmlFor="nutrition-manual-calories">{t("nutrition.logForm.manualCaloriesLabel")}</FieldLabel>
                 <Input
                   id="nutrition-manual-calories"
                   type="number"
@@ -369,7 +377,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="nutrition-manual-protein">Proteini (g)</FieldLabel>
+                <FieldLabel htmlFor="nutrition-manual-protein">{t("nutrition.logForm.manualProteinLabel")}</FieldLabel>
                 <Input
                   id="nutrition-manual-protein"
                   type="number"
@@ -379,7 +387,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="nutrition-manual-fat">Masti (g)</FieldLabel>
+                <FieldLabel htmlFor="nutrition-manual-fat">{t("nutrition.logForm.manualFatLabel")}</FieldLabel>
                 <Input
                   id="nutrition-manual-fat"
                   type="number"
@@ -389,7 +397,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="nutrition-manual-carbs">Ugljeni hidrati (g)</FieldLabel>
+                <FieldLabel htmlFor="nutrition-manual-carbs">{t("nutrition.logForm.manualCarbsLabel")}</FieldLabel>
                 <Input
                   id="nutrition-manual-carbs"
                   type="number"
@@ -399,7 +407,7 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="nutrition-manual-fiber">Vlakna (g)</FieldLabel>
+                <FieldLabel htmlFor="nutrition-manual-fiber">{t("nutrition.logForm.manualFiberLabel")}</FieldLabel>
                 <Input
                   id="nutrition-manual-fiber"
                   type="number"
@@ -414,10 +422,14 @@ export function NutritionLogForm({ date, entry, onSaved, onCancel }) {
 
           <div className="flex gap-2">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Čuvanje..." : isEditing ? "Sačuvaj izmene" : "Dodaj unos"}
+              {isSubmitting
+                ? t("nutrition.logForm.saving")
+                : isEditing
+                  ? t("nutrition.logForm.saveChanges")
+                  : t("nutrition.logForm.addEntry")}
             </Button>
             <Button type="button" variant="outline" onClick={onCancel}>
-              Otkaži
+              {t("nutrition.logForm.cancel")}
             </Button>
           </div>
         </form>

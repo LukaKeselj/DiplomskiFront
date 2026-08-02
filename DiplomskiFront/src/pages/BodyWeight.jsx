@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Plus, Scale, Trash2 } from "lucide-react"
 
 import { deleteWeightLogRequest, getWeightLogsRequest, logWeightRequest } from "@/api/weightLogs"
@@ -35,6 +36,7 @@ function todayDateString() {
 }
 
 export default function BodyWeight() {
+  const { t } = useTranslation()
   const today = useMemo(() => todayDateString(), [])
   const [logs, setLogs] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -49,9 +51,10 @@ export default function BodyWeight() {
     getWeightLogsRequest()
       .then(setLogs)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje istorije težine")
+        toast.error(error.response?.data?.message || t("bodyWeight.errors.loadFailed"))
       })
       .finally(() => setIsLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reloadNonce])
 
   function openAddForm() {
@@ -64,18 +67,18 @@ export default function BodyWeight() {
 
     const weightNumber = Number(form.weight)
     if (!(weightNumber > 0)) {
-      toast.error("Unesi validnu težinu")
+      toast.error(t("bodyWeight.errors.invalidWeight"))
       return
     }
 
     setIsSubmitting(true)
     try {
       await logWeightRequest({ date: form.date, weight: weightNumber })
-      toast.success("Merenje je sačuvano")
+      toast.success(t("bodyWeight.success.saved"))
       setIsFormOpen(false)
       setReloadNonce((prev) => prev + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
+      toast.error(error.response?.data?.message || t("bodyWeight.errors.saveFailed"))
     } finally {
       setIsSubmitting(false)
     }
@@ -87,14 +90,14 @@ export default function BodyWeight() {
     setIsDeleting(true)
     try {
       await deleteWeightLogRequest(deleteTarget._id)
-      toast.success("Merenje je obrisano")
+      toast.success(t("bodyWeight.success.deleted"))
       setDeleteTarget(null)
       setReloadNonce((prev) => prev + 1)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj zapis")
+        toast.error(t("bodyWeight.errors.deleteForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje nije uspelo")
+        toast.error(error.response?.data?.message || t("bodyWeight.errors.deleteFailed"))
       }
     } finally {
       setIsDeleting(false)
@@ -104,19 +107,21 @@ export default function BodyWeight() {
   const latest = logs[0]
 
   return (
-    <AppLayout breadcrumb="Telesna težina">
+    <AppLayout breadcrumb={t("sidebar.nav.bodyWeight")}>
       <div className="flex items-center justify-between gap-4">
         <div className="flex flex-col">
           <span className="text-2xl font-semibold">
             {latest ? `${latest.weight} kg` : "—"}
           </span>
           <span className="text-sm text-muted-foreground">
-            {latest ? `Poslednje merenje: ${latest.date.slice(0, 10)}` : "Nema unetih merenja"}
+            {latest
+              ? t("bodyWeight.lastMeasurement", { date: latest.date.slice(0, 10) })
+              : t("bodyWeight.noMeasurements")}
           </span>
         </div>
         <Button onClick={openAddForm}>
           <Plus />
-          Dodaj merenje
+          {t("bodyWeight.addMeasurement")}
         </Button>
       </div>
 
@@ -124,7 +129,7 @@ export default function BodyWeight() {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Istorija</CardTitle>
+              <CardTitle>{t("bodyWeight.history")}</CardTitle>
             </CardHeader>
             <CardContent>
               <Skeleton className="h-48 w-full" />
@@ -144,12 +149,12 @@ export default function BodyWeight() {
       ) : logs.length === 0 ? (
         <EmptyState
           icon={Scale}
-          title="Nema unetih merenja"
-          description="Dodaj prvo merenje da počneš da pratiš svoju telesnu težinu."
+          title={t("bodyWeight.emptyState.title")}
+          description={t("bodyWeight.emptyState.description")}
           action={
             <Button size="sm" onClick={openAddForm}>
               <Plus />
-              Dodaj merenje
+              {t("bodyWeight.addMeasurement")}
             </Button>
           }
         />
@@ -157,7 +162,7 @@ export default function BodyWeight() {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Istorija</CardTitle>
+              <CardTitle>{t("bodyWeight.history")}</CardTitle>
             </CardHeader>
             <CardContent>
               <WeightHistoryChart logs={logs} />
@@ -191,13 +196,13 @@ export default function BodyWeight() {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Dodaj merenje</DialogTitle>
-            <DialogDescription>Unesi datum i izmerenu težinu.</DialogDescription>
+            <DialogTitle>{t("bodyWeight.form.title")}</DialogTitle>
+            <DialogDescription>{t("bodyWeight.form.description")}</DialogDescription>
           </DialogHeader>
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="weight-log-date">Datum</FieldLabel>
+                <FieldLabel htmlFor="weight-log-date">{t("bodyWeight.form.dateLabel")}</FieldLabel>
                 <Input
                   id="weight-log-date"
                   type="date"
@@ -212,7 +217,7 @@ export default function BodyWeight() {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="weight-log-weight">Težina (kg)</FieldLabel>
+                <FieldLabel htmlFor="weight-log-weight">{t("bodyWeight.form.weightLabel")}</FieldLabel>
                 <Input
                   id="weight-log-weight"
                   type="number"
@@ -227,10 +232,10 @@ export default function BodyWeight() {
             </FieldGroup>
             <div className="flex gap-2">
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Čuvanje..." : "Sačuvaj"}
+                {isSubmitting ? t("bodyWeight.form.saving") : t("bodyWeight.form.save")}
               </Button>
               <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
-                Otkaži
+                {t("bodyWeight.form.cancel")}
               </Button>
             </div>
           </form>
@@ -240,16 +245,17 @@ export default function BodyWeight() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati merenje?</AlertDialogTitle>
+            <AlertDialogTitle>{t("bodyWeight.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš merenje od {deleteTarget?.date?.slice(0, 10)}?
-              Ova akcija se ne može poništiti.
+              {t("bodyWeight.deleteDialog.description", {
+                date: deleteTarget?.date?.slice(0, 10),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("bodyWeight.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Brisanje..." : "Obriši"}
+              {isDeleting ? t("bodyWeight.deleteDialog.deleting") : t("bodyWeight.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

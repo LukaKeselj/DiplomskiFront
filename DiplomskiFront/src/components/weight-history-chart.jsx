@@ -1,10 +1,7 @@
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { useTranslation } from "react-i18next"
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-
-const chartConfig = {
-  weight: { label: "Težina (kg)", color: "var(--chart-1)" },
-}
 
 function formatDay(dateString) {
   return new Date(`${dateString}T00:00:00Z`).toLocaleDateString("sr-RS", {
@@ -14,6 +11,10 @@ function formatDay(dateString) {
 }
 
 export function WeightHistoryChart({ logs, className }) {
+  const { t } = useTranslation()
+  const chartConfig = {
+    weight: { label: t("bodyWeight.chart.weightLabel"), color: "var(--chart-1)" },
+  }
   const chartData = [...logs]
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .map((log) => ({

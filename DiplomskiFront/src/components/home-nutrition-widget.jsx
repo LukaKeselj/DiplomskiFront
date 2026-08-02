@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Apple, Plus, Trash2 } from "lucide-react"
 
 import { deleteNutritionLogRequest, getNutritionLogsRequest } from "@/api/nutrition"
@@ -30,6 +31,7 @@ function toDateKey(date) {
 }
 
 export function HomeNutritionWidget({ date, onLogChange }) {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const selectedDate = useMemo(() => date ?? new Date(), [date])
   const dateKey = useMemo(() => toDateKey(selectedDate), [selectedDate])
@@ -106,7 +108,7 @@ export function HomeNutritionWidget({ date, onLogChange }) {
       }
       onLogChange?.()
     } catch (error) {
-      toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
+      toast.error(error.response?.data?.message || t("home.nutritionWidget.toasts.saveError"))
     } finally {
       setPendingItemId(null)
     }
@@ -119,9 +121,9 @@ export function HomeNutritionWidget({ date, onLogChange }) {
       onLogChange?.()
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj unos")
+        toast.error(t("home.nutritionWidget.toasts.deleteNoPermission"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje nije uspelo")
+        toast.error(error.response?.data?.message || t("home.nutritionWidget.toasts.deleteError"))
       }
     }
   }
@@ -141,10 +143,12 @@ export function HomeNutritionWidget({ date, onLogChange }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-heading text-sm font-medium">
-              {isToday ? "Ishrana danas" : `Ishrana — ${formatFullDateLabel(selectedDate)}`}
+              {isToday
+                ? t("home.nutritionWidget.titleToday")
+                : t("home.nutritionWidget.titleForDate", { date: formatFullDateLabel(selectedDate) })}
             </p>
             <p className="truncate text-xs text-muted-foreground">
-              {plan?.name ?? "Nema aktivnog plana"}
+              {plan?.name ?? t("home.nutritionWidget.noPlanLabel")}
             </p>
           </div>
           {dayItems.length > 0 && (
@@ -172,14 +176,14 @@ export function HomeNutritionWidget({ date, onLogChange }) {
             <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
               {!plan ? (
                 <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border py-8 text-center">
-                  <p className="text-sm text-muted-foreground">Nemaš aktivan plan ishrane</p>
+                  <p className="text-sm text-muted-foreground">{t("home.nutritionWidget.noPlan")}</p>
                   <Button size="sm" variant="outline" asChild>
-                    <Link to="/nutrition-plans">Izaberi plan</Link>
+                    <Link to="/nutrition-plans">{t("home.nutritionWidget.noPlanCta")}</Link>
                   </Button>
                 </div>
               ) : dayItems.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  Nema planiranih namirnica za ovaj dan
+                  {t("home.nutritionWidget.noItemsForDay")}
                 </p>
               ) : (
                 <div className="flex flex-col gap-0.5">
@@ -230,7 +234,7 @@ export function HomeNutritionWidget({ date, onLogChange }) {
               {extraEntries.length > 0 && (
                 <div className="flex flex-col gap-0.5">
                   {plan && (
-                    <p className="px-1.5 text-xs font-medium text-muted-foreground">Dodatno</p>
+                    <p className="px-1.5 text-xs font-medium text-muted-foreground">{t("home.nutritionWidget.extraLabel")}</p>
                   )}
                   {extraEntries.map((entry) => (
                     <div
@@ -266,7 +270,7 @@ export function HomeNutritionWidget({ date, onLogChange }) {
                 onClick={() => setIsFormOpen(true)}
               >
                 <Plus />
-                Dodaj namirnicu
+                {t("home.nutritionWidget.addFood")}
               </Button>
             )}
           </>
@@ -276,8 +280,8 @@ export function HomeNutritionWidget({ date, onLogChange }) {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Dodaj namirnicu</DialogTitle>
-            <DialogDescription>Pretraži bazu hrane ili unesi podatke ručno.</DialogDescription>
+            <DialogTitle>{t("home.nutritionWidget.addFoodDialog.title")}</DialogTitle>
+            <DialogDescription>{t("home.nutritionWidget.addFoodDialog.description")}</DialogDescription>
           </DialogHeader>
           {isFormOpen && (
             <NutritionLogForm

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { ChevronRight, Pencil, Trash2 } from "lucide-react"
 
 import { deleteWorkoutPlanRequest, getWorkoutPlanRequest } from "@/api/workoutPlans"
@@ -30,6 +31,7 @@ import { useActivateWorkoutPlan } from "@/hooks/use-activate-workout-plan"
 import { getWorkoutScheduleForDate } from "@/lib/workout-cycle"
 
 export default function WorkoutPlanDetail() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -46,14 +48,14 @@ export default function WorkoutPlanDetail() {
       .then(setPlan)
       .catch((error) => {
         if (error.response?.status === 403) {
-          toast.error("Nemaš pristup ovom planu")
+          toast.error(t("workout.detail.toasts.accessDenied"))
         } else {
-          toast.error(error.response?.data?.message || "Plan nije pronađen")
+          toast.error(error.response?.data?.message || t("workout.detail.toasts.notFound"))
         }
         navigate("/workout-plans")
       })
       .finally(() => setIsLoading(false))
-  }, [id, navigate])
+  }, [id, navigate, t])
 
   const scheduledToday = useMemo(() => {
     if (!isActivePlan || !plan) return null
@@ -64,20 +66,20 @@ export default function WorkoutPlanDetail() {
     setIsDeleting(true)
     try {
       await deleteWorkoutPlanRequest(id)
-      toast.success("Plan je obrisan")
+      toast.success(t("workout.detail.toasts.deleteSuccess"))
       navigate("/workout-plans")
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj plan")
+        toast.error(t("workout.detail.toasts.deleteForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje plana nije uspelo")
+        toast.error(error.response?.data?.message || t("workout.detail.toasts.deleteFailed"))
       }
       setIsDeleting(false)
     }
   }
 
   return (
-    <AppLayout breadcrumb={plan?.name ?? "Plan"}>
+    <AppLayout breadcrumb={plan?.name ?? t("workout.detail.breadcrumbFallback")}>
       {isLoading ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
@@ -100,20 +102,20 @@ export default function WorkoutPlanDetail() {
               <h1 className="text-xl font-medium">{plan.name}</h1>
               {isActivePlan && (
                 <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                  Aktivan
+                  {t("workout.detail.active")}
                 </span>
               )}
             </div>
             <div className="flex gap-2">
               {!isActivePlan && (
                 <Button onClick={() => activate(id)} disabled={isActivating}>
-                  {isActivating ? "Aktiviranje..." : "Aktiviraj"}
+                  {isActivating ? t("workout.detail.activating") : t("workout.detail.activate")}
                 </Button>
               )}
               <Button variant="outline" asChild>
                 <Link to={`/workout-plans/${plan._id}/edit`}>
                   <Pencil />
-                  Izmeni
+                  {t("workout.detail.edit")}
                 </Link>
               </Button>
               <Button
@@ -122,7 +124,7 @@ export default function WorkoutPlanDetail() {
                 disabled={isDeleting}
               >
                 <Trash2 />
-                {isDeleting ? "Brisanje..." : "Obriši"}
+                {isDeleting ? t("workout.detail.deleting") : t("workout.detail.delete")}
               </Button>
             </div>
           </div>
@@ -137,12 +139,17 @@ export default function WorkoutPlanDetail() {
                         <CardTitle>{day.dayName}</CardTitle>
                         {scheduledToday?.day?._id === day._id && (
                           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                            Sledeći
+                            {t("workout.detail.nextBadge")}
                           </span>
                         )}
                       </div>
                       <CardDescription>
-                        {day.exercises.length} {day.exercises.length === 1 ? "vežba" : "vežbi"}
+                        {day.exercises.length}{" "}
+                        {t(
+                          day.exercises.length === 1
+                            ? "workout.detail.dayCard.exerciseCount.one"
+                            : "workout.detail.dayCard.exerciseCount.other"
+                        )}
                       </CardDescription>
                       <CardAction>
                         <ChevronRight className="size-4 text-muted-foreground" />
@@ -155,23 +162,22 @@ export default function WorkoutPlanDetail() {
           </CardGrid>
 
           <Button variant="outline" onClick={() => navigate("/workout-plans")}>
-            Nazad na listu
+            {t("workout.detail.backToList")}
           </Button>
         </div>
       ) : null}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati plan?</AlertDialogTitle>
+            <AlertDialogTitle>{t("workout.detail.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš plan &quot;{plan?.name}&quot;? Ova akcija se ne
-              može poništiti.
+              {t("workout.detail.deleteDialog.description", { name: plan?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("workout.detail.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete}>
-              Obriši
+              {t("workout.detail.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

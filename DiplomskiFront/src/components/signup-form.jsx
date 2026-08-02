@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { GoogleLogin } from "@react-oauth/google"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -30,6 +31,7 @@ export function SignupForm({ className, ...props }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   function handleChange(field) {
     return (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }))
@@ -39,7 +41,7 @@ export function SignupForm({ className, ...props }) {
     event.preventDefault()
 
     if (form.password !== form.confirmPassword) {
-      toast.error("Lozinke se ne poklapaju")
+      toast.error(t("auth.register.errors.passwordMismatch"))
       return
     }
 
@@ -53,10 +55,10 @@ export function SignupForm({ className, ...props }) {
         password: form.password,
         height: Number(form.height),
       })
-      toast.success("Nalog je kreiran! Proveri email da potvrdiš nalog.")
+      toast.success(t("auth.register.errors.accountCreated"))
       navigate("/login")
     } catch (error) {
-      toast.error(error.response?.data?.message || "Registracija nije uspela")
+      toast.error(error.response?.data?.message || t("auth.register.errors.registrationFailed"))
     } finally {
       setIsSubmitting(false)
     }
@@ -72,7 +74,7 @@ export function SignupForm({ className, ...props }) {
       login(data)
       navigate("/")
     } catch (error) {
-      toast.error(error.response?.data?.message || "Google sign up failed")
+      toast.error(error.response?.data?.message || t("auth.register.errors.googleSignupFailed"))
     }
   }
 
@@ -80,14 +82,14 @@ export function SignupForm({ className, ...props }) {
     <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Create your account</h1>
+          <h1 className="text-2xl font-bold">{t("auth.register.title")}</h1>
           <p className="text-sm text-balance text-muted-foreground">
-            Fill in the form below to create your account
+            {t("auth.register.subtitle")}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Field>
-            <FieldLabel htmlFor="name">First Name</FieldLabel>
+            <FieldLabel htmlFor="name">{t("auth.register.firstNameLabel")}</FieldLabel>
             <Input
               id="name"
               type="text"
@@ -98,7 +100,7 @@ export function SignupForm({ className, ...props }) {
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="surname">Last Name</FieldLabel>
+            <FieldLabel htmlFor="surname">{t("auth.register.lastNameLabel")}</FieldLabel>
             <Input
               id="surname"
               type="text"
@@ -110,7 +112,7 @@ export function SignupForm({ className, ...props }) {
           </Field>
         </div>
         <Field>
-          <FieldLabel htmlFor="username">Username</FieldLabel>
+          <FieldLabel htmlFor="username">{t("auth.register.usernameLabel")}</FieldLabel>
           <Input
             id="username"
             type="text"
@@ -121,7 +123,7 @@ export function SignupForm({ className, ...props }) {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <FieldLabel htmlFor="email">{t("auth.register.emailLabel")}</FieldLabel>
           <Input
             id="email"
             type="email"
@@ -130,13 +132,10 @@ export function SignupForm({ className, ...props }) {
             onChange={handleChange("email")}
             required
           />
-          <FieldDescription>
-            We&apos;ll use this to contact you. We will not share your email
-            with anyone else.
-          </FieldDescription>
+          <FieldDescription>{t("auth.register.emailHelp")}</FieldDescription>
         </Field>
         <Field>
-          <FieldLabel htmlFor="height">Height (cm)</FieldLabel>
+          <FieldLabel htmlFor="height">{t("auth.register.heightLabel")}</FieldLabel>
           <Input
             id="height"
             type="number"
@@ -147,7 +146,7 @@ export function SignupForm({ className, ...props }) {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="password">Password</FieldLabel>
+          <FieldLabel htmlFor="password">{t("auth.register.passwordLabel")}</FieldLabel>
           <Input
             id="password"
             type="password"
@@ -155,12 +154,12 @@ export function SignupForm({ className, ...props }) {
             onChange={handleChange("password")}
             required
           />
-          <FieldDescription>
-            Must be at least 8 characters long.
-          </FieldDescription>
+          <FieldDescription>{t("auth.register.passwordHelp")}</FieldDescription>
         </Field>
         <Field>
-          <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+          <FieldLabel htmlFor="confirm-password">
+            {t("auth.register.confirmPasswordLabel")}
+          </FieldLabel>
           <Input
             id="confirm-password"
             type="password"
@@ -168,23 +167,23 @@ export function SignupForm({ className, ...props }) {
             onChange={handleChange("confirmPassword")}
             required
           />
-          <FieldDescription>Please confirm your password.</FieldDescription>
+          <FieldDescription>{t("auth.register.confirmPasswordHelp")}</FieldDescription>
         </Field>
         <Field>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating account..." : "Create Account"}
+            {isSubmitting ? t("auth.register.submitting") : t("auth.register.submit")}
           </Button>
         </Field>
-        <FieldSeparator>Or continue with</FieldSeparator>
+        <FieldSeparator>{t("auth.register.orContinueWith")}</FieldSeparator>
         <Field>
           <div className="flex justify-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => toast.error("Google sign up failed")}
+              onError={() => toast.error(t("auth.register.errors.googleSignupFailed"))}
             />
           </div>
           <FieldDescription className="px-6 text-center">
-            Already have an account? <a href="/login">Sign in</a>
+            {t("auth.register.haveAccount")} <a href="/login">{t("auth.register.signIn")}</a>
           </FieldDescription>
         </Field>
       </FieldGroup>

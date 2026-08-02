@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Check, ChevronLeft, ChevronRight, Dumbbell } from "lucide-react"
 
 import { getExercisesRequest } from "@/api/exercises"
@@ -28,6 +29,7 @@ function toDateKey(date) {
 }
 
 export function HomeWorkoutWidget({ date, onSessionChange }) {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const selectedDate = useMemo(() => date ?? new Date(), [date])
   const dateKey = useMemo(() => toDateKey(selectedDate), [selectedDate])
@@ -121,11 +123,11 @@ export function HomeWorkoutWidget({ date, onSessionChange }) {
         day: dayToShow._id,
         date: dateKey,
       })
-      toast.success("Dan je označen kao odrađen")
+      toast.success(t("home.workoutWidget.toasts.completeSuccess"))
       setJustCompleted(true)
       onSessionChange?.()
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nije uspelo označavanje dana")
+      toast.error(error.response?.data?.message || t("home.workoutWidget.toasts.completeError"))
     } finally {
       setIsCompleting(false)
     }
@@ -141,11 +143,11 @@ export function HomeWorkoutWidget({ date, onSessionChange }) {
         day: dayToShow._id,
         date: dateKey,
       })
-      toast.success("Dan je preskočen")
+      toast.success(t("home.workoutWidget.toasts.skipSuccess"))
       setJustSkipped(true)
       onSessionChange?.()
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nije uspelo preskakanje dana")
+      toast.error(error.response?.data?.message || t("home.workoutWidget.toasts.skipError"))
     } finally {
       setIsSkipping(false)
     }
@@ -160,21 +162,23 @@ export function HomeWorkoutWidget({ date, onSessionChange }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-heading text-sm font-medium">
-              {isToday ? "Trening danas" : `Trening — ${formatFullDateLabel(selectedDate)}`}
+              {isToday
+                ? t("home.workoutWidget.titleToday")
+                : t("home.workoutWidget.titleForDate", { date: formatFullDateLabel(selectedDate) })}
             </p>
             <p className="truncate text-xs text-muted-foreground">
-              {plan?.name ?? "Nema aktivnog plana"}
+              {plan?.name ?? t("home.workoutWidget.noPlanLabel")}
             </p>
           </div>
           {isToday && isCompletedForDate && (
             <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
               <Check className="size-3.5" />
-              Odrađeno
+              {t("home.workoutWidget.completedBadge")}
             </span>
           )}
           {isToday && isSkippedForDate && (
             <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-              Preskočeno
+              {t("home.workoutWidget.skippedBadge")}
             </span>
           )}
         </div>
@@ -188,19 +192,19 @@ export function HomeWorkoutWidget({ date, onSessionChange }) {
           </div>
         ) : !plan ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border py-8 text-center">
-            <p className="text-sm text-muted-foreground">Nemaš aktivan plan treninga</p>
+            <p className="text-sm text-muted-foreground">{t("home.workoutWidget.noPlan")}</p>
             <Button size="sm" variant="outline" asChild>
-              <Link to="/workout-plans">Izaberi plan</Link>
+              <Link to="/workout-plans">{t("home.workoutWidget.choosePlan")}</Link>
             </Button>
           </div>
         ) : beforeActivation ? (
-          <p className="text-sm text-muted-foreground">Plan tog dana još nije bio aktivan</p>
+          <p className="text-sm text-muted-foreground">{t("home.workoutWidget.beforeActivation")}</p>
         ) : isEmptyPlan ? (
-          <p className="text-sm text-muted-foreground">Nema dana u ovom planu</p>
+          <p className="text-sm text-muted-foreground">{t("home.workoutWidget.emptyPlan")}</p>
         ) : isRestDay ? (
           <>
-            <p className="text-lg font-semibold">Dan odmora</p>
-            <p className="text-sm text-muted-foreground">Danas nema zakazanog treninga.</p>
+            <p className="text-lg font-semibold">{t("home.workoutWidget.restDay.title")}</p>
+            <p className="text-sm text-muted-foreground">{t("home.workoutWidget.restDay.subtitle")}</p>
           </>
         ) : (
           <>
@@ -210,15 +214,15 @@ export function HomeWorkoutWidget({ date, onSessionChange }) {
                 {isPast && (
                   <span className="ml-2 text-xs font-normal text-muted-foreground">
                     {isSkippedForDate
-                      ? "— preskočeno"
+                      ? t("home.workoutWidget.pastStatus.skipped")
                       : isCompletedForDate
-                        ? "— odrađeno"
-                        : "— nije odrađeno"}
+                        ? t("home.workoutWidget.pastStatus.completed")
+                        : t("home.workoutWidget.pastStatus.notCompleted")}
                   </span>
                 )}
                 {isFuture && (
                   <span className="ml-2 text-xs font-normal text-muted-foreground">
-                    — pregled
+                    {t("home.workoutWidget.futureStatus")}
                   </span>
                 )}
               </p>
@@ -231,11 +235,11 @@ export function HomeWorkoutWidget({ date, onSessionChange }) {
                       onClick={handleSkipDay}
                       disabled={isCompleting || isSkipping}
                     >
-                      {isSkipping ? "Čuvanje..." : "Preskoči dan"}
+                      {isSkipping ? t("home.workoutWidget.saving") : t("home.workoutWidget.skipDay")}
                     </Button>
                     <Button size="sm" onClick={handleCompleteDay} disabled={isCompleting || isSkipping}>
                       <Check />
-                      {isCompleting ? "Čuvanje..." : "Završi dan"}
+                      {isCompleting ? t("home.workoutWidget.saving") : t("home.workoutWidget.completeDay")}
                     </Button>
                   </>
                 )}
@@ -262,9 +266,9 @@ export function HomeWorkoutWidget({ date, onSessionChange }) {
               </div>
             </div>
             {isSkippedForDate ? (
-              <p className="text-sm text-muted-foreground">Ovaj dan je preskočen</p>
+              <p className="text-sm text-muted-foreground">{t("home.workoutWidget.skippedDay")}</p>
             ) : missedPast ? (
-              <p className="text-sm text-muted-foreground">Trening nije odrađen</p>
+              <p className="text-sm text-muted-foreground">{t("home.workoutWidget.missedDay")}</p>
             ) : (
               <CardGrid
                 ref={scrollRef}

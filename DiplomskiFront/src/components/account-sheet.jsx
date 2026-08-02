@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 
 import { updateUserRequest } from "@/api/users"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -32,6 +33,7 @@ const emptyPasswordFields = {
 }
 
 export function AccountSheet({ open, onOpenChange }) {
+  const { t } = useTranslation()
   const { user, updateUser } = useAuth()
   const fileInputRef = useRef(null)
   const [wasOpen, setWasOpen] = useState(false)
@@ -71,7 +73,7 @@ export function AccountSheet({ open, onOpenChange }) {
     if (!file) return
 
     if (file.size > MAX_IMAGE_BYTES) {
-      toast.error("Slika je prevelika (maksimalno 2MB)")
+      toast.error(t("account.errors.imageTooLarge"))
       return
     }
 
@@ -88,15 +90,15 @@ export function AccountSheet({ open, onOpenChange }) {
 
     if (isChangingPassword) {
       if (!currentPassword || !newPassword || !confirmNewPassword) {
-        toast.error("Popuni sva polja za promenu šifre")
+        toast.error(t("account.errors.fillAllPasswordFields"))
         return
       }
       if (newPassword.length < 8) {
-        toast.error("Nova šifra mora imati bar 8 karaktera")
+        toast.error(t("account.errors.passwordTooShort"))
         return
       }
       if (newPassword !== confirmNewPassword) {
-        toast.error("Nove šifre se ne poklapaju")
+        toast.error(t("account.errors.passwordMismatch"))
         return
       }
     }
@@ -120,9 +122,9 @@ export function AccountSheet({ open, onOpenChange }) {
       const updatedUser = await updateUserRequest(user._id, payload)
       updateUser(updatedUser)
       setPasswordFields(emptyPasswordFields)
-      toast.success("Nalog je ažuriran")
+      toast.success(t("account.success"))
     } catch (error) {
-      toast.error(error.response?.data?.message || "Ažuriranje naloga nije uspelo")
+      toast.error(error.response?.data?.message || t("account.errors.updateFailed"))
     } finally {
       setIsSubmitting(false)
     }
@@ -132,8 +134,8 @@ export function AccountSheet({ open, onOpenChange }) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>Nalog</SheetTitle>
-          <SheetDescription>Ažuriraj svoje podatke, sliku i šifru.</SheetDescription>
+          <SheetTitle>{t("account.title")}</SheetTitle>
+          <SheetDescription>{t("account.description")}</SheetDescription>
         </SheetHeader>
         <form className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4" onSubmit={handleSubmit}>
           <FieldGroup>
@@ -151,7 +153,7 @@ export function AccountSheet({ open, onOpenChange }) {
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  Promeni sliku
+                  {t("account.changePicture")}
                 </Button>
                 <input
                   ref={fileInputRef}
@@ -160,17 +162,17 @@ export function AccountSheet({ open, onOpenChange }) {
                   className="hidden"
                   onChange={handleImageSelect}
                 />
-                <FieldDescription>JPG ili PNG, maksimalno 2MB.</FieldDescription>
+                <FieldDescription>{t("account.pictureHint")}</FieldDescription>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="account-name">Ime</FieldLabel>
+                <FieldLabel htmlFor="account-name">{t("account.firstNameLabel")}</FieldLabel>
                 <Input id="account-name" value={form.name} onChange={handleChange("name")} required />
               </Field>
               <Field>
-                <FieldLabel htmlFor="account-surname">Prezime</FieldLabel>
+                <FieldLabel htmlFor="account-surname">{t("account.lastNameLabel")}</FieldLabel>
                 <Input
                   id="account-surname"
                   value={form.surname}
@@ -180,7 +182,7 @@ export function AccountSheet({ open, onOpenChange }) {
               </Field>
             </div>
             <Field>
-              <FieldLabel htmlFor="account-username">Korisničko ime</FieldLabel>
+              <FieldLabel htmlFor="account-username">{t("account.usernameLabel")}</FieldLabel>
               <Input
                 id="account-username"
                 value={form.username}
@@ -189,7 +191,7 @@ export function AccountSheet({ open, onOpenChange }) {
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="account-email">Email</FieldLabel>
+              <FieldLabel htmlFor="account-email">{t("account.emailLabel")}</FieldLabel>
               <Input
                 id="account-email"
                 type="email"
@@ -199,7 +201,7 @@ export function AccountSheet({ open, onOpenChange }) {
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="account-height">Visina (cm)</FieldLabel>
+              <FieldLabel htmlFor="account-height">{t("account.heightLabel")}</FieldLabel>
               <Input
                 id="account-height"
                 type="number"
@@ -209,10 +211,10 @@ export function AccountSheet({ open, onOpenChange }) {
               />
             </Field>
 
-            <FieldSeparator>Promena šifre</FieldSeparator>
+            <FieldSeparator>{t("account.changePassword")}</FieldSeparator>
 
             <Field>
-              <FieldLabel htmlFor="current-password">Trenutna šifra</FieldLabel>
+              <FieldLabel htmlFor="current-password">{t("account.currentPasswordLabel")}</FieldLabel>
               <Input
                 id="current-password"
                 type="password"
@@ -223,7 +225,7 @@ export function AccountSheet({ open, onOpenChange }) {
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="new-password">Nova šifra</FieldLabel>
+                <FieldLabel htmlFor="new-password">{t("account.newPasswordLabel")}</FieldLabel>
                 <Input
                   id="new-password"
                   type="password"
@@ -233,7 +235,9 @@ export function AccountSheet({ open, onOpenChange }) {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="confirm-new-password">Potvrdi šifru</FieldLabel>
+                <FieldLabel htmlFor="confirm-new-password">
+                  {t("account.confirmNewPasswordLabel")}
+                </FieldLabel>
                 <Input
                   id="confirm-new-password"
                   type="password"
@@ -243,12 +247,12 @@ export function AccountSheet({ open, onOpenChange }) {
                 />
               </Field>
             </div>
-            <FieldDescription>Ostavi prazno ako ne želiš da menjaš šifru.</FieldDescription>
+            <FieldDescription>{t("account.passwordHint")}</FieldDescription>
           </FieldGroup>
 
           <SheetFooter className="px-0">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Čuvanje..." : "Sačuvaj izmene"}
+              {isSubmitting ? t("account.saving") : t("account.save")}
             </Button>
           </SheetFooter>
         </form>

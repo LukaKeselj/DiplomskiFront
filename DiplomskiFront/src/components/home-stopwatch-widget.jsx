@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Pause, Play, RotateCcw, SkipForward, Timer } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -55,6 +56,7 @@ function nextPhase(phase, set, sets) {
 }
 
 function StopwatchTab() {
+  const { t } = useTranslation()
   const [isRunning, setIsRunning] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const startRef = useRef(null)
@@ -96,7 +98,11 @@ function StopwatchTab() {
       <div className="flex items-center gap-2">
         <Button type="button" size="sm" onClick={handleToggle}>
           {isRunning ? <Pause /> : <Play />}
-          {isRunning ? "Pauziraj" : elapsed > 0 ? "Nastavi" : "Start"}
+          {isRunning
+            ? t("home.stopwatchWidget.stopwatch.pause")
+            : elapsed > 0
+              ? t("home.stopwatchWidget.stopwatch.resume")
+              : t("home.stopwatchWidget.stopwatch.start")}
         </Button>
         <Button
           type="button"
@@ -106,7 +112,7 @@ function StopwatchTab() {
           disabled={elapsed === 0 && !isRunning}
         >
           <RotateCcw />
-          Reset
+          {t("home.stopwatchWidget.stopwatch.reset")}
         </Button>
       </div>
     </div>
@@ -114,6 +120,7 @@ function StopwatchTab() {
 }
 
 function IntervalTab() {
+  const { t } = useTranslation()
   const [sets, setSets] = useState(3)
   const [workSeconds, setWorkSeconds] = useState(30)
   const [restSeconds, setRestSeconds] = useState(60)
@@ -204,10 +211,16 @@ function IntervalTab() {
     return (
       <div className="flex flex-1 flex-col justify-center gap-4 py-2">
         <div className="grid grid-cols-3 gap-3">
-          <NumberScrollField id="sw-sets" label="Serije" min={1} value={sets} onChange={setSets} />
+          <NumberScrollField
+            id="sw-sets"
+            label={t("home.stopwatchWidget.interval.setsLabel")}
+            min={1}
+            value={sets}
+            onChange={setSets}
+          />
           <NumberScrollField
             id="sw-work"
-            label="Trajanje"
+            label={t("home.stopwatchWidget.interval.durationLabel")}
             min={1}
             step={5}
             suffix="s"
@@ -216,7 +229,7 @@ function IntervalTab() {
           />
           <NumberScrollField
             id="sw-rest"
-            label="Pauza"
+            label={t("home.stopwatchWidget.interval.restLabel")}
             min={0}
             step={5}
             suffix="s"
@@ -224,10 +237,10 @@ function IntervalTab() {
             onChange={setRestSeconds}
           />
         </div>
-        <p className="text-muted-foreground text-center text-xs">Prevuci gore/dole po broju da promeniš vrednost</p>
+        <p className="text-muted-foreground text-center text-xs">{t("home.stopwatchWidget.interval.dragHint")}</p>
         <Button type="button" size="sm" className="self-center" onClick={handleStart}>
           <Play />
-          Start
+          {t("home.stopwatchWidget.interval.start")}
         </Button>
       </div>
     )
@@ -236,7 +249,7 @@ function IntervalTab() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 py-2">
       {isDone ? (
-        <p className="text-lg font-semibold">Gotovo! Odradio si {sets} serija 💪</p>
+        <p className="text-lg font-semibold">{t("home.stopwatchWidget.interval.done", { sets })}</p>
       ) : (
         <>
           <span
@@ -247,7 +260,11 @@ function IntervalTab() {
                 : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
             )}
           >
-            {isWork ? "Rad" : "Pauza"} — serija {currentSet}/{sets}
+            {isWork
+              ? t("home.stopwatchWidget.interval.phaseWork")
+              : t("home.stopwatchWidget.interval.phasePause")}{" "}
+            —{" "}
+            {t("home.stopwatchWidget.interval.setProgress", { current: currentSet, total: sets })}
           </span>
           <div className="font-mono text-4xl font-semibold tabular-nums">
             {formatCountdown(remainingMs)}
@@ -258,21 +275,23 @@ function IntervalTab() {
         {isDone ? (
           <Button type="button" size="sm" onClick={handleReset}>
             <RotateCcw />
-            Nova serija
+            {t("home.stopwatchWidget.interval.newSet")}
           </Button>
         ) : (
           <>
             <Button type="button" size="sm" onClick={isRunning ? handlePause : handleStart}>
               {isRunning ? <Pause /> : <Play />}
-              {isRunning ? "Pauziraj" : "Nastavi"}
+              {isRunning
+                ? t("home.stopwatchWidget.interval.pause")
+                : t("home.stopwatchWidget.interval.resume")}
             </Button>
             <Button type="button" variant="outline" size="sm" onClick={handleSkip}>
               <SkipForward />
-              Preskoči
+              {t("home.stopwatchWidget.interval.skip")}
             </Button>
             <Button type="button" variant="outline" size="sm" onClick={handleReset}>
               <RotateCcw />
-              Reset
+              {t("home.stopwatchWidget.interval.reset")}
             </Button>
           </>
         )}
@@ -282,6 +301,8 @@ function IntervalTab() {
 }
 
 export function HomeStopwatchWidget() {
+  const { t } = useTranslation()
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -290,16 +311,16 @@ export function HomeStopwatchWidget() {
             <Timer className="size-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-heading text-sm font-medium">Štoperica</p>
-            <p className="truncate text-xs text-muted-foreground">Za pauze i treninge</p>
+            <p className="font-heading text-sm font-medium">{t("home.stopwatchWidget.title")}</p>
+            <p className="truncate text-xs text-muted-foreground">{t("home.stopwatchWidget.subtitle")}</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col">
         <Tabs defaultValue="stopwatch" className="flex flex-1 flex-col">
           <TabsList className="self-center">
-            <TabsTrigger value="stopwatch">Štoperica</TabsTrigger>
-            <TabsTrigger value="intervals">Serije</TabsTrigger>
+            <TabsTrigger value="stopwatch">{t("home.stopwatchWidget.tabs.stopwatch")}</TabsTrigger>
+            <TabsTrigger value="intervals">{t("home.stopwatchWidget.tabs.intervals")}</TabsTrigger>
           </TabsList>
           <TabsContent value="stopwatch" className="flex flex-1 flex-col">
             <StopwatchTab />

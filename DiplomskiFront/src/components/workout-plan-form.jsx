@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Plus, Trash2 } from "lucide-react"
 
 import { createWorkoutPlanRequest, updateWorkoutPlanRequest } from "@/api/workoutPlans"
@@ -50,6 +51,7 @@ function daysFromPlan(plan) {
 }
 
 export function WorkoutPlanForm({ plan }) {
+  const { t } = useTranslation()
   const isEditing = Boolean(plan)
   const navigate = useNavigate()
   const [exercises, setExercises] = useState([])
@@ -62,10 +64,10 @@ export function WorkoutPlanForm({ plan }) {
     getExercisesRequest()
       .then(setExercises)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje vežbi")
+        toast.error(error.response?.data?.message || t("workout.form.toasts.loadExercisesFailed"))
       })
       .finally(() => setIsLoadingExercises(false))
-  }, [])
+  }, [t])
 
   function handleDayNameChange(dayIndex, value) {
     setDays((prev) =>
@@ -118,11 +120,11 @@ export function WorkoutPlanForm({ plan }) {
     event.preventDefault()
 
     if (!name.trim()) {
-      toast.error("Naziv plana je obavezan")
+      toast.error(t("workout.form.toasts.nameRequired"))
       return
     }
     if (days.some((day) => !day.dayName.trim())) {
-      toast.error("Naziv dana je obavezan")
+      toast.error(t("workout.form.toasts.dayNameRequired"))
       return
     }
 
@@ -150,13 +152,13 @@ export function WorkoutPlanForm({ plan }) {
         ? await updateWorkoutPlanRequest(plan._id, payload)
         : await createWorkoutPlanRequest(payload)
 
-      toast.success(isEditing ? "Plan je ažuriran" : "Plan je kreiran")
+      toast.success(isEditing ? t("workout.form.toasts.updateSuccess") : t("workout.form.toasts.createSuccess"))
       navigate(`/workout-plans/${savedPlan._id}`)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da izmeniš ovaj plan")
+        toast.error(t("workout.form.toasts.editForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Čuvanje plana nije uspelo")
+        toast.error(error.response?.data?.message || t("workout.form.toasts.saveFailed"))
       }
     } finally {
       setIsSubmitting(false)
@@ -167,7 +169,7 @@ export function WorkoutPlanForm({ plan }) {
     <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="plan-name">Naziv plana</FieldLabel>
+          <FieldLabel htmlFor="plan-name">{t("workout.form.planNameLabel")}</FieldLabel>
           <Input id="plan-name" value={name} onChange={(event) => setName(event.target.value)} required />
         </Field>
       </FieldGroup>
@@ -177,10 +179,10 @@ export function WorkoutPlanForm({ plan }) {
           <Card key={day.uid}>
             <CardHeader className="flex-row items-end justify-between gap-2">
               <Field className="flex-1">
-                <FieldLabel htmlFor={`day-name-${day.uid}`}>Naziv dana</FieldLabel>
+                <FieldLabel htmlFor={`day-name-${day.uid}`}>{t("workout.form.dayNameLabel")}</FieldLabel>
                 <Input
                   id={`day-name-${day.uid}`}
-                  placeholder="npr. Dan 1"
+                  placeholder={t("workout.form.dayNamePlaceholder")}
                   value={day.dayName}
                   onChange={(event) => handleDayNameChange(dayIndex, event.target.value)}
                   required
@@ -204,7 +206,7 @@ export function WorkoutPlanForm({ plan }) {
                   className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-end"
                 >
                   <Field className="flex-1">
-                    <FieldLabel htmlFor={`exercise-${exercise.uid}`}>Vežba</FieldLabel>
+                    <FieldLabel htmlFor={`exercise-${exercise.uid}`}>{t("workout.form.exerciseLabel")}</FieldLabel>
                     <Select
                       value={exercise.exercise}
                       onValueChange={(value) =>
@@ -212,7 +214,7 @@ export function WorkoutPlanForm({ plan }) {
                       }
                     >
                       <SelectTrigger id={`exercise-${exercise.uid}`}>
-                        <SelectValue placeholder="Izaberi vežbu" />
+                        <SelectValue placeholder={t("workout.form.exercisePlaceholder")} />
                       </SelectTrigger>
                       <SelectContent>
                         {exercises.map((item) => (
@@ -224,7 +226,7 @@ export function WorkoutPlanForm({ plan }) {
                     </Select>
                   </Field>
                   <Field className="w-full sm:w-24">
-                    <FieldLabel htmlFor={`sets-${exercise.uid}`}>Serije</FieldLabel>
+                    <FieldLabel htmlFor={`sets-${exercise.uid}`}>{t("workout.form.setsLabel")}</FieldLabel>
                     <Input
                       id={`sets-${exercise.uid}`}
                       type="number"
@@ -241,7 +243,7 @@ export function WorkoutPlanForm({ plan }) {
                     />
                   </Field>
                   <Field className="w-full sm:w-24">
-                    <FieldLabel htmlFor={`reps-${exercise.uid}`}>Ponavljanja</FieldLabel>
+                    <FieldLabel htmlFor={`reps-${exercise.uid}`}>{t("workout.form.repsLabel")}</FieldLabel>
                     <Input
                       id={`reps-${exercise.uid}`}
                       type="number"
@@ -258,7 +260,7 @@ export function WorkoutPlanForm({ plan }) {
                     />
                   </Field>
                   <Field className="w-full sm:w-24">
-                    <FieldLabel htmlFor={`rest-${exercise.uid}`}>Odmor (min)</FieldLabel>
+                    <FieldLabel htmlFor={`rest-${exercise.uid}`}>{t("workout.form.restLabel")}</FieldLabel>
                     <Input
                       id={`rest-${exercise.uid}`}
                       type="number"
@@ -294,7 +296,7 @@ export function WorkoutPlanForm({ plan }) {
                 disabled={isLoadingExercises}
               >
                 <Plus />
-                Dodaj vežbu
+                {t("workout.form.addExercise")}
               </Button>
             </CardContent>
           </Card>
@@ -304,16 +306,20 @@ export function WorkoutPlanForm({ plan }) {
       <div>
         <Button type="button" variant="outline" onClick={handleAddDay}>
           <Plus />
-          Dodaj dan
+          {t("workout.form.addDay")}
         </Button>
       </div>
 
       <div className="flex gap-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Čuvanje..." : isEditing ? "Sačuvaj izmene" : "Kreiraj plan"}
+          {isSubmitting
+            ? t("workout.form.submitting")
+            : isEditing
+              ? t("workout.form.submitEdit")
+              : t("workout.form.submitCreate")}
         </Button>
         <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-          Otkaži
+          {t("workout.form.cancel")}
         </Button>
       </div>
     </form>

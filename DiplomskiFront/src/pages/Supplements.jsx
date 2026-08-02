@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Pencil, Pill, Plus, Search, Trash2 } from "lucide-react"
 
 import { deleteSupplementRequest, getSupplementsRequest } from "@/api/supplements"
@@ -31,6 +32,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/context/AuthContext"
 
 function SupplementCard({ supplement, isAdmin, onDeleteRequest }) {
+  const { t } = useTranslation()
   return (
     <Card className="h-full transition-colors hover:bg-muted/50">
       <CardHeader>
@@ -70,7 +72,7 @@ function SupplementCard({ supplement, isAdmin, onDeleteRequest }) {
             <Button variant="outline" asChild>
               <Link to={`/my-supplements/new?supplementId=${supplement._id}`}>
                 <Plus />
-                Dodaj u moj režim
+                {t("supplements.list.addToMyRoutine")}
               </Link>
             </Button>
           )}
@@ -81,6 +83,7 @@ function SupplementCard({ supplement, isAdmin, onDeleteRequest }) {
 }
 
 export default function Supplements() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
   const [supplements, setSupplements] = useState([])
@@ -93,10 +96,10 @@ export default function Supplements() {
     getSupplementsRequest()
       .then(setSupplements)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje suplemenata")
+        toast.error(error.response?.data?.message || t("supplements.list.loadError"))
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
 
   async function handleDelete() {
     if (!deleteTarget) return
@@ -105,10 +108,10 @@ export default function Supplements() {
     try {
       await deleteSupplementRequest(deleteTarget._id)
       setSupplements((prev) => prev.filter((item) => item._id !== deleteTarget._id))
-      toast.success("Suplement je obrisan")
+      toast.success(t("supplements.list.deleteSuccess"))
       setDeleteTarget(null)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Brisanje suplementa nije uspelo")
+      toast.error(error.response?.data?.message || t("supplements.list.deleteFailed"))
     } finally {
       setIsDeleting(false)
     }
@@ -120,13 +123,13 @@ export default function Supplements() {
     : supplements
 
   return (
-    <AppLayout breadcrumb="Suplementi">
+    <AppLayout breadcrumb={t("sidebar.nav.supplements")}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="w-56 pl-8"
-            placeholder="Pretraži suplemente..."
+            placeholder={t("supplements.list.searchPlaceholder")}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
@@ -135,7 +138,7 @@ export default function Supplements() {
           <Button asChild>
             <Link to="/supplements/new">
               <Plus />
-              Dodaj suplement
+              {t("supplements.list.addSupplement")}
             </Link>
           </Button>
         )}
@@ -146,13 +149,13 @@ export default function Supplements() {
       ) : visibleSupplements.length === 0 ? (
         <EmptyState
           icon={Pill}
-          title="Nema suplemenata za prikaz"
+          title={t("supplements.list.empty.title")}
           description={
             supplements.length > 0
-              ? "Promeni pretragu da vidiš druge suplemente."
+              ? t("supplements.list.empty.filteredDescription")
               : isAdmin
-                ? "Dodaj prvi suplement da ga korisnici mogu pronaći."
-                : "Trenutno nema dostupnih suplemenata."
+                ? t("supplements.list.empty.adminDescription")
+                : t("supplements.list.empty.userDescription")
           }
           action={
             supplements.length === 0 &&
@@ -160,7 +163,7 @@ export default function Supplements() {
               <Button asChild size="sm">
                 <Link to="/supplements/new">
                   <Plus />
-                  Dodaj suplement
+                  {t("supplements.list.addSupplement")}
                 </Link>
               </Button>
             )
@@ -183,16 +186,15 @@ export default function Supplements() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati suplement?</AlertDialogTitle>
+            <AlertDialogTitle>{t("supplements.list.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš suplement &quot;{deleteTarget?.name}&quot;? Ova
-              akcija se ne može poništiti.
+              {t("supplements.list.deleteDialog.description", { name: deleteTarget?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("supplements.list.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Brisanje..." : "Obriši"}
+              {isDeleting ? t("supplements.list.deleteDialog.deleting") : t("supplements.list.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

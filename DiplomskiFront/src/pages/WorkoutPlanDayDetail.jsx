@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { ArrowLeft, Check } from "lucide-react"
 
 import { getWorkoutPlanRequest } from "@/api/workoutPlans"
@@ -20,6 +21,7 @@ function todayDateString() {
 }
 
 export default function WorkoutPlanDayDetail() {
+  const { t } = useTranslation()
   const { id, dayId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -37,14 +39,14 @@ export default function WorkoutPlanDayDetail() {
       })
       .catch((error) => {
         if (error.response?.status === 403) {
-          toast.error("Nemaš pristup ovom planu")
+          toast.error(t("workout.dayDetail.toasts.accessDenied"))
         } else {
-          toast.error(error.response?.data?.message || "Plan nije pronađen")
+          toast.error(error.response?.data?.message || t("workout.dayDetail.toasts.notFound"))
         }
         navigate("/workout-plans")
       })
       .finally(() => setIsLoading(false))
-  }, [id, navigate])
+  }, [id, navigate, t])
 
   const isActivePlan = user?.activeWorkoutPlan === id
 
@@ -63,10 +65,10 @@ export default function WorkoutPlanDayDetail() {
 
   useEffect(() => {
     if (!isLoading && plan && !day) {
-      toast.error("Dan nije pronađen")
+      toast.error(t("workout.dayDetail.toasts.dayNotFound"))
       navigate(`/workout-plans/${id}`)
     }
-  }, [isLoading, plan, day, id, navigate])
+  }, [isLoading, plan, day, id, navigate, t])
 
   const isNextDay = nextDay?.day?._id === dayId
 
@@ -74,17 +76,17 @@ export default function WorkoutPlanDayDetail() {
     setIsCompleting(true)
     try {
       await completeWorkoutDayRequest({ workoutPlan: id, day: dayId, date: todayDateString() })
-      toast.success("Dan je označen kao odrađen")
+      toast.success(t("workout.dayDetail.toasts.completeSuccess"))
       setJustCompleted(true)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nije uspelo označavanje dana")
+      toast.error(error.response?.data?.message || t("workout.dayDetail.toasts.completeFailed"))
     } finally {
       setIsCompleting(false)
     }
   }
 
   return (
-    <AppLayout breadcrumb={day?.dayName ?? "Dan"}>
+    <AppLayout breadcrumb={day?.dayName ?? t("workout.dayDetail.breadcrumbFallback")}>
       {isLoading ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <Skeleton className="h-9 w-32" />
@@ -109,7 +111,7 @@ export default function WorkoutPlanDayDetail() {
             <Button variant="outline" asChild>
               <Link to={`/workout-plans/${id}`}>
                 <ArrowLeft />
-                Nazad na plan
+                {t("workout.dayDetail.backToPlan")}
               </Link>
             </Button>
           </div>
@@ -117,22 +119,27 @@ export default function WorkoutPlanDayDetail() {
             <div>
               <h1 className="text-xl font-medium">{day.dayName}</h1>
               <p className="text-sm text-muted-foreground">
-                {day.exercises.length} {day.exercises.length === 1 ? "vežba" : "vežbi"}
+                {day.exercises.length}{" "}
+                {t(
+                  day.exercises.length === 1
+                    ? "workout.dayDetail.exerciseCount.one"
+                    : "workout.dayDetail.exerciseCount.other"
+                )}
               </p>
             </div>
             {justCompleted ? (
               <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400">
                 <Check className="size-4" />
-                Odrađeno danas
+                {t("workout.dayDetail.completedToday")}
               </span>
             ) : isNextDay ? (
               <Button onClick={handleCompleteDay} disabled={isCompleting}>
                 <Check />
-                {isCompleting ? "Čuvanje..." : "Završi dan"}
+                {isCompleting ? t("workout.dayDetail.saving") : t("workout.dayDetail.finishDay")}
               </Button>
             ) : nextDay?.day ? (
               <span className="text-sm text-muted-foreground">
-                Sledeći na redu:{" "}
+                {t("workout.dayDetail.nextUpLabel")}{" "}
                 <Link className="underline underline-offset-4" to={`/workout-plans/${id}/days/${nextDay.day._id}`}>
                   {nextDay.day.dayName}
                 </Link>

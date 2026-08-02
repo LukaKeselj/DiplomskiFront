@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 
 import { getNutritionPlanRequest } from "@/api/nutritionPlans"
 import { AppLayout } from "@/components/app-layout"
@@ -8,6 +9,7 @@ import { NutritionPlanForm } from "@/components/nutrition-plan-form"
 import { FormSkeleton } from "@/components/ui/form-skeleton"
 
 export default function NutritionPlanFormPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const isEditing = Boolean(id)
   const navigate = useNavigate()
@@ -21,17 +23,19 @@ export default function NutritionPlanFormPage() {
       .then(setPlan)
       .catch((error) => {
         if (error.response?.status === 403) {
-          toast.error("Nemaš pristup ovom planu")
+          toast.error(t("nutrition.planForm.accessDenied"))
         } else {
-          toast.error(error.response?.data?.message || "Plan nije pronađen")
+          toast.error(error.response?.data?.message || t("nutrition.planForm.notFound"))
         }
         navigate("/nutrition-plans")
       })
       .finally(() => setIsLoading(false))
-  }, [id, isEditing, navigate])
+  }, [id, isEditing, navigate, t])
 
   return (
-    <AppLayout breadcrumb={isEditing ? "Izmena plana ishrane" : "Novi plan ishrane"}>
+    <AppLayout
+      breadcrumb={isEditing ? t("nutrition.planForm.breadcrumbEdit") : t("nutrition.planForm.breadcrumbNew")}
+    >
       <div className="mx-auto w-full max-w-2xl">
         {isLoading ? (
           <FormSkeleton fields={5} />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
+import { useTranslation } from "react-i18next"
 import { ChevronsUpDown, Dumbbell, Plus } from "lucide-react"
 
 import { getWorkoutPlansRequest } from "@/api/workoutPlans"
@@ -26,6 +27,7 @@ export function ProgramSwitcher() {
   const { user } = useAuth()
   const [plans, setPlans] = useState([])
   const { isActivating, activate } = useActivateWorkoutPlan()
+  const { t } = useTranslation()
 
   useEffect(() => {
     getWorkoutPlansRequest()
@@ -55,7 +57,7 @@ export function ProgramSwitcher() {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
-                  {activePlan?.name ?? "Nema aktivnog plana"}
+                  {activePlan?.name ?? t("sidebar.noActivePlan")}
                 </span>
                 <span
                   className={
@@ -64,7 +66,7 @@ export function ProgramSwitcher() {
                       : "truncate text-xs text-sidebar-foreground/50"
                   }
                 >
-                  {activePlan ? "Aktivan" : "Izaberi plan"}
+                  {activePlan ? t("sidebar.active") : t("sidebar.selectPlan")}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -77,10 +79,12 @@ export function ProgramSwitcher() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Moji planovi
+              {t("sidebar.myPlans")}
             </DropdownMenuLabel>
             {plans.length === 0 ? (
-              <div className="px-2 py-1.5 text-xs text-muted-foreground">Nemaš planova</div>
+              <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                {t("sidebar.noPlans")}
+              </div>
             ) : (
               plans.map((plan, index) => (
                 <DropdownMenuItem
@@ -107,7 +111,7 @@ export function ProgramSwitcher() {
                 <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                   <Plus className="size-4" />
                 </div>
-                <div className="font-medium text-muted-foreground">Novi plan</div>
+                <div className="font-medium text-muted-foreground">{t("sidebar.newPlan")}</div>
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

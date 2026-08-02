@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 
 import { createExerciseRequest, updateExerciseRequest } from "@/api/exercises"
 import { Button } from "@/components/ui/button"
@@ -22,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { MUSCLE_GROUPS } from "@/lib/muscle-groups"
 
 export function ExerciseForm({ exercise }) {
+  const { t } = useTranslation()
   const isEditing = Boolean(exercise)
   const navigate = useNavigate()
   const [form, setForm] = useState({
@@ -41,11 +43,11 @@ export function ExerciseForm({ exercise }) {
     event.preventDefault()
 
     if (!form.name.trim()) {
-      toast.error("Naziv vežbe je obavezan")
+      toast.error(t("exercises.form.toasts.nameRequired"))
       return
     }
     if (!form.muscleGroup) {
-      toast.error("Mišićna grupa je obavezna")
+      toast.error(t("exercises.form.toasts.muscleGroupRequired"))
       return
     }
 
@@ -63,10 +65,10 @@ export function ExerciseForm({ exercise }) {
         ? await updateExerciseRequest(exercise._id, payload)
         : await createExerciseRequest(payload)
 
-      toast.success(isEditing ? "Vežba je ažurirana" : "Vežba je kreirana")
+      toast.success(isEditing ? t("exercises.form.toasts.updateSuccess") : t("exercises.form.toasts.createSuccess"))
       navigate(`/exercises/${savedExercise._id}`)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Čuvanje vežbe nije uspelo")
+      toast.error(error.response?.data?.message || t("exercises.form.toasts.saveFailed"))
     } finally {
       setIsSubmitting(false)
     }
@@ -76,7 +78,7 @@ export function ExerciseForm({ exercise }) {
     <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="exercise-name">Naziv vežbe</FieldLabel>
+          <FieldLabel htmlFor="exercise-name">{t("exercises.form.nameLabel")}</FieldLabel>
           <Input
             id="exercise-name"
             value={form.name}
@@ -85,34 +87,34 @@ export function ExerciseForm({ exercise }) {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="exercise-muscle-group">Mišićna grupa</FieldLabel>
+          <FieldLabel htmlFor="exercise-muscle-group">{t("exercises.form.muscleGroupLabel")}</FieldLabel>
           <Select
             value={form.muscleGroup}
             onValueChange={(value) => setForm((prev) => ({ ...prev, muscleGroup: value }))}
           >
             <SelectTrigger id="exercise-muscle-group">
-              <SelectValue placeholder="Izaberi mišićnu grupu" />
+              <SelectValue placeholder={t("exercises.form.muscleGroupPlaceholder")} />
             </SelectTrigger>
             <SelectContent>
               {MUSCLE_GROUPS.map((group) => (
                 <SelectItem key={group.value} value={group.value}>
-                  {group.label}
+                  {t(group.labelKey)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </Field>
         <Field>
-          <FieldLabel htmlFor="exercise-equipment">Oprema</FieldLabel>
+          <FieldLabel htmlFor="exercise-equipment">{t("exercises.form.equipmentLabel")}</FieldLabel>
           <Input
             id="exercise-equipment"
-            placeholder="npr. Šipka, Bučice"
+            placeholder={t("exercises.form.equipmentPlaceholder")}
             value={form.equipment}
             onChange={handleChange("equipment")}
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="exercise-description">Opis</FieldLabel>
+          <FieldLabel htmlFor="exercise-description">{t("exercises.form.descriptionLabel")}</FieldLabel>
           <Textarea
             id="exercise-description"
             rows={4}
@@ -121,24 +123,28 @@ export function ExerciseForm({ exercise }) {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="exercise-video">YouTube link</FieldLabel>
+          <FieldLabel htmlFor="exercise-video">{t("exercises.form.videoLabel")}</FieldLabel>
           <Input
             id="exercise-video"
             type="url"
-            placeholder="https://www.youtube.com/watch?v=..."
+            placeholder={t("exercises.form.videoPlaceholder")}
             value={form.videoUrl}
             onChange={handleChange("videoUrl")}
           />
           <FieldDescription>
-            Podržani su youtube.com/watch, youtu.be i /shorts/ linkovi.
+            {t("exercises.form.videoHint")}
           </FieldDescription>
         </Field>
         <div className="flex gap-2">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Čuvanje..." : isEditing ? "Sačuvaj izmene" : "Kreiraj vežbu"}
+            {isSubmitting
+              ? t("exercises.form.submitting")
+              : isEditing
+                ? t("exercises.form.submitEdit")
+                : t("exercises.form.submitCreate")}
           </Button>
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-            Otkaži
+            {t("exercises.form.cancel")}
           </Button>
         </div>
       </FieldGroup>

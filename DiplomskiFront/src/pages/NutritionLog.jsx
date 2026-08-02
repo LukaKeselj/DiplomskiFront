@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { BarChart3, Pencil, Plus, Trash2, UtensilsCrossed } from "lucide-react"
 
 import {
@@ -39,43 +40,75 @@ function todayDateString() {
   return new Date().toISOString().slice(0, 10)
 }
 
-const SUMMARY_ITEMS = [
-  {
-    key: "calories",
-    label: "Kalorije",
-    unit: "kcal",
-    color: "text-orange-600 dark:text-orange-400",
-  },
-  {
-    key: "protein",
-    label: "Proteini",
-    unit: "g",
-    color: "text-rose-600 dark:text-rose-400",
-  },
-  { key: "fat", label: "Masti", unit: "g", color: "text-violet-600 dark:text-violet-400" },
-  {
-    key: "carbs",
-    label: "Ugljeni hidrati",
-    unit: "g",
-    color: "text-blue-600 dark:text-blue-400",
-  },
-  {
-    key: "fiber",
-    label: "Vlakna",
-    unit: "g",
-    color: "text-emerald-600 dark:text-emerald-400",
-  },
-]
+function getSummaryItems(t) {
+  return [
+    {
+      key: "calories",
+      label: t("nutrition.log.summary.calories"),
+      unit: "kcal",
+      color: "text-orange-600 dark:text-orange-400",
+    },
+    {
+      key: "protein",
+      label: t("nutrition.log.summary.protein"),
+      unit: "g",
+      color: "text-rose-600 dark:text-rose-400",
+    },
+    {
+      key: "fat",
+      label: t("nutrition.log.summary.fat"),
+      unit: "g",
+      color: "text-violet-600 dark:text-violet-400",
+    },
+    {
+      key: "carbs",
+      label: t("nutrition.log.summary.carbs"),
+      unit: "g",
+      color: "text-blue-600 dark:text-blue-400",
+    },
+    {
+      key: "fiber",
+      label: t("nutrition.log.summary.fiber"),
+      unit: "g",
+      color: "text-emerald-600 dark:text-emerald-400",
+    },
+  ]
+}
 
-const ENTRY_STATS = [
-  { key: "calories", color: "text-orange-600 dark:text-orange-400", format: (v) => `${v} kcal` },
-  { key: "protein", color: "text-rose-600 dark:text-rose-400", format: (v) => `${v}g protein` },
-  { key: "fat", color: "text-violet-600 dark:text-violet-400", format: (v) => `${v}g masti` },
-  { key: "carbs", color: "text-blue-600 dark:text-blue-400", format: (v) => `${v}g UH` },
-  { key: "fiber", color: "text-emerald-600 dark:text-emerald-400", format: (v) => `${v}g vlakna` },
-]
+function getEntryStats(t) {
+  return [
+    {
+      key: "calories",
+      color: "text-orange-600 dark:text-orange-400",
+      format: (v) => t("nutrition.log.entryStats.calories", { value: v }),
+    },
+    {
+      key: "protein",
+      color: "text-rose-600 dark:text-rose-400",
+      format: (v) => t("nutrition.log.entryStats.protein", { value: v }),
+    },
+    {
+      key: "fat",
+      color: "text-violet-600 dark:text-violet-400",
+      format: (v) => t("nutrition.log.entryStats.fat", { value: v }),
+    },
+    {
+      key: "carbs",
+      color: "text-blue-600 dark:text-blue-400",
+      format: (v) => t("nutrition.log.entryStats.carbs", { value: v }),
+    },
+    {
+      key: "fiber",
+      color: "text-emerald-600 dark:text-emerald-400",
+      format: (v) => t("nutrition.log.entryStats.fiber", { value: v }),
+    },
+  ]
+}
 
 export default function NutritionLog() {
+  const { t } = useTranslation()
+  const summaryItems = useMemo(() => getSummaryItems(t), [t])
+  const entryStats = useMemo(() => getEntryStats(t), [t])
   const today = useMemo(() => todayDateString(), [])
   const [date, setDate] = useState(today)
   const [entries, setEntries] = useState([])
@@ -95,10 +128,10 @@ export default function NutritionLog() {
         setSummary(summaryData)
       })
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje dnevnika ishrane")
+        toast.error(error.response?.data?.message || t("nutrition.log.loadError"))
       })
       .finally(() => setIsLoading(false))
-  }, [date, reloadNonce])
+  }, [date, reloadNonce, t])
 
   function openAddForm() {
     setEditingEntry(null)
@@ -122,14 +155,14 @@ export default function NutritionLog() {
     setIsDeleting(true)
     try {
       await deleteNutritionLogRequest(deleteTarget._id)
-      toast.success("Unos je obrisan")
+      toast.success(t("nutrition.log.deleteSuccess"))
       setDeleteTarget(null)
       setReloadNonce((prev) => prev + 1)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj zapis")
+        toast.error(t("nutrition.log.deleteForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje nije uspelo")
+        toast.error(error.response?.data?.message || t("nutrition.log.deleteFailed"))
       }
     } finally {
       setIsDeleting(false)
@@ -137,7 +170,7 @@ export default function NutritionLog() {
   }
 
   return (
-    <AppLayout breadcrumb="Dnevnik ishrane">
+    <AppLayout breadcrumb={t("sidebar.nav.nutritionLog")}>
       <div className="flex items-center justify-between gap-4">
         <Input
           type="date"
@@ -149,11 +182,11 @@ export default function NutritionLog() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setIsWeeklyChartOpen(true)}>
             <BarChart3 />
-            Nedeljni pregled
+            {t("nutrition.log.weeklyOverview")}
           </Button>
           <Button onClick={openAddForm}>
             <Plus />
-            Dodaj unos
+            {t("nutrition.log.addEntry")}
           </Button>
         </div>
       </div>
@@ -161,10 +194,10 @@ export default function NutritionLog() {
       {summary && (
         <Card>
           <CardHeader>
-            <CardTitle>Dnevni total</CardTitle>
+            <CardTitle>{t("nutrition.log.dailyTotal")}</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-5">
-            {SUMMARY_ITEMS.map((item) => (
+            {summaryItems.map((item) => (
               <div key={item.key} className="flex flex-col gap-0.5">
                 <span className={cn("text-lg font-semibold", item.color)}>
                   {summary[item.key]}
@@ -193,12 +226,12 @@ export default function NutritionLog() {
       ) : entries.length === 0 ? (
         <EmptyState
           icon={UtensilsCrossed}
-          title="Nema unosa za izabrani dan"
-          description="Dodaj šta si jeo/la da bi pratio unos kalorija i makronutrijenata."
+          title={t("nutrition.log.empty.title")}
+          description={t("nutrition.log.empty.description")}
           action={
             <Button size="sm" onClick={openAddForm}>
               <Plus />
-              Dodaj unos
+              {t("nutrition.log.addEntry")}
             </Button>
           }
         />
@@ -210,7 +243,7 @@ export default function NutritionLog() {
                 <CardHeader>
                   <CardTitle>{entry.foodName}</CardTitle>
                   <CardDescription className="flex flex-wrap items-center gap-x-1.5">
-                    {ENTRY_STATS.map((stat, index) => (
+                    {entryStats.map((stat, index) => (
                       <span key={stat.key} className="flex items-center gap-1.5">
                         {index > 0 && <span className="text-muted-foreground">•</span>}
                         <span className={cn("font-medium", stat.color)}>
@@ -237,11 +270,13 @@ export default function NutritionLog() {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingEntry ? "Izmena unosa" : "Dodaj unos"}</DialogTitle>
+            <DialogTitle>
+              {editingEntry ? t("nutrition.log.dialog.editTitle") : t("nutrition.log.dialog.addTitle")}
+            </DialogTitle>
             <DialogDescription>
               {editingEntry
-                ? "Izmeni podatke o unetoj namirnici."
-                : "Pretraži bazu hrane ili unesi podatke ručno."}
+                ? t("nutrition.log.dialog.editDescription")
+                : t("nutrition.log.dialog.addDescription")}
             </DialogDescription>
           </DialogHeader>
           {isFormOpen && (
@@ -258,9 +293,9 @@ export default function NutritionLog() {
       <Dialog open={isWeeklyChartOpen} onOpenChange={setIsWeeklyChartOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Nedeljni pregled</DialogTitle>
+            <DialogTitle>{t("nutrition.log.weeklyDialog.title")}</DialogTitle>
             <DialogDescription>
-              Raspodela kalorija po makroima za poslednjih 7 dana (zaključno sa {date}).
+              {t("nutrition.log.weeklyDialog.description", { date })}
             </DialogDescription>
           </DialogHeader>
           {isWeeklyChartOpen && <NutritionWeeklyChart endDate={date} />}
@@ -270,16 +305,15 @@ export default function NutritionLog() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati unos?</AlertDialogTitle>
+            <AlertDialogTitle>{t("nutrition.log.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš &quot;{deleteTarget?.foodName}&quot; iz
-              dnevnika? Ova akcija se ne može poništiti.
+              {t("nutrition.log.deleteDialog.description", { name: deleteTarget?.foodName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("nutrition.log.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Brisanje..." : "Obriši"}
+              {isDeleting ? t("nutrition.log.deleteDialog.deleting") : t("nutrition.log.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import {
   Apple,
   Dumbbell,
@@ -28,65 +29,69 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/AuthContext"
 
-const data = {
-  navMain: [
-    { title: "Pregled", url: "/", icon: House },
-    { title: "Treninzi", url: "/workout-plans", icon: Dumbbell },
-    { title: "Vežbe", url: "/exercises", icon: ListChecks },
-    { title: "Fitness Score", url: "/fitness-score", icon: Gauge },
+function getNavMain(t) {
+  return [
+    { title: t("sidebar.nav.overview"), url: "/", icon: House },
+    { title: t("sidebar.nav.workouts"), url: "/workout-plans", icon: Dumbbell },
+    { title: t("sidebar.nav.exercises"), url: "/exercises", icon: ListChecks },
+    { title: t("sidebar.nav.fitnessScore"), url: "/fitness-score", icon: Gauge },
     {
-      title: "Napredak",
+      title: t("sidebar.nav.progress"),
       icon: TrendingUp,
       items: [
-        { title: "Telesna težina", url: "/body-weight" },
-        { title: "Progres vežbi", url: "/exercise-progress" },
+        { title: t("sidebar.nav.bodyWeight"), url: "/body-weight" },
+        { title: t("sidebar.nav.exerciseProgress"), url: "/exercise-progress" },
       ],
     },
     {
-      title: "Ishrana",
+      title: t("sidebar.nav.nutrition"),
       icon: Apple,
       items: [
-        { title: "Dnevnik ishrane", url: "/nutrition-log" },
-        { title: "Planovi ishrane", url: "/nutrition-plans" },
+        { title: t("sidebar.nav.nutritionLog"), url: "/nutrition-log" },
+        { title: t("sidebar.nav.nutritionPlans"), url: "/nutrition-plans" },
       ],
     },
     {
-      title: "Suplementi",
+      title: t("sidebar.nav.supplements"),
       icon: Pill,
       items: [
-        { title: "Svi suplementi", url: "/supplements" },
-        { title: "Moj režim", url: "/my-supplements" },
+        { title: t("sidebar.nav.allSupplements"), url: "/supplements" },
+        { title: t("sidebar.nav.mySupplements"), url: "/my-supplements" },
       ],
     },
-    { title: "Teretane", url: "/nearby-gyms", icon: MapPin },
-  ],
+    { title: t("sidebar.nav.gyms"), url: "/nearby-gyms", icon: MapPin },
+  ]
 }
 
-const adminNavMain = [
-  { title: "Treninzi", url: "/workout-plans", icon: Dumbbell },
-  { title: "Vežbe", url: "/exercises", icon: ListChecks },
-  {
-    title: "Suplementi",
-    icon: Pill,
-    items: [
-      { title: "Svi suplementi", url: "/supplements" },
-      { title: "Dodaj suplement", url: "/supplements/new" },
-      { title: "Moj režim", url: "/my-supplements" },
-    ],
-  },
-  {
-    title: "Ishrana",
-    icon: Apple,
-    items: [
-      { title: "Dnevnik ishrane", url: "/nutrition-log" },
-      { title: "Planovi ishrane", url: "/nutrition-plans" },
-    ],
-  },
-  { title: "Teretane", url: "/nearby-gyms", icon: MapPin },
-  { title: "Korisnici", url: "/", icon: Users },
-]
+function getAdminNavMain(t) {
+  return [
+    { title: t("sidebar.nav.workouts"), url: "/workout-plans", icon: Dumbbell },
+    { title: t("sidebar.nav.exercises"), url: "/exercises", icon: ListChecks },
+    {
+      title: t("sidebar.nav.supplements"),
+      icon: Pill,
+      items: [
+        { title: t("sidebar.nav.allSupplements"), url: "/supplements" },
+        { title: t("sidebar.nav.addSupplement"), url: "/supplements/new" },
+        { title: t("sidebar.nav.mySupplements"), url: "/my-supplements" },
+      ],
+    },
+    {
+      title: t("sidebar.nav.nutrition"),
+      icon: Apple,
+      items: [
+        { title: t("sidebar.nav.nutritionLog"), url: "/nutrition-log" },
+        { title: t("sidebar.nav.nutritionPlans"), url: "/nutrition-plans" },
+      ],
+    },
+    { title: t("sidebar.nav.gyms"), url: "/nearby-gyms", icon: MapPin },
+    { title: t("sidebar.nav.users"), url: "/", icon: Users },
+  ]
+}
 
 function AdminHeader() {
+  const { t } = useTranslation()
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -95,8 +100,8 @@ function AdminHeader() {
             <ShieldCheck className="size-4" />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">IronLog</span>
-            <span className="truncate text-xs">Administracija</span>
+            <span className="truncate font-medium">{t("common.appName")}</span>
+            <span className="truncate text-xs">{t("sidebar.administration")}</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>
@@ -108,6 +113,7 @@ export function AppSidebar({ ...props }) {
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
   const [isAccountOpen, setIsAccountOpen] = useState(false)
+  const { t } = useTranslation()
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -115,7 +121,7 @@ export function AppSidebar({ ...props }) {
         {isAdmin ? <AdminHeader /> : <ProgramSwitcher />}
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={isAdmin ? adminNavMain : data.navMain} />
+        <NavMain items={isAdmin ? getAdminNavMain(t) : getNavMain(t)} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser onOpenAccount={() => setIsAccountOpen(true)} />

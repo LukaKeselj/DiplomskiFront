@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
+import { useTranslation } from "react-i18next"
 import { Apple, ChevronRight, Dumbbell, Gauge, Pill, Scale } from "lucide-react"
 
 import { getFitnessScoreHistoryRequest } from "@/api/fitnessScore"
@@ -10,10 +11,30 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 const BREAKDOWN_ROWS = [
-  { key: "workout", label: "Treninzi", icon: Dumbbell, emptyLabel: "Nema aktivnog plana" },
-  { key: "nutrition", label: "Ishrana", icon: Apple, emptyLabel: "Nema unosa" },
-  { key: "weight", label: "Težina", icon: Scale, emptyLabel: "Nije unešeno" },
-  { key: "supplements", label: "Suplementi", icon: Pill, emptyLabel: "Nema aktivnih suplemenata" },
+  {
+    key: "workout",
+    labelKey: "home.fitnessScoreWidget.breakdown.workout",
+    icon: Dumbbell,
+    emptyLabelKey: "home.fitnessScoreWidget.breakdown.workoutEmpty",
+  },
+  {
+    key: "nutrition",
+    labelKey: "home.fitnessScoreWidget.breakdown.nutrition",
+    icon: Apple,
+    emptyLabelKey: "home.fitnessScoreWidget.breakdown.nutritionEmpty",
+  },
+  {
+    key: "weight",
+    labelKey: "home.fitnessScoreWidget.breakdown.weight",
+    icon: Scale,
+    emptyLabelKey: "home.fitnessScoreWidget.breakdown.weightEmpty",
+  },
+  {
+    key: "supplements",
+    labelKey: "home.fitnessScoreWidget.breakdown.supplements",
+    icon: Pill,
+    emptyLabelKey: "home.fitnessScoreWidget.breakdown.supplementsEmpty",
+  },
 ]
 
 function scoreColor(score) {
@@ -24,6 +45,7 @@ function scoreColor(score) {
 }
 
 export function HomeFitnessScoreWidget({ refreshKey }) {
+  const { t } = useTranslation()
   const [weeks, setWeeks] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -47,12 +69,12 @@ export function HomeFitnessScoreWidget({ refreshKey }) {
             <Gauge className="size-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-heading text-sm font-medium">Fitness Score</p>
-            <p className="truncate text-xs text-muted-foreground">Ova nedelja</p>
+            <p className="font-heading text-sm font-medium">{t("home.fitnessScoreWidget.title")}</p>
+            <p className="truncate text-xs text-muted-foreground">{t("home.fitnessScoreWidget.thisWeek")}</p>
           </div>
           <Button size="sm" variant="ghost" asChild>
             <Link to="/fitness-score">
-              Detalji
+              {t("home.fitnessScoreWidget.details")}
               <ChevronRight />
             </Link>
           </Button>
@@ -84,7 +106,7 @@ export function HomeFitnessScoreWidget({ refreshKey }) {
                   )}
                 >
                   {delta > 0 ? "+" : ""}
-                  {delta} od prošle nedelje
+                  {delta} {t("home.fitnessScoreWidget.sinceLastWeek")}
                 </span>
               )}
             </div>
@@ -95,9 +117,9 @@ export function HomeFitnessScoreWidget({ refreshKey }) {
                 return (
                   <div key={row.key} className="flex items-center gap-2.5">
                     <Icon className="size-4 shrink-0 text-muted-foreground" />
-                    <span className="w-20 shrink-0 text-xs text-muted-foreground">{row.label}</span>
+                    <span className="w-20 shrink-0 text-xs text-muted-foreground">{t(row.labelKey)}</span>
                     {item?.score === null ? (
-                      <span className="text-xs text-muted-foreground/70">{row.emptyLabel}</span>
+                      <span className="text-xs text-muted-foreground/70">{t(row.emptyLabelKey)}</span>
                     ) : (
                       <>
                         <Progress value={item.score} className="h-1.5" />

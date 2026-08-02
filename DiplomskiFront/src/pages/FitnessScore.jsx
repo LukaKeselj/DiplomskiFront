@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Apple, Dumbbell, Gauge, Pill, Scale } from "lucide-react"
 import {
   CartesianGrid,
@@ -24,39 +25,57 @@ import { cn } from "@/lib/utils"
 
 const WEEKS_TO_SHOW = 12
 
-const BREAKDOWN_ROWS = [
-  {
-    key: "workout",
-    label: "Treninzi",
-    icon: Dumbbell,
-    describe: (b) => (b.expected > 0 ? `${b.completed}/${b.expected} treninga` : "Nema aktivnog plana"),
-  },
-  {
-    key: "nutrition",
-    label: "Ishrana",
-    icon: Apple,
-    describe: (b) => (b.expected > 0 ? `${b.completed}/${b.expected} stavki iz plana` : `${b.loggedDays}/${b.totalDays} dana sa unosom`),
-  },
-  {
-    key: "weight",
-    label: "Težina",
-    icon: Scale,
-    describe: (b) => (b.logged ? `BMI ${b.bmi} (${b.weight} kg)` : "Nije uneta ove nedelje"),
-  },
-  {
-    key: "supplements",
-    label: "Suplementi",
-    icon: Pill,
-    describe: (b) => (b.expected > 0 ? `${b.completed}/${b.expected} uzeto` : "Nema aktivnih suplemenata"),
-  },
-]
-
-const trendChartConfig = {
-  overall: { label: "Fitness Score", color: "var(--chart-1)" },
-}
-
-const radarChartConfig = {
-  score: { label: "Score", color: "var(--chart-1)" },
+function getBreakdownRows(t) {
+  return [
+    {
+      key: "workout",
+      label: t("fitnessScore.breakdown.workout.label"),
+      icon: Dumbbell,
+      describe: (b) =>
+        b.expected > 0
+          ? t("fitnessScore.breakdown.workout.completed", {
+              completed: b.completed,
+              expected: b.expected,
+            })
+          : t("fitnessScore.breakdown.workout.noPlan"),
+    },
+    {
+      key: "nutrition",
+      label: t("fitnessScore.breakdown.nutrition.label"),
+      icon: Apple,
+      describe: (b) =>
+        b.expected > 0
+          ? t("fitnessScore.breakdown.nutrition.completed", {
+              completed: b.completed,
+              expected: b.expected,
+            })
+          : t("fitnessScore.breakdown.nutrition.loggedDays", {
+              loggedDays: b.loggedDays,
+              totalDays: b.totalDays,
+            }),
+    },
+    {
+      key: "weight",
+      label: t("fitnessScore.breakdown.weight.label"),
+      icon: Scale,
+      describe: (b) =>
+        b.logged
+          ? t("fitnessScore.breakdown.weight.summary", { bmi: b.bmi, weight: b.weight })
+          : t("fitnessScore.breakdown.weight.notLogged"),
+    },
+    {
+      key: "supplements",
+      label: t("fitnessScore.breakdown.supplements.label"),
+      icon: Pill,
+      describe: (b) =>
+        b.expected > 0
+          ? t("fitnessScore.breakdown.supplements.completed", {
+              completed: b.completed,
+              expected: b.expected,
+            })
+          : t("fitnessScore.breakdown.supplements.noActive"),
+    },
+  ]
 }
 
 function formatWeekLabel(dateString) {
@@ -74,6 +93,7 @@ function scoreColor(score) {
 }
 
 export default function FitnessScore() {
+  const { t } = useTranslation()
   const [weeks, setWeeks] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -81,10 +101,18 @@ export default function FitnessScore() {
     getFitnessScoreHistoryRequest(WEEKS_TO_SHOW)
       .then(setWeeks)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje score-a")
+        toast.error(error.response?.data?.message || t("fitnessScore.errors.loadFailed"))
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
+
+  const BREAKDOWN_ROWS = getBreakdownRows(t)
+  const trendChartConfig = {
+    overall: { label: t("fitnessScore.chart.overallLabel"), color: "var(--chart-1)" },
+  }
+  const radarChartConfig = {
+    score: { label: t("fitnessScore.chart.scoreLabel"), color: "var(--chart-1)" },
+  }
 
   const current = weeks.length > 0 ? weeks[weeks.length - 1] : null
   const trendData = weeks.map((week) => ({
@@ -99,7 +127,7 @@ export default function FitnessScore() {
     : []
 
   return (
-    <AppLayout breadcrumb="Fitness Score">
+    <AppLayout breadcrumb={t("sidebar.nav.fitnessScore")}>
       {isLoading ? (
         <div className="flex flex-col gap-4">
           <Skeleton className="h-44 w-full" />
@@ -108,14 +136,14 @@ export default function FitnessScore() {
       ) : !current ? (
         <EmptyState
           icon={Gauge}
-          title="Nema podataka za prikaz"
-          description="Probaj ponovo kasnije."
+          title={t("fitnessScore.emptyState.title")}
+          description={t("fitnessScore.emptyState.description")}
         />
       ) : (
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Ova nedelja</CardTitle>
+              <CardTitle>{t("fitnessScore.thisWeek")}</CardTitle>
               <CardDescription>
                 {current.weekStart} – {current.weekEnd}
               </CardDescription>
@@ -125,7 +153,7 @@ export default function FitnessScore() {
                 <span className={cn("text-5xl font-bold tabular-nums", scoreColor(current.overall))}>
                   {current.overall ?? "—"}
                 </span>
-                <span className="text-xs text-muted-foreground">od 100</span>
+                <span className="text-xs text-muted-foreground">{t("fitnessScore.outOf100")}</span>
               </div>
               <ChartContainer
                 config={radarChartConfig}
@@ -165,8 +193,10 @@ export default function FitnessScore() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Trend kroz vreme</CardTitle>
-              <CardDescription>Poslednjih {weeks.length} nedelja</CardDescription>
+              <CardTitle>{t("fitnessScore.trendTitle")}</CardTitle>
+              <CardDescription>
+                {t("fitnessScore.trendDescription", { count: weeks.length })}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ChartContainer config={trendChartConfig} className="aspect-auto h-64 w-full">

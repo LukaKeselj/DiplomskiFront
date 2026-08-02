@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Pencil, Plus, Search, Trash2, UtensilsCrossed } from "lucide-react"
 
 import { deleteNutritionPlanRequest, getNutritionPlansRequest } from "@/api/nutritionPlans"
@@ -30,6 +31,7 @@ function itemCount(plan) {
 
 function PlanCard({ plan, isActive, onDeleteRequest }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   function handleEditClick(event) {
     event.preventDefault()
@@ -57,13 +59,13 @@ function PlanCard({ plan, isActive, onDeleteRequest }) {
             <CardTitle>{plan.name}</CardTitle>
             {isActive && (
               <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
-                Aktivan
+                {t("nutrition.plans.activeBadge")}
               </span>
             )}
           </div>
           <CardDescription>
-            {plan.days.length} {plan.days.length === 1 ? "dan" : "dana"} u ciklusu •{" "}
-            {itemCount(plan)} namirnica ukupno
+            {plan.days.length} {plan.days.length === 1 ? t("nutrition.plans.day") : t("nutrition.plans.days")}{" "}
+            {t("nutrition.plans.inCycle")} • {itemCount(plan)} {t("nutrition.plans.foodItemsTotal")}
           </CardDescription>
           <CardAction className="flex gap-2">
             <Button variant="outline" size="icon" onClick={handleEditClick}>
@@ -80,6 +82,7 @@ function PlanCard({ plan, isActive, onDeleteRequest }) {
 }
 
 export default function NutritionPlans() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [plans, setPlans] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -91,10 +94,10 @@ export default function NutritionPlans() {
     getNutritionPlansRequest()
       .then(setPlans)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje planova ishrane")
+        toast.error(error.response?.data?.message || t("nutrition.plans.loadError"))
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
 
   async function handleDelete() {
     if (!deleteTarget) return
@@ -103,13 +106,13 @@ export default function NutritionPlans() {
     try {
       await deleteNutritionPlanRequest(deleteTarget._id)
       setPlans((prev) => prev.filter((item) => item._id !== deleteTarget._id))
-      toast.success("Plan je obrisan")
+      toast.success(t("nutrition.plans.deleteSuccess"))
       setDeleteTarget(null)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj plan")
+        toast.error(t("nutrition.plans.deleteForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje plana nije uspelo")
+        toast.error(error.response?.data?.message || t("nutrition.plans.deleteFailed"))
       }
     } finally {
       setIsDeleting(false)
@@ -122,13 +125,13 @@ export default function NutritionPlans() {
     : plans
 
   return (
-    <AppLayout breadcrumb="Planovi ishrane">
+    <AppLayout breadcrumb={t("sidebar.nav.nutritionPlans")}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="w-56 pl-8"
-            placeholder="Pretraži planove..."
+            placeholder={t("nutrition.plans.searchPlaceholder")}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
@@ -136,7 +139,7 @@ export default function NutritionPlans() {
         <Button asChild>
           <Link to="/nutrition-plans/new">
             <Plus />
-            Novi plan
+            {t("nutrition.plans.newPlan")}
           </Link>
         </Button>
       </div>
@@ -146,18 +149,18 @@ export default function NutritionPlans() {
       ) : visiblePlans.length === 0 ? (
         <EmptyState
           icon={UtensilsCrossed}
-          title="Nema planova za prikaz"
+          title={t("nutrition.plans.empty.title")}
           description={
             plans.length === 0
-              ? "Napravi svoj prvi plan ishrane da počneš sa praćenjem."
-              : "Promeni pretragu da vidiš druge planove."
+              ? t("nutrition.plans.empty.descriptionEmpty")
+              : t("nutrition.plans.empty.descriptionFiltered")
           }
           action={
             plans.length === 0 && (
               <Button asChild size="sm">
                 <Link to="/nutrition-plans/new">
                   <Plus />
-                  Novi plan
+                  {t("nutrition.plans.newPlan")}
                 </Link>
               </Button>
             )
@@ -180,16 +183,15 @@ export default function NutritionPlans() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati plan?</AlertDialogTitle>
+            <AlertDialogTitle>{t("nutrition.plans.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš plan &quot;{deleteTarget?.name}&quot;? Ova akcija
-              se ne može poništiti.
+              {t("nutrition.plans.deleteDialog.description", { name: deleteTarget?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("nutrition.plans.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Brisanje..." : "Obriši"}
+              {isDeleting ? t("nutrition.plans.deleteDialog.deleting") : t("nutrition.plans.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

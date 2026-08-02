@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Pencil, Pill, Plus, Trash2 } from "lucide-react"
 
 import {
@@ -40,6 +41,7 @@ function todayDateString() {
 }
 
 export default function MySupplements() {
+  const { t } = useTranslation()
   const today = useMemo(() => todayDateString(), [])
   const [userSupplements, setUserSupplements] = useState([])
   const [supplements, setSupplements] = useState([])
@@ -64,10 +66,10 @@ export default function MySupplements() {
         setTakenMap(map)
       })
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje režima")
+        toast.error(error.response?.data?.message || t("supplements.mySupplements.loadError"))
       })
       .finally(() => setIsLoading(false))
-  }, [today])
+  }, [today, t])
 
   const supplementById = useMemo(() => {
     const map = new Map()
@@ -85,7 +87,7 @@ export default function MySupplements() {
       })
     } catch (error) {
       setTakenMap((prev) => ({ ...prev, [userSupplementId]: !nextTaken }))
-      toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
+      toast.error(error.response?.data?.message || t("supplements.mySupplements.toggleFailed"))
     }
   }
 
@@ -96,13 +98,13 @@ export default function MySupplements() {
     try {
       await deleteUserSupplementRequest(deleteTarget._id)
       setUserSupplements((prev) => prev.filter((item) => item._id !== deleteTarget._id))
-      toast.success("Suplement je uklonjen iz režima")
+      toast.success(t("supplements.mySupplements.removeSuccess"))
       setDeleteTarget(null)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj zapis")
+        toast.error(t("supplements.mySupplements.deleteForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje nije uspelo")
+        toast.error(error.response?.data?.message || t("supplements.mySupplements.deleteFailed"))
       }
     } finally {
       setIsDeleting(false)
@@ -110,12 +112,12 @@ export default function MySupplements() {
   }
 
   return (
-    <AppLayout breadcrumb="Moj režim">
+    <AppLayout breadcrumb={t("sidebar.nav.mySupplements")}>
       <div className="flex justify-end">
         <Button asChild>
           <Link to="/my-supplements/new">
             <Plus />
-            Dodaj suplement
+            {t("supplements.mySupplements.addSupplement")}
           </Link>
         </Button>
       </div>
@@ -139,13 +141,13 @@ export default function MySupplements() {
       ) : userSupplements.length === 0 ? (
         <EmptyState
           icon={Pill}
-          title="Nemaš dodatih suplemenata u režimu"
-          description="Dodaj suplement iz baze da počneš da pratiš svoj režim."
+          title={t("supplements.mySupplements.empty.title")}
+          description={t("supplements.mySupplements.empty.description")}
           action={
             <Button asChild size="sm">
               <Link to="/my-supplements/new">
                 <Plus />
-                Dodaj suplement
+                {t("supplements.mySupplements.addSupplement")}
               </Link>
             </Button>
           }
@@ -170,10 +172,10 @@ export default function MySupplements() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <CardTitle>{supplement?.name ?? "Nepoznat suplement"}</CardTitle>
+                        <CardTitle>{supplement?.name ?? t("supplements.mySupplements.unknownSupplement")}</CardTitle>
                         <CardDescription>
                           {item.dosage} • {item.timeOfDay}
-                          {!item.active && " • Neaktivan"}
+                          {!item.active && t("supplements.mySupplements.inactiveSuffix")}
                         </CardDescription>
                         {supplement?.description && (
                           <p className="mt-1 text-xs text-muted-foreground">
@@ -190,7 +192,7 @@ export default function MySupplements() {
                             handleToggleTaken(item._id, checked === true)
                           }
                         />
-                        Uzeto danas
+                        {t("supplements.mySupplements.takenToday")}
                       </label>
                       <Button variant="outline" size="icon" asChild>
                         <Link to={`/my-supplements/${item._id}/edit`}>
@@ -216,17 +218,21 @@ export default function MySupplements() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Ukloniti suplement iz režima?</AlertDialogTitle>
+            <AlertDialogTitle>{t("supplements.mySupplements.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da ukloniš &quot;
-              {supplementById.get(deleteTarget?.supplement)?.name ?? "ovaj suplement"}&quot; iz
-              svog režima? Ova akcija se ne može poništiti.
+              {t("supplements.mySupplements.deleteDialog.description", {
+                name:
+                  supplementById.get(deleteTarget?.supplement)?.name ??
+                  t("supplements.mySupplements.deleteDialog.fallbackName"),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("supplements.mySupplements.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Brisanje..." : "Obriši"}
+              {isDeleting
+                ? t("supplements.mySupplements.deleteDialog.deleting")
+                : t("supplements.mySupplements.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

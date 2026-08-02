@@ -1,0 +1,998 @@
+{
+  "common": {
+    "appName": "IronLog",
+    "gymAlt": "Gym",
+    "themeToggleLabel": "Toggle theme",
+    "languageToggleLabel": "Change language",
+    "home": "Home"
+  },
+  "landing": {
+    "login": "Log in",
+    "badge": "Your personal fitness companion",
+    "heroTitle": "Workouts, nutrition and progress in one place",
+    "heroDescription": "IronLog is an app that helps you plan workouts, track nutrition and supplements, and see your progress over time — all in one place.",
+    "createAccount": "Create account",
+    "featuresTitle": "Everything you need in one place",
+    "featuresDescription": "From planning workouts to tracking progress — no juggling between apps.",
+    "features": {
+      "workoutPlans": {
+        "title": "Workout plans",
+        "description": "Build your own workout plan or follow ready-made programs day by day."
+      },
+      "exerciseLibrary": {
+        "title": "Exercise library",
+        "description": "Browse exercises by muscle group and track your progress for each one."
+      },
+      "fitnessScore": {
+        "title": "Fitness Score",
+        "description": "A single number that sums up your training, nutrition and body weight for the day."
+      },
+      "nutritionLog": {
+        "title": "Nutrition log",
+        "description": "Log your meals and track calorie and macronutrient intake."
+      },
+      "supplements": {
+        "title": "Supplements",
+        "description": "Organize your supplement routine and never miss a dose."
+      },
+      "progressTracking": {
+        "title": "Progress tracking",
+        "description": "Charts of body weight and exercise progress over time."
+      }
+    },
+    "ctaTitle": "Ready to get started?",
+    "ctaDescription": "Log in and take control of your workouts and nutrition."
+  },
+  "auth": {
+    "login": {
+      "title": "Login to your account",
+      "subtitle": "Enter your email below to login to your account",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Login",
+      "submitting": "Logging in...",
+      "orContinueWith": "Or continue with",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "errors": {
+        "loginFailed": "Login failed",
+        "googleLoginFailed": "Google login failed"
+      }
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Fill in the form below to create your account",
+      "firstNameLabel": "First Name",
+      "lastNameLabel": "Last Name",
+      "usernameLabel": "Username",
+      "emailLabel": "Email",
+      "emailHelp": "We'll use this to contact you. We will not share your email with anyone else.",
+      "heightLabel": "Height (cm)",
+      "passwordLabel": "Password",
+      "passwordHelp": "Must be at least 8 characters long.",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordHelp": "Please confirm your password.",
+      "submit": "Create Account",
+      "submitting": "Creating account...",
+      "orContinueWith": "Or continue with",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "accountCreated": "Account created! Check your email to confirm your account.",
+        "registrationFailed": "Registration failed",
+        "googleSignupFailed": "Google sign up failed"
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email and we'll send you a link to reset it",
+      "emailLabel": "Email",
+      "submit": "Send reset link",
+      "submitting": "Sending...",
+      "rememberPassword": "Remember your password?",
+      "login": "Login",
+      "sentTitle": "Check your email",
+      "sentDescription": "If an account exists for {{email}}, we've sent a link to reset your password.",
+      "backToLogin": "Back to login",
+      "errors": {
+        "generic": "Something went wrong"
+      }
+    },
+    "resetPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter a new password for your account",
+      "newPasswordLabel": "New password",
+      "confirmPasswordLabel": "Confirm password",
+      "submit": "Reset password",
+      "submitting": "Resetting...",
+      "backToLogin": "Back to login",
+      "errors": {
+        "invalidLink": "Reset link is invalid or has expired",
+        "mismatch": "Passwords do not match",
+        "generic": "Something went wrong"
+      },
+      "success": "Password reset successfully"
+    }
+  },
+  "sidebar": {
+    "groupLabel": "Platform",
+    "administration": "Administration",
+    "nav": {
+      "overview": "Overview",
+      "workouts": "Workouts",
+      "exercises": "Exercises",
+      "fitnessScore": "Fitness Score",
+      "progress": "Progress",
+      "bodyWeight": "Body weight",
+      "exerciseProgress": "Exercise progress",
+      "nutrition": "Nutrition",
+      "nutritionLog": "Nutrition log",
+      "nutritionPlans": "Nutrition plans",
+      "supplements": "Supplements",
+      "allSupplements": "All supplements",
+      "addSupplement": "Add supplement",
+      "mySupplements": "My routine",
+      "gyms": "Gyms",
+      "users": "Users"
+    },
+    "noActivePlan": "No active plan",
+    "active": "Active",
+    "selectPlan": "Select a plan",
+    "myPlans": "My plans",
+    "noPlans": "You have no plans",
+    "newPlan": "New plan",
+    "account": "Account",
+    "logout": "Log out"
+  },
+  "account": {
+    "title": "Account",
+    "description": "Update your info, picture and password.",
+    "changePicture": "Change picture",
+    "pictureHint": "JPG or PNG, max 2MB.",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "usernameLabel": "Username",
+    "emailLabel": "Email",
+    "heightLabel": "Height (cm)",
+    "changePassword": "Change password",
+    "currentPasswordLabel": "Current password",
+    "newPasswordLabel": "New password",
+    "confirmNewPasswordLabel": "Confirm password",
+    "passwordHint": "Leave blank if you don't want to change your password.",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "success": "Account updated",
+    "errors": {
+      "imageTooLarge": "Image is too large (max 2MB)",
+      "fillAllPasswordFields": "Fill in all fields to change your password",
+      "passwordTooShort": "New password must be at least 8 characters",
+      "passwordMismatch": "New passwords do not match",
+      "updateFailed": "Account update failed"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "backHome": "Back to home"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Refresh the page and try again.",
+    "backHome": "Back to home"
+  },
+  "bodyWeight": {
+    "addMeasurement": "Add measurement",
+    "lastMeasurement": "Last measurement: {{date}}",
+    "noMeasurements": "No measurements logged",
+    "history": "History",
+    "emptyState": {
+      "title": "No measurements logged",
+      "description": "Add your first measurement to start tracking your body weight."
+    },
+    "form": {
+      "title": "Add measurement",
+      "description": "Enter the date and the measured weight.",
+      "dateLabel": "Date",
+      "weightLabel": "Weight (kg)",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "deleteDialog": {
+      "title": "Delete measurement?",
+      "description": "Are you sure you want to delete the measurement from {{date}}? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting..."
+    },
+    "errors": {
+      "loadFailed": "Failed to load weight history",
+      "invalidWeight": "Enter a valid weight",
+      "saveFailed": "Saving failed",
+      "deleteForbidden": "You don't have permission to delete this entry",
+      "deleteFailed": "Deleting failed"
+    },
+    "success": {
+      "saved": "Measurement saved",
+      "deleted": "Measurement deleted"
+    },
+    "chart": {
+      "weightLabel": "Weight (kg)"
+    }
+  },
+  "fitnessScore": {
+    "thisWeek": "This week",
+    "outOf100": "out of 100",
+    "trendTitle": "Trend over time",
+    "trendDescription": "Last {{count}} weeks",
+    "emptyState": {
+      "title": "No data to display",
+      "description": "Try again later."
+    },
+    "errors": {
+      "loadFailed": "Failed to load score"
+    },
+    "chart": {
+      "overallLabel": "Fitness Score",
+      "scoreLabel": "Score"
+    },
+    "breakdown": {
+      "workout": {
+        "label": "Workouts",
+        "completed": "{{completed}}/{{expected}} workouts",
+        "noPlan": "No active plan"
+      },
+      "nutrition": {
+        "label": "Nutrition",
+        "completed": "{{completed}}/{{expected}} plan items",
+        "loggedDays": "{{loggedDays}}/{{totalDays}} days logged"
+      },
+      "weight": {
+        "label": "Weight",
+        "summary": "BMI {{bmi}} ({{weight}} kg)",
+        "notLogged": "Not logged this week"
+      },
+      "supplements": {
+        "label": "Supplements",
+        "completed": "{{completed}}/{{expected}} taken",
+        "noActive": "No active supplements"
+      }
+    }
+  },
+  "profile": {
+    "title": "Finish registration",
+    "description": "Signed in with Google as {{email}}. We still need your username and height.",
+    "usernameLabel": "Username",
+    "heightLabel": "Height (cm)",
+    "submit": "Finish registration",
+    "submitting": "Creating account...",
+    "errors": {
+      "failed": "Account creation failed"
+    }
+  },
+  "gyms": {
+    "breadcrumb": "Nearby gyms",
+    "apiKeyMissing": "Google Maps API key is not configured (VITE_GOOGLE_MAPS_API_KEY).",
+    "unsupported": "Your browser doesn't support geolocation.",
+    "locating": "Looking for your location...",
+    "locationDeniedMessage": "We couldn't access your location. Check your browser permissions and try again.",
+    "retry": "Try again",
+    "openInGoogleMaps": "Open in Google Maps",
+    "wheelchairAccessible": "Wheelchair accessible entrance",
+    "emptyState": {
+      "title": "No gyms nearby",
+      "description": "We couldn't find any gyms within {{radius}} km."
+    },
+    "errors": {
+      "loadFailed": "Failed to load nearby gyms",
+      "locationDenied": "We couldn't access your location"
+    }
+  },
+  "home": {
+    "greeting": "Hello{{name}}",
+    "admin": {
+      "statTiles": {
+        "totalUsers": "Total users",
+        "blockedUsers": "Blocked users",
+        "exercisesInDb": "Exercises in database"
+      },
+      "usersSection": {
+        "title": "Users",
+        "emptyTitle": "No users to display",
+        "table": {
+          "fullName": "Full name",
+          "username": "Username",
+          "email": "Email",
+          "role": "Role",
+          "status": "Status"
+        },
+        "statusBlocked": "Blocked",
+        "statusActive": "Active"
+      },
+      "toasts": {
+        "loadUsersError": "Failed to load users",
+        "loadExercisesError": "Failed to load exercises",
+        "userBlocked": "User has been blocked",
+        "userUnblocked": "User has been unblocked",
+        "toggleBlockError": "Failed to update user status"
+      },
+      "sheet": {
+        "usernameLabel": "Username",
+        "heightLabel": "Height",
+        "roleLabel": "Role",
+        "statusLabel": "Status",
+        "saving": "Saving...",
+        "unblockUser": "Unblock user",
+        "blockUser": "Block user"
+      }
+    },
+    "calendar": {
+      "title": "Calendar",
+      "today": "Today",
+      "weightProgress": "Weight progress",
+      "noWeightLogs": "No weight entries yet",
+      "nutritionForDay": "Nutrition for this day",
+      "summary": {
+        "calories": "Calories",
+        "protein": "Protein",
+        "fat": "Fat",
+        "carbs": "Carbs"
+      }
+    },
+    "fitnessScoreWidget": {
+      "title": "Fitness Score",
+      "thisWeek": "This week",
+      "details": "Details",
+      "sinceLastWeek": "since last week",
+      "breakdown": {
+        "workout": "Workouts",
+        "workoutEmpty": "No active plan",
+        "nutrition": "Nutrition",
+        "nutritionEmpty": "No entries",
+        "weight": "Weight",
+        "weightEmpty": "Not logged",
+        "supplements": "Supplements",
+        "supplementsEmpty": "No active supplements"
+      }
+    },
+    "nutritionWidget": {
+      "titleToday": "Nutrition today",
+      "titleForDate": "Nutrition — {{date}}",
+      "noPlan": "You don't have an active nutrition plan",
+      "noPlanCta": "Select a plan",
+      "noPlanLabel": "No active plan",
+      "noItemsForDay": "No foods planned for this day",
+      "extraLabel": "Extra",
+      "addFood": "Add food",
+      "addFoodDialog": {
+        "title": "Add food",
+        "description": "Search the food database or enter the details manually."
+      },
+      "toasts": {
+        "saveError": "Save failed",
+        "deleteNoPermission": "You don't have permission to delete this entry",
+        "deleteError": "Delete failed"
+      }
+    },
+    "stopwatchWidget": {
+      "title": "Stopwatch",
+      "subtitle": "For rests and workouts",
+      "tabs": {
+        "stopwatch": "Stopwatch",
+        "intervals": "Intervals"
+      },
+      "stopwatch": {
+        "pause": "Pause",
+        "resume": "Resume",
+        "start": "Start",
+        "reset": "Reset"
+      },
+      "interval": {
+        "setsLabel": "Sets",
+        "durationLabel": "Duration",
+        "restLabel": "Rest",
+        "dragHint": "Drag up/down on a number to change its value",
+        "start": "Start",
+        "done": "Done! You finished {{sets}} sets 💪",
+        "phaseWork": "Work",
+        "phasePause": "Rest",
+        "setProgress": "set {{current}}/{{total}}",
+        "newSet": "New set",
+        "pause": "Pause",
+        "resume": "Resume",
+        "skip": "Skip",
+        "reset": "Reset"
+      }
+    },
+    "supplementsWidget": {
+      "titleToday": "Supplements today",
+      "titleForDate": "Supplements — {{date}}",
+      "subtitle": "Your daily routine",
+      "noSupplements": "You have no active supplements in your routine",
+      "unknownSupplement": "Unknown supplement",
+      "addSupplement": "Add supplement",
+      "addDialog": {
+        "title": "Add supplement",
+        "description": "Add a supplement from the catalog to your routine."
+      },
+      "detailDialog": {
+        "noDescription": "No description entered for this supplement."
+      },
+      "toasts": {
+        "loadError": "Failed to load supplements",
+        "saveError": "Save failed"
+      }
+    },
+    "workoutWidget": {
+      "titleToday": "Workout today",
+      "titleForDate": "Workout — {{date}}",
+      "noPlan": "You don't have an active workout plan",
+      "noPlanLabel": "No active plan",
+      "choosePlan": "Select a plan",
+      "beforeActivation": "The plan wasn't active yet on that day",
+      "emptyPlan": "This plan has no days",
+      "restDay": {
+        "title": "Rest day",
+        "subtitle": "No workout scheduled for today."
+      },
+      "completedBadge": "Completed",
+      "skippedBadge": "Skipped",
+      "pastStatus": {
+        "skipped": "— skipped",
+        "completed": "— completed",
+        "notCompleted": "— not completed"
+      },
+      "futureStatus": "— preview",
+      "skipDay": "Skip day",
+      "completeDay": "Finish day",
+      "saving": "Saving...",
+      "skippedDay": "This day was skipped",
+      "missedDay": "Workout was not completed",
+      "toasts": {
+        "completeSuccess": "Day marked as completed",
+        "completeError": "Failed to mark the day",
+        "skipSuccess": "Day skipped",
+        "skipError": "Failed to skip the day"
+      }
+    },
+    "weeklyWeightBanner": {
+      "message": "You haven't logged your weight this week",
+      "lastMeasurement": "Last measurement: {{weight}} kg ({{date}})",
+      "firstEntry": "This would be your first entry.",
+      "save": "Save",
+      "saving": "Saving...",
+      "history": "History",
+      "toasts": {
+        "invalidWeight": "Enter a valid weight",
+        "saved": "Weight has been logged",
+        "saveError": "Save failed"
+      }
+    }
+  },
+  "workout": {
+    "plans": {
+      "breadcrumb": "Workout Plans",
+      "searchPlaceholder": "Search plans...",
+      "newPlan": "New plan",
+      "active": "Active",
+      "dayCount": { "one": "day", "other": "days" },
+      "empty": {
+        "title": "No plans to show",
+        "descriptionEmpty": "Create your first workout plan to start training.",
+        "descriptionFiltered": "Change your search to see other plans."
+      },
+      "deleteDialog": {
+        "title": "Delete plan?",
+        "description": "Are you sure you want to delete the plan \"{{name}}\"? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "confirming": "Deleting..."
+      },
+      "toasts": {
+        "loadFailed": "Failed to load plans",
+        "deleteSuccess": "Plan deleted",
+        "deleteForbidden": "You don't have permission to delete this plan",
+        "deleteFailed": "Failed to delete plan"
+      }
+    },
+    "detail": {
+      "breadcrumbFallback": "Plan",
+      "active": "Active",
+      "activate": "Activate",
+      "activating": "Activating...",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "nextBadge": "Next",
+      "backToList": "Back to list",
+      "dayCard": {
+        "exerciseCount": { "one": "exercise", "other": "exercises" }
+      },
+      "deleteDialog": {
+        "title": "Delete plan?",
+        "description": "Are you sure you want to delete the plan \"{{name}}\"? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "toasts": {
+        "accessDenied": "You don't have access to this plan",
+        "notFound": "Plan not found",
+        "deleteSuccess": "Plan deleted",
+        "deleteForbidden": "You don't have permission to delete this plan",
+        "deleteFailed": "Failed to delete plan"
+      }
+    },
+    "dayDetail": {
+      "breadcrumbFallback": "Day",
+      "backToPlan": "Back to plan",
+      "exerciseCount": { "one": "exercise", "other": "exercises" },
+      "completedToday": "Completed today",
+      "finishDay": "Finish day",
+      "saving": "Saving...",
+      "nextUpLabel": "Next up:",
+      "toasts": {
+        "accessDenied": "You don't have access to this plan",
+        "notFound": "Plan not found",
+        "dayNotFound": "Day not found",
+        "completeSuccess": "Day marked as completed",
+        "completeFailed": "Failed to mark day as completed"
+      }
+    },
+    "form": {
+      "breadcrumbEdit": "Edit Plan",
+      "breadcrumbNew": "New Plan",
+      "planNameLabel": "Plan name",
+      "dayNameLabel": "Day name",
+      "dayNamePlaceholder": "e.g. Day 1",
+      "exerciseLabel": "Exercise",
+      "exercisePlaceholder": "Select an exercise",
+      "setsLabel": "Sets",
+      "repsLabel": "Reps",
+      "restLabel": "Rest (min)",
+      "addExercise": "Add exercise",
+      "addDay": "Add day",
+      "submitCreate": "Create plan",
+      "submitEdit": "Save changes",
+      "submitting": "Saving...",
+      "cancel": "Cancel",
+      "toasts": {
+        "accessDenied": "You don't have access to this plan",
+        "notFound": "Plan not found",
+        "loadExercisesFailed": "Failed to load exercises",
+        "nameRequired": "Plan name is required",
+        "dayNameRequired": "Day name is required",
+        "updateSuccess": "Plan updated",
+        "createSuccess": "Plan created",
+        "editForbidden": "You don't have permission to edit this plan",
+        "saveFailed": "Failed to save plan"
+      }
+    },
+    "dayExerciseCard": {
+      "unknownExercise": "Unknown exercise",
+      "restMinutes": "Rest: {{minutes}} min",
+      "playVideoAria": "Play video: {{name}}",
+      "historyLink": "History",
+      "fullHistoryLink": "Full history",
+      "weightPlaceholder": "kg",
+      "loggedWeight": "Logged: {{weight}} kg",
+      "saveWeight": "Log weight",
+      "updateWeight": "Update weight",
+      "saving": "Saving...",
+      "defaultExerciseName": "exercise",
+      "stats": {
+        "sets": "Sets",
+        "reps": "Reps",
+        "rest": "Rest (min)"
+      },
+      "recentProgress": "Recent progress",
+      "loading": "Loading...",
+      "noLogsYet": "No weights logged for this exercise yet.",
+      "toasts": {
+        "invalidWeight": "Enter a valid weight",
+        "weightSaved": "Weight logged for {{name}}",
+        "saveFailed": "Failed to save"
+      }
+    },
+    "activatePlan": {
+      "toasts": {
+        "success": "Plan activated",
+        "failed": "Activation failed"
+      }
+    }
+  },
+  "exercises": {
+    "list": {
+      "breadcrumb": "Exercises",
+      "searchPlaceholder": "Search exercises...",
+      "allMuscleGroups": "All muscle groups",
+      "addExercise": "Add exercise",
+      "playVideoAria": "Play video: {{name}}",
+      "empty": {
+        "title": "No exercises to show",
+        "descriptionAdmin": "Add your first exercise or change the search/filter.",
+        "descriptionUser": "Change your search or muscle group filter."
+      },
+      "deleteDialog": {
+        "title": "Delete exercise?",
+        "description": "Are you sure you want to delete the exercise \"{{name}}\"? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "confirming": "Deleting..."
+      },
+      "toasts": {
+        "loadFailed": "Failed to load exercises",
+        "deleteSuccess": "Exercise deleted",
+        "deleteFailed": "Failed to delete exercise"
+      }
+    },
+    "detail": {
+      "breadcrumbFallback": "Exercise",
+      "backToList": "Back to list",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "deleteDialog": {
+        "title": "Delete exercise?",
+        "description": "Are you sure you want to delete the exercise \"{{name}}\"? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "toasts": {
+        "notFound": "Exercise not found",
+        "deleteSuccess": "Exercise deleted",
+        "deleteFailed": "Failed to delete exercise"
+      }
+    },
+    "form": {
+      "breadcrumbEdit": "Edit Exercise",
+      "breadcrumbNew": "New Exercise",
+      "nameLabel": "Exercise name",
+      "muscleGroupLabel": "Muscle group",
+      "muscleGroupPlaceholder": "Select a muscle group",
+      "equipmentLabel": "Equipment",
+      "equipmentPlaceholder": "e.g. Barbell, Dumbbells",
+      "descriptionLabel": "Description",
+      "videoLabel": "YouTube link",
+      "videoPlaceholder": "https://www.youtube.com/watch?v=...",
+      "videoHint": "youtube.com/watch, youtu.be and /shorts/ links are supported.",
+      "submitCreate": "Create exercise",
+      "submitEdit": "Save changes",
+      "submitting": "Saving...",
+      "cancel": "Cancel",
+      "toasts": {
+        "notFound": "Exercise not found",
+        "nameRequired": "Exercise name is required",
+        "muscleGroupRequired": "Muscle group is required",
+        "updateSuccess": "Exercise updated",
+        "createSuccess": "Exercise created",
+        "saveFailed": "Failed to save exercise"
+      }
+    },
+    "progress": {
+      "breadcrumb": "Progress by Exercise",
+      "empty": {
+        "title": "No weights logged yet",
+        "description": "Log a weight for an exercise (on the Home page or in exercise details) to track progress here."
+      },
+      "firstEntry": "First entry: {{weight}} kg",
+      "max": "Max: {{weight}} kg",
+      "entryCount": { "one": "entry", "other": "entries" },
+      "deltaPositive": "+{{delta}} kg",
+      "deltaNegative": "{{delta}} kg",
+      "deltaZero": "0 kg",
+      "toasts": {
+        "loadFailed": "Failed to load progress"
+      },
+      "card": {
+        "title": "My progress",
+        "latestLabel": "Latest: {{weight}} kg ({{date}})",
+        "noEntries": "No results entered yet",
+        "logWeight": "Log weight",
+        "emptyHint": "Log your first result to track progress on this exercise",
+        "dialog": {
+          "title": "Log weight",
+          "description": "Enter the date and weight you lifted.",
+          "dateLabel": "Date",
+          "weightLabel": "Weight (kg)",
+          "save": "Save",
+          "saving": "Saving...",
+          "cancel": "Cancel"
+        },
+        "deleteDialog": {
+          "title": "Delete entry?",
+          "description": "Are you sure you want to delete the entry from {{date}}? This action cannot be undone.",
+          "cancel": "Cancel",
+          "confirm": "Delete",
+          "confirming": "Deleting..."
+        },
+        "toasts": {
+          "loadFailed": "Failed to load progress",
+          "invalidWeight": "Enter a valid weight",
+          "saveSuccess": "Progress saved",
+          "saveFailed": "Failed to save",
+          "deleteSuccess": "Entry deleted",
+          "deleteForbidden": "You don't have permission to delete this entry",
+          "deleteFailed": "Failed to delete"
+        }
+      }
+    },
+    "muscleGroups": {
+      "grudi": "Chest",
+      "leđa": "Back",
+      "noge": "Legs",
+      "ramena": "Shoulders",
+      "ruke": "Arms",
+      "core": "Core"
+    }
+  },
+  "nutrition": {
+    "log": {
+      "loadError": "Failed to load nutrition log",
+      "weeklyOverview": "Weekly overview",
+      "addEntry": "Add entry",
+      "dailyTotal": "Daily total",
+      "summary": {
+        "calories": "Calories",
+        "protein": "Protein",
+        "fat": "Fat",
+        "carbs": "Carbs",
+        "fiber": "Fiber"
+      },
+      "entryStats": {
+        "calories": "{{value}} kcal",
+        "protein": "{{value}}g protein",
+        "fat": "{{value}}g fat",
+        "carbs": "{{value}}g carbs",
+        "fiber": "{{value}}g fiber"
+      },
+      "empty": {
+        "title": "No entries for the selected day",
+        "description": "Add what you ate to track your calorie and macronutrient intake."
+      },
+      "deleteSuccess": "Entry deleted",
+      "deleteForbidden": "You don't have permission to delete this entry",
+      "deleteFailed": "Delete failed",
+      "dialog": {
+        "editTitle": "Edit entry",
+        "addTitle": "Add entry",
+        "editDescription": "Edit the details of this food entry.",
+        "addDescription": "Search the food database or enter details manually."
+      },
+      "weeklyDialog": {
+        "title": "Weekly overview",
+        "description": "Calorie distribution by macro for the last 7 days (up to {{date}})."
+      },
+      "deleteDialog": {
+        "title": "Delete entry?",
+        "description": "Are you sure you want to delete \"{{name}}\" from the log? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "deleting": "Deleting..."
+      }
+    },
+    "plans": {
+      "loadError": "Failed to load nutrition plans",
+      "activeBadge": "Active",
+      "day": "day",
+      "days": "days",
+      "inCycle": "in the cycle",
+      "foodItemsTotal": "food items total",
+      "searchPlaceholder": "Search plans...",
+      "newPlan": "New plan",
+      "empty": {
+        "title": "No plans to show",
+        "descriptionEmpty": "Create your first nutrition plan to start tracking.",
+        "descriptionFiltered": "Change your search to see other plans."
+      },
+      "deleteSuccess": "Plan deleted",
+      "deleteForbidden": "You don't have permission to delete this plan",
+      "deleteFailed": "Failed to delete plan",
+      "deleteDialog": {
+        "title": "Delete plan?",
+        "description": "Are you sure you want to delete the plan \"{{name}}\"? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "deleting": "Deleting..."
+      }
+    },
+    "planDetail": {
+      "breadcrumbFallback": "Nutrition plan",
+      "accessDenied": "You don't have access to this plan",
+      "notFound": "Plan not found",
+      "activateSuccess": "Plan activated",
+      "activateFailed": "Activation failed",
+      "deleteSuccess": "Plan deleted",
+      "deleteForbidden": "You don't have permission to delete this plan",
+      "deleteFailed": "Failed to delete plan",
+      "activeBadge": "Active",
+      "todayBadge": "Today",
+      "activating": "Activating...",
+      "activate": "Activate",
+      "edit": "Edit",
+      "deleting": "Deleting...",
+      "delete": "Delete",
+      "noItems": "No planned food items",
+      "itemsCount": "{{count}} food items",
+      "itemMacros": "{{calories}} kcal • {{protein}}g protein • {{fat}}g fat • {{carbs}}g carbs",
+      "backToList": "Back to list",
+      "deleteDialog": {
+        "title": "Delete plan?",
+        "description": "Are you sure you want to delete the plan \"{{name}}\"? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      }
+    },
+    "planForm": {
+      "breadcrumbEdit": "Edit nutrition plan",
+      "breadcrumbNew": "New nutrition plan",
+      "accessDenied": "You don't have access to this plan",
+      "notFound": "Plan not found",
+      "defaultDayName": "Day {{number}}",
+      "defaultDayNameFallback": "Day 1",
+      "planNameLabel": "Plan name",
+      "cycleNote": "Days aren't tied to a real day of the week — when you activate the plan, the activation day becomes \"{{dayName}}\", and the plan proceeds in order and loops around.",
+      "dayNameLabel": "Day name",
+      "dayNamePlaceholder": "e.g. Day 1",
+      "foodNameLabel": "Food",
+      "caloriesLabel": "Kcal",
+      "proteinLabel": "Protein (g)",
+      "fatLabel": "Fat (g)",
+      "carbsLabel": "Carbs (g)",
+      "fiberLabel": "Fiber (g)",
+      "addFoodItem": "Add food item",
+      "addDay": "Add day",
+      "planNameRequired": "Plan name is required",
+      "dayNameRequired": "Day name is required",
+      "itemValidation": "Every food item must have a name, calories, protein, fat and carbs",
+      "updateSuccess": "Plan updated",
+      "createSuccess": "Plan created",
+      "updateForbidden": "You don't have permission to edit this plan",
+      "saveFailed": "Failed to save plan",
+      "saving": "Saving...",
+      "saveChanges": "Save changes",
+      "createPlan": "Create plan",
+      "cancel": "Cancel"
+    },
+    "logForm": {
+      "searchTab": "Search",
+      "manualTab": "Manual entry",
+      "searchLabel": "Search food",
+      "searchPlaceholder": "e.g. chicken, rice...",
+      "searching": "Searching...",
+      "noResults": "No results",
+      "changeFood": "Change food",
+      "loadingServings": "Loading servings...",
+      "servingLabel": "Serving",
+      "gramsLabel": "Weight (g)",
+      "servingCountLabel": "Amount (number of servings)",
+      "noGramsHint": "This serving doesn't have a defined weight — enter the number of servings (e.g. 1.5).",
+      "computed": {
+        "protein": "protein",
+        "fat": "fat",
+        "carbs": "carbs",
+        "fiber": "fiber"
+      },
+      "addEntry": "Add entry",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "manualNameLabel": "Food name",
+      "manualCaloriesLabel": "Calories (kcal)",
+      "manualProteinLabel": "Protein (g)",
+      "manualFatLabel": "Fat (g)",
+      "manualCarbsLabel": "Carbs (g)",
+      "manualFiberLabel": "Fiber (g)",
+      "saveChanges": "Save changes",
+      "searchFailed": "Food search failed",
+      "foodDetailsFailed": "Failed to load food details",
+      "updateSuccess": "Entry updated",
+      "createSuccess": "Entry added to log",
+      "updateForbidden": "You don't have permission to edit this entry",
+      "saveFailed": "Save failed",
+      "selectFoodAndServing": "Select a food and a serving",
+      "gramsMustBePositive": "Weight must be greater than 0",
+      "amountMustBePositive": "Amount must be greater than 0",
+      "nameRequired": "Food name is required",
+      "numbersRequired": "Calories, protein, fat, carbs and fiber must be numbers"
+    },
+    "weeklyChart": {
+      "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      "protein": "Protein",
+      "fat": "Fat",
+      "carbs": "Carbs",
+      "loadError": "Failed to load weekly stats"
+    }
+  },
+  "supplements": {
+    "list": {
+      "loadError": "Failed to load supplements",
+      "addToMyRoutine": "Add to my routine",
+      "searchPlaceholder": "Search supplements...",
+      "addSupplement": "Add supplement",
+      "empty": {
+        "title": "No supplements to show",
+        "filteredDescription": "Change your search to see other supplements.",
+        "adminDescription": "Add the first supplement so users can find it.",
+        "userDescription": "There are no supplements available right now."
+      },
+      "deleteSuccess": "Supplement deleted",
+      "deleteFailed": "Failed to delete supplement",
+      "deleteDialog": {
+        "title": "Delete supplement?",
+        "description": "Are you sure you want to delete the supplement \"{{name}}\"? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "deleting": "Deleting..."
+      }
+    },
+    "mySupplements": {
+      "loadError": "Failed to load routine",
+      "toggleFailed": "Save failed",
+      "addSupplement": "Add supplement",
+      "empty": {
+        "title": "You haven't added any supplements to your routine",
+        "description": "Add a supplement from the database to start tracking your routine."
+      },
+      "unknownSupplement": "Unknown supplement",
+      "inactiveSuffix": " • Inactive",
+      "takenToday": "Taken today",
+      "removeSuccess": "Supplement removed from routine",
+      "deleteForbidden": "You don't have permission to delete this entry",
+      "deleteFailed": "Delete failed",
+      "deleteDialog": {
+        "title": "Remove supplement from routine?",
+        "description": "Are you sure you want to remove \"{{name}}\" from your routine? This action cannot be undone.",
+        "fallbackName": "this supplement",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "deleting": "Deleting..."
+      }
+    },
+    "form": {
+      "breadcrumbEdit": "Edit supplement",
+      "breadcrumbNew": "New supplement",
+      "notFound": "Supplement not found",
+      "nameRequired": "Supplement name is required",
+      "updateSuccess": "Supplement updated",
+      "createSuccess": "Supplement created",
+      "duplicateName": "A supplement with that name already exists",
+      "saveFailed": "Failed to save supplement",
+      "imageUrlLabel": "Image link",
+      "imageUrlPlaceholder": "https://...",
+      "imageUrlHint": "Paste a link to an image from the web. Optional.",
+      "nameLabel": "Supplement name",
+      "descriptionLabel": "Description / purpose",
+      "descriptionPlaceholder": "What this supplement is used for...",
+      "saving": "Saving...",
+      "saveChanges": "Save changes",
+      "createSupplement": "Create supplement",
+      "cancel": "Cancel"
+    },
+    "userForm": {
+      "breadcrumbEdit": "Edit supplement",
+      "breadcrumbAdd": "Add supplement to routine",
+      "accessDenied": "You don't have access to this entry",
+      "notFound": "Entry not found",
+      "loadError": "Failed to load supplements",
+      "supplementRequired": "Supplement is required",
+      "dosageRequired": "Dosage is required",
+      "timeRequired": "Time of day is required",
+      "updateSuccess": "Supplement in routine updated",
+      "createSuccess": "Supplement added to your routine",
+      "updateForbidden": "You don't have permission to edit this entry",
+      "saveFailed": "Save failed",
+      "supplementLabel": "Supplement",
+      "supplementPlaceholder": "Select a supplement",
+      "dosageLabel": "Dosage",
+      "dosagePlaceholder": "e.g. 500mg",
+      "timeLabel": "Time of day",
+      "timePlaceholder": "e.g. morning, before workout",
+      "activeLabel": "Active",
+      "saving": "Saving...",
+      "saveChanges": "Save changes",
+      "addToRoutine": "Add to routine",
+      "cancel": "Cancel"
+    }
+  }
+}

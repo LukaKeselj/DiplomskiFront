@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 
 import {
   createUserSupplementRequest,
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/select"
 
 export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
+  const { t } = useTranslation()
   const isEditing = Boolean(userSupplement)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -39,10 +41,10 @@ export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
     getSupplementsRequest()
       .then(setSupplements)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje suplemenata")
+        toast.error(error.response?.data?.message || t("supplements.userForm.loadError"))
       })
       .finally(() => setIsLoadingSupplements(false))
-  }, [])
+  }, [t])
 
   function handleChange(field) {
     return (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }))
@@ -52,15 +54,15 @@ export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
     event.preventDefault()
 
     if (!form.supplement) {
-      toast.error("Suplement je obavezan")
+      toast.error(t("supplements.userForm.supplementRequired"))
       return
     }
     if (!form.dosage.trim()) {
-      toast.error("Doza je obavezna")
+      toast.error(t("supplements.userForm.dosageRequired"))
       return
     }
     if (!form.timeOfDay.trim()) {
-      toast.error("Vreme uzimanja je obavezno")
+      toast.error(t("supplements.userForm.timeRequired"))
       return
     }
 
@@ -76,10 +78,10 @@ export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
       let saved
       if (isEditing) {
         saved = await updateUserSupplementRequest(userSupplement._id, payload)
-        toast.success("Suplement u režimu je ažuriran")
+        toast.success(t("supplements.userForm.updateSuccess"))
       } else {
         saved = await createUserSupplementRequest(payload)
-        toast.success("Suplement je dodat u tvoj režim")
+        toast.success(t("supplements.userForm.createSuccess"))
       }
       if (onSaved) {
         onSaved(saved)
@@ -88,9 +90,9 @@ export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
       }
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da izmeniš ovaj zapis")
+        toast.error(t("supplements.userForm.updateForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Čuvanje nije uspelo")
+        toast.error(error.response?.data?.message || t("supplements.userForm.saveFailed"))
       }
     } finally {
       setIsSubmitting(false)
@@ -101,13 +103,13 @@ export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
     <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="user-supplement-supplement">Suplement</FieldLabel>
+          <FieldLabel htmlFor="user-supplement-supplement">{t("supplements.userForm.supplementLabel")}</FieldLabel>
           <Select
             value={form.supplement}
             onValueChange={(value) => setForm((prev) => ({ ...prev, supplement: value }))}
           >
             <SelectTrigger id="user-supplement-supplement" disabled={isLoadingSupplements}>
-              <SelectValue placeholder="Izaberi suplement" />
+              <SelectValue placeholder={t("supplements.userForm.supplementPlaceholder")} />
             </SelectTrigger>
             <SelectContent>
               {supplements.map((supplement) => (
@@ -119,19 +121,19 @@ export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
           </Select>
         </Field>
         <Field>
-          <FieldLabel htmlFor="user-supplement-dosage">Doza</FieldLabel>
+          <FieldLabel htmlFor="user-supplement-dosage">{t("supplements.userForm.dosageLabel")}</FieldLabel>
           <Input
             id="user-supplement-dosage"
-            placeholder="npr. 500mg"
+            placeholder={t("supplements.userForm.dosagePlaceholder")}
             value={form.dosage}
             onChange={handleChange("dosage")}
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="user-supplement-time">Vreme uzimanja</FieldLabel>
+          <FieldLabel htmlFor="user-supplement-time">{t("supplements.userForm.timeLabel")}</FieldLabel>
           <Input
             id="user-supplement-time"
-            placeholder="npr. ujutru, pre treninga"
+            placeholder={t("supplements.userForm.timePlaceholder")}
             value={form.timeOfDay}
             onChange={handleChange("timeOfDay")}
           />
@@ -144,14 +146,18 @@ export function UserSupplementForm({ userSupplement, onSaved, onCancel }) {
               setForm((prev) => ({ ...prev, active: checked === true }))
             }
           />
-          <FieldLabel htmlFor="user-supplement-active">Aktivan</FieldLabel>
+          <FieldLabel htmlFor="user-supplement-active">{t("supplements.userForm.activeLabel")}</FieldLabel>
         </Field>
         <div className="flex gap-2">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Čuvanje..." : isEditing ? "Sačuvaj izmene" : "Dodaj u režim"}
+            {isSubmitting
+              ? t("supplements.userForm.saving")
+              : isEditing
+                ? t("supplements.userForm.saveChanges")
+                : t("supplements.userForm.addToRoutine")}
           </Button>
           <Button type="button" variant="outline" onClick={onCancel ?? (() => navigate(-1))}>
-            Otkaži
+            {t("supplements.userForm.cancel")}
           </Button>
         </div>
       </FieldGroup>

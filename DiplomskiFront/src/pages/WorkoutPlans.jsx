@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Dumbbell, Pencil, Plus, Search, Trash2 } from "lucide-react"
 
 import { deleteWorkoutPlanRequest, getWorkoutPlansRequest } from "@/api/workoutPlans"
@@ -32,6 +33,7 @@ import { cn } from "@/lib/utils"
 
 function PlanCard({ plan, isActive, onDeleteRequest }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   function handleEditClick(event) {
     event.preventDefault()
@@ -59,12 +61,13 @@ function PlanCard({ plan, isActive, onDeleteRequest }) {
             <CardTitle>{plan.name}</CardTitle>
             {isActive && (
               <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
-                Aktivan
+                {t("workout.plans.active")}
               </span>
             )}
           </div>
           <CardDescription>
-            {plan.days.length} {plan.days.length === 1 ? "dan" : "dana"}
+            {plan.days.length}{" "}
+            {t(plan.days.length === 1 ? "workout.plans.dayCount.one" : "workout.plans.dayCount.other")}
           </CardDescription>
           <CardAction className="flex gap-2">
             <Button variant="outline" size="icon" onClick={handleEditClick}>
@@ -81,6 +84,7 @@ function PlanCard({ plan, isActive, onDeleteRequest }) {
 }
 
 export default function WorkoutPlans() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [plans, setPlans] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -92,10 +96,10 @@ export default function WorkoutPlans() {
     getWorkoutPlansRequest()
       .then(setPlans)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Neuspešno učitavanje planova")
+        toast.error(error.response?.data?.message || t("workout.plans.toasts.loadFailed"))
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
 
   async function handleDelete() {
     if (!deleteTarget) return
@@ -104,13 +108,13 @@ export default function WorkoutPlans() {
     try {
       await deleteWorkoutPlanRequest(deleteTarget._id)
       setPlans((prev) => prev.filter((item) => item._id !== deleteTarget._id))
-      toast.success("Plan je obrisan")
+      toast.success(t("workout.plans.toasts.deleteSuccess"))
       setDeleteTarget(null)
     } catch (error) {
       if (error.response?.status === 403) {
-        toast.error("Nemaš dozvolu da obrišeš ovaj plan")
+        toast.error(t("workout.plans.toasts.deleteForbidden"))
       } else {
-        toast.error(error.response?.data?.message || "Brisanje plana nije uspelo")
+        toast.error(error.response?.data?.message || t("workout.plans.toasts.deleteFailed"))
       }
     } finally {
       setIsDeleting(false)
@@ -123,13 +127,13 @@ export default function WorkoutPlans() {
     : plans
 
   return (
-    <AppLayout breadcrumb="Planovi treninga">
+    <AppLayout breadcrumb={t("workout.plans.breadcrumb")}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="w-56 pl-8"
-            placeholder="Pretraži planove..."
+            placeholder={t("workout.plans.searchPlaceholder")}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
@@ -137,7 +141,7 @@ export default function WorkoutPlans() {
         <Button asChild>
           <Link to="/workout-plans/new">
             <Plus />
-            Novi plan
+            {t("workout.plans.newPlan")}
           </Link>
         </Button>
       </div>
@@ -147,18 +151,18 @@ export default function WorkoutPlans() {
       ) : visiblePlans.length === 0 ? (
         <EmptyState
           icon={Dumbbell}
-          title="Nema planova za prikaz"
+          title={t("workout.plans.empty.title")}
           description={
             plans.length === 0
-              ? "Napravi svoj prvi plan treninga da počneš sa vežbanjem."
-              : "Promeni pretragu da vidiš druge planove."
+              ? t("workout.plans.empty.descriptionEmpty")
+              : t("workout.plans.empty.descriptionFiltered")
           }
           action={
             plans.length === 0 && (
               <Button asChild size="sm">
                 <Link to="/workout-plans/new">
                   <Plus />
-                  Novi plan
+                  {t("workout.plans.newPlan")}
                 </Link>
               </Button>
             )
@@ -181,16 +185,15 @@ export default function WorkoutPlans() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati plan?</AlertDialogTitle>
+            <AlertDialogTitle>{t("workout.plans.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš plan &quot;{deleteTarget?.name}&quot;? Ova akcija
-              se ne može poništiti.
+              {t("workout.plans.deleteDialog.description", { name: deleteTarget?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("workout.plans.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Brisanje..." : "Obriši"}
+              {isDeleting ? t("workout.plans.deleteDialog.confirming") : t("workout.plans.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Pencil, Trash2 } from "lucide-react"
 
 import { deleteExerciseRequest, getExerciseRequest } from "@/api/exercises"
@@ -29,6 +30,7 @@ import { ExerciseProgress } from "@/components/exercise-progress"
 import { getYoutubeEmbedUrl } from "@/lib/youtube"
 
 export default function ExerciseDetail() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
@@ -42,20 +44,20 @@ export default function ExerciseDetail() {
     getExerciseRequest(id)
       .then(setExercise)
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Vežba nije pronađena")
+        toast.error(error.response?.data?.message || t("exercises.detail.toasts.notFound"))
         navigate("/exercises")
       })
       .finally(() => setIsLoading(false))
-  }, [id, navigate])
+  }, [id, navigate, t])
 
   async function handleDelete() {
     setIsDeleting(true)
     try {
       await deleteExerciseRequest(id)
-      toast.success("Vežba je obrisana")
+      toast.success(t("exercises.detail.toasts.deleteSuccess"))
       navigate("/exercises")
     } catch (error) {
-      toast.error(error.response?.data?.message || "Brisanje vežbe nije uspelo")
+      toast.error(error.response?.data?.message || t("exercises.detail.toasts.deleteFailed"))
       setIsDeleting(false)
     }
   }
@@ -63,7 +65,7 @@ export default function ExerciseDetail() {
   const embedUrl = exercise ? getYoutubeEmbedUrl(exercise.videoUrl) : null
 
   return (
-    <AppLayout breadcrumb={exercise?.name ?? "Vežba"}>
+    <AppLayout breadcrumb={exercise?.name ?? t("exercises.detail.breadcrumbFallback")}>
       {isLoading ? (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <Card>
@@ -108,14 +110,14 @@ export default function ExerciseDetail() {
 
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigate("/exercises")}>
-              Nazad na listu
+              {t("exercises.detail.backToList")}
             </Button>
             {isAdmin && (
               <>
                 <Button variant="outline" asChild>
                   <Link to={`/exercises/${exercise._id}/edit`}>
                     <Pencil />
-                    Izmeni
+                    {t("exercises.detail.edit")}
                   </Link>
                 </Button>
                 <Button
@@ -124,7 +126,7 @@ export default function ExerciseDetail() {
                   disabled={isDeleting}
                 >
                   <Trash2 />
-                  {isDeleting ? "Brisanje..." : "Obriši"}
+                  {isDeleting ? t("exercises.detail.deleting") : t("exercises.detail.delete")}
                 </Button>
               </>
             )}
@@ -134,16 +136,15 @@ export default function ExerciseDetail() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati vežbu?</AlertDialogTitle>
+            <AlertDialogTitle>{t("exercises.detail.deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li si siguran da želiš da obrišeš vežbu &quot;{exercise?.name}&quot;? Ova akcija
-              se ne može poništiti.
+              {t("exercises.detail.deleteDialog.description", { name: exercise?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel>{t("exercises.detail.deleteDialog.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete}>
-              Obriši
+              {t("exercises.detail.deleteDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

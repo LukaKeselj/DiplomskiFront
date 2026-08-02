@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 import { Accessibility, MapPin, SquareArrowOutUpRight } from "lucide-react"
 import {
   APIProvider,
@@ -28,6 +29,7 @@ function googleMapsPlaceUrl(gym) {
 }
 
 function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId, setSelectedGymId }) {
+  const { t } = useTranslation()
   const map = useMap()
   const placesLib = useMapsLibrary("places")
 
@@ -61,7 +63,7 @@ function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId
       .catch((error) => {
         if (!cancelled) {
           console.error(error)
-          toast.error("Neuspešno učitavanje teretana u okolini")
+          toast.error(t("gyms.errors.loadFailed"))
         }
       })
       .finally(() => {
@@ -71,7 +73,7 @@ function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId
     return () => {
       cancelled = true
     }
-  }, [placesLib, userLocation, setGyms, setIsSearching])
+  }, [placesLib, userLocation, setGyms, setIsSearching, t])
 
   const selectedGym = gyms.find((gym) => gym.id === selectedGymId) ?? null
 
@@ -107,7 +109,7 @@ function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId
                 href={googleMapsPlaceUrl(selectedGym)}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Otvori u Google Maps"
+                aria-label={t("gyms.openInGoogleMaps")}
                 className="flex size-6 shrink-0 items-center justify-center rounded-md bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
               >
                 <SquareArrowOutUpRight className="size-3.5" />
@@ -121,7 +123,7 @@ function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId
             {selectedGym.accessibilityOptions?.wheelchairAccessibleEntrance && (
               <p className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-600">
                 <Accessibility className="size-3.5" />
-                Pristupačan ulaz
+                {t("gyms.wheelchairAccessible")}
               </p>
             )}
           </div>
@@ -132,6 +134,7 @@ function GymMarkers({ userLocation, gyms, setGyms, setIsSearching, selectedGymId
 }
 
 function NearbyGymsView({ userLocation }) {
+  const { t } = useTranslation()
   const [gyms, setGyms] = useState([])
   const [isSearching, setIsSearching] = useState(true)
   const [selectedGymId, setSelectedGymId] = useState(null)
@@ -172,8 +175,10 @@ function NearbyGymsView({ userLocation }) {
         ) : gyms.length === 0 ? (
           <EmptyState
             icon={MapPin}
-            title="Nema teretana u okolini"
-            description={`Nismo pronašli teretane u prečniku od ${SEARCH_RADIUS_METERS / 1000} km.`}
+            title={t("gyms.emptyState.title")}
+            description={t("gyms.emptyState.description", {
+              radius: SEARCH_RADIUS_METERS / 1000,
+            })}
           />
         ) : (
           <CardGrid className="flex flex-col gap-2">
@@ -207,6 +212,7 @@ function isGeolocationSupported() {
 }
 
 export default function NearbyGyms() {
+  const { t } = useTranslation()
   const [status, setStatus] = useState(() => (isGeolocationSupported() ? "loading" : "unsupported"))
   const [userLocation, setUserLocation] = useState(null)
   const [requestId, setRequestId] = useState(0)
@@ -224,11 +230,11 @@ export default function NearbyGyms() {
       },
       () => {
         setStatus("denied")
-        toast.error("Nismo mogli da pristupimo tvojoj lokaciji")
+        toast.error(t("gyms.errors.locationDenied"))
       },
       { enableHighAccuracy: true, timeout: 10000 }
     )
-  }, [requestId])
+  }, [requestId, t])
 
   function handleRetry() {
     setStatus("loading")
@@ -236,22 +242,17 @@ export default function NearbyGyms() {
   }
 
   return (
-    <AppLayout breadcrumb="Teretane u okolini">
+    <AppLayout breadcrumb={t("gyms.breadcrumb")}>
       {!GOOGLE_MAPS_API_KEY ? (
-        <p className="text-sm text-muted-foreground">
-          Google Maps API ključ nije podešen (VITE_GOOGLE_MAPS_API_KEY).
-        </p>
+        <p className="text-sm text-muted-foreground">{t("gyms.apiKeyMissing")}</p>
       ) : status === "unsupported" ? (
-        <p className="text-sm text-muted-foreground">Tvoj pregledač ne podržava geolokaciju.</p>
+        <p className="text-sm text-muted-foreground">{t("gyms.unsupported")}</p>
       ) : status === "loading" ? (
-        <p className="text-sm text-muted-foreground">Tražimo tvoju lokaciju...</p>
+        <p className="text-sm text-muted-foreground">{t("gyms.locating")}</p>
       ) : status === "denied" ? (
         <div className="flex flex-col items-start gap-3">
-          <p className="text-sm text-muted-foreground">
-            Nismo mogli da pristupimo tvojoj lokaciji. Proveri dozvole u pregledaču i pokušaj
-            ponovo.
-          </p>
-          <Button onClick={handleRetry}>Pokušaj ponovo</Button>
+          <p className="text-sm text-muted-foreground">{t("gyms.locationDeniedMessage")}</p>
+          <Button onClick={handleRetry}>{t("gyms.retry")}</Button>
         </div>
       ) : (
         <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={["places", "marker"]}>
